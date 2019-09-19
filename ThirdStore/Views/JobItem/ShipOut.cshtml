@@ -1,0 +1,68 @@
+﻿@model JobItemShipOutViewModel
+@section Scripts
+{
+    <script src="@Url.Content("~/Scripts/jquery.scannerdetection.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.tabbable.min.js")"></script>
+}
+@{
+    ViewBag.Title = "Ship Out";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    <table width="100%">
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.JobItemLineID):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.JobItemLineID)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.JobItemLineReference):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.JobItemLineReference)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.TrackingNumber):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.TrackingNumber)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="submit" id="btnSubmitNext" class="k-button" value="Submit and Next" />
+                <a href="@Html.Raw(Url.Action("List", "JobItem"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
+            </td>
+        </tr>
+    </table>
+    <script>
+        $(document).ready(function () {
+            $('#@Html.FieldIdFor(model => model.JobItemLineReference)').focus();
+
+            $(this).scannerDetection({
+                timeBeforeScanTest: 200, // wait for the next character for upto 200ms
+                avgTimeByChar: 100, // it's not a barcode if a character takes longer than 40ms
+                onComplete: function (barcode, qty) {
+                    //var e = $.Event("keypress");
+                    //e.which = 9; //enter keycode
+                    //e.keyCode = 9;
+                    //$(document).trigger(e);
+                    debugger;
+                    //jQuery.event.trigger({ type: 'keypress', which: character.charCodeAt(9) });
+                    $.tabNext();
+                    //alert(barcode);
+                } // main callback function
+            });
+
+        });
+    </script>
+}

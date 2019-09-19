@@ -1,0 +1,468 @@
+﻿@model ItemViewModel
+
+@Html.HiddenFor(model => model.ID)
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Basic Info</a></li>
+        <li><a href="#tabs-2">Images</a></li>
+    </ul>
+
+    <div id="tabs-1">
+        @*@Html.ValidationSummary(false)*@
+        <div>
+            @BasicInfo()
+        </div>
+        <div>
+            @ChildItems()
+        </div>
+
+    </div>
+    <div id="tabs-2">
+        @Images()
+    </div>
+</div>
+<div>
+
+    <input type="submit" id="btnSave" class="k-button" value="Save" />
+    <a href="@Html.Raw(Url.Action("List", "Item"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#tabs").tabs();
+    });
+
+</script>
+
+
+@helper BasicInfo()
+{
+<table style="width:100%;">
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.SKU)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.SKU)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Type)
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.Type, Model.ItemTypes)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Name)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Name)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Description)
+        </td>
+        <td class="adminData">
+            @Html.TextAreaFor(model => model.Description, 4, 30, null)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Cost)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Cost)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.GrossWeight)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.GrossWeight)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.NetWeight)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.NetWeight)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Price)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Price)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Length)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Length)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Width)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Width)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Height)
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.Height)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.SupplierID)
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.SupplierID, Model.Suppliers)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.IsActive)
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.IsActive, Model.YesOrNo)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.IgnoreListing)
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.IgnoreListing, Model.YesOrNo)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Ref1)
+        </td>
+        <td  colspan="3">
+            @Html.EditorFor(model => model.Ref1)
+        </td>
+    </tr>
+</table>
+
+}
+
+@helper ChildItems()
+{
+    <div id="childItemLine-grid"></div>
+    <script>
+        $(document).ready(function () {
+            $("#childItemLine-grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "@Html.Raw(Url.Action("ReadChildItemLines", "Item", new { itemID = Model.ID }))",
+                            type: "POST",
+                            dataType: "json"
+                        },
+                        update: function (e) { },
+                        create: function (e) { },
+                        destroy: {
+                            url: "@Html.Raw(Url.Action("ChildItemDelete", "Item"))",
+                            type: "POST",
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            id: "ID",
+                            fields: {
+                                ID: { editable: false, type: "number" },
+                                ChildItemID: { editable: false, type: "number" },
+                                ChildItemSKU: {
+                                    editable: true, type: "string", validation: {
+                                        required: true,
+                                        skuvalidation: function (input) {
+                                            //debugger;
+                                            var isValid = true;
+                                            if (input.is("[name='ChildItemSKU']")) {
+
+                                                $.ajax({
+                                                    url: '@Url.Action("CheckInputSKU", "Item")',
+                                                    type: "POST",
+                                                    //contentType: "application/json; charset=utf-8",
+                                                    data: { inputSKU: input.val() },
+                                                    dataType: "json",
+                                                    async: false,
+                                                    success: function (data) {
+                                                        //debugger;
+                                                        if (data.Result) {
+                                                            isValid = true;
+                                                        }
+                                                        else {
+                                                            input.attr("data-skuvalidation-msg", "SKU is not valid");
+                                                            isValid = false;
+                                                        }
+                                                    },
+                                                    error: function (data) {
+                                                        //debugger;
+                                                        alert("sku check error");
+                                                        isValid = false;
+                                                    }
+                                                });
+                                            }
+                                            else
+                                                isValid = true;
+                                            return isValid;
+                                        }
+                                    }
+                                },
+                                ChildItemQty: { editable: true, type: "number", validation: { required: true }, defaultValue: 1  }
+                            }
+                        }
+                    },
+                    pageSize: "100",
+                    requestEnd: function (e) {
+                        //debugger;
+                        if (e.type == "create" || e.type == "update") {
+
+                            //this.read();
+                        }
+                    },
+                    error: function (e) {
+                        display_kendoui_grid_error(e);
+                        // Cancel the changes
+                        this.cancelChanges();
+                    },
+
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: ["100"]
+                },
+                editable: {
+                    confirmation: false,
+                    mode: "inline"
+                },
+                scrollable: false,
+                toolbar: ["create"],
+                edit: function (e) {
+                    //debugger;
+                    if (e.container.find('.k-grid-cancel') != "undefined") {
+                        e.container.find('.k-grid-cancel').hide();
+                    }
+                    if (e.model.isNew()) {
+                    }
+                },
+                columns: [{
+                    field: "ID",
+                    template: "<input type='hidden' name='ChildItemLines[#= index(data)#].ID' value='#=ID#' />",
+                    hidden: true
+                }, {
+                    field: "ChildItemID",
+                    template: "<input type='hidden' name='ChildItemLines[#= index(data)#].ChildItemID' value='#=ChildItemID#' />",
+                    hidden: true
+                }, {
+                    field: "ChildItemSKU",
+                    template: "#=ChildItemSKU#" + "<input type='hidden' name='ChildItemLines[#= index(data)#].ChildItemSKU' value='#=ChildItemSKU#' />"
+                }, {
+                    field: "ChildItemQty",
+                    title: "Quantity",
+                    template: "#=ChildItemQty#" + "<input type='hidden' name='ChildItemLines[#= index(data)#].ChildItemQty' value='#=ChildItemQty#' />",
+                }, {
+                    command: ["edit"
+                        @*@if(Model.ID==0)
+                    {
+                        <text>*@
+                        , { name: "destroy",text:"Del"}
+                //    </text>
+                //}
+                    ], title: "&nbsp;", width: "150px"
+                }]
+            });
+        });
+
+
+    function index(dataItem) {
+        var data = $("#childItemLine-grid").data("kendoGrid").dataSource.data();
+        //debugger;
+        return data.indexOf(dataItem);
+    }
+
+    </script>
+}
+
+
+@helper Images()
+{
+
+    <input type="file" id="uploadImages" name="uploadImages" multiple accept="image/*" />
+    <input type="button" id="btnUpload" value="Upload" />
+    <div id="itemImage-grid"></div>
+
+    <script>
+        $(document).ready(function () {
+            
+
+            $('#btnUpload').click(function () {
+                var data = new FormData();
+                var files = $("#uploadImages").get(0).files;
+                if (files.length > 0) {
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("ItemImages",files[x]);
+                    }
+                }
+                debugger;
+                var link = '@Html.Raw(@Url.Action("UploadImages","Item"))';
+                //debugger;
+                $.ajax({
+                    url: link,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    data: data,
+                    success: function (response) {
+                        //code after success
+                        debugger;
+
+                        if (response.ImageList != undefined) {
+                            var grid = $("#itemImage-grid").data("kendoGrid");
+                            var data = grid.dataSource.data().toJSON(); //the data of the DataSource
+                            var newRowIndex = data.length;
+                            //var res = Math.max.apply(Math, array.map(function (o) { return o.y; }))
+                            $.each(response.ImageList, function (i, item) {
+                                //debugger;
+                                //alert(key + ": " + value);
+                                var newImage = { ID: 0, ImageID: item['ImageID'], ImageName: item['ImageName'], ImageURL: item['ImageURL'],DisplayOrder: newRowIndex, StatusID: 0};
+                                data.push(newImage);
+                                newRowIndex++;
+                            });
+
+                            grid.dataSource.data(data);
+
+                        }
+                        alert("Images upload success.")
+                    },
+                    error: function (er) {
+                        debugger;
+                        alert(er);
+                    }
+
+                });
+            });
+
+
+            $("#itemImage-grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "@Html.Raw(Url.Action("ReadItemImages", "Item", new { itemID = Model.ID }))",
+                            type: "POST",
+                            dataType: "json"
+                        },
+                        update: function (e) { },
+                        create: function (e) { },
+                        destroy: {
+                            url: "@Html.Raw(Url.Action("ItemImageDelete", "Item"))",
+                            type: "POST",
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            id: "ID",
+                            fields: {
+                                ID: { editable: false, type: "number" },
+                                ImageID: { editable: false, type: "number" },
+                                ImageURL: { editable: false, type: "string" },
+                                ImageName: { editable: false, type: "string" },
+                                DisplayOrder: {
+                                    editable: true, type: "number"
+                                },
+                                StatusID: { editable: true, type: "number" }
+                            }
+                        }
+                    },
+                    pageSize: "100",
+                    requestEnd: function (e) {
+                        //debugger;
+                        if (e.type == "create" || e.type == "update") {
+
+                            //this.read();
+                        }
+                    },
+                    error: function (e) {
+                        display_kendoui_grid_error(e);
+                        // Cancel the changes
+                        this.cancelChanges();
+                    },
+
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: ["100"]
+                },
+                editable: {
+                    confirmation: false,
+                    mode: "inline"
+                },
+                scrollable: false,
+                edit: function (e) {
+                    //debugger;
+                    if (e.container.find('.k-grid-cancel') != "undefined") {
+                        e.container.find('.k-grid-cancel').hide();
+                    }
+                    if (e.model.isNew()) {
+                    }
+                },
+                columns: [{
+                    field: "ID",
+                    template: "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].ID' value='#=ID#' />",
+                    hidden: true
+                }, {
+                        field: "ImageID",
+                        template: "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].ImageID' value='#=ImageID#' />",
+                    hidden: true
+                    },
+                    {
+                        field: "ImageURL",
+                        title: "Image",
+                        template: '<a href="#=ImageURL#" target="_blank"><img alt="#=ImageID#" src="#=ImageURL#" width="150" /></a>',
+                        width: 200
+                    },
+                    {
+                        field: "ImageName",
+                        title: "Image Name",
+                        template: '<a href="#=ImageURL#" target="_blank">#=ImageName#</a>',
+                        width: 200
+                    },
+                    {
+                        field: "DisplayOrder",
+                        template: "#=DisplayOrder#" + "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].DisplayOrder' value='#=DisplayOrder#' />"
+                }, {
+                        field: "StatusID",
+                        title: "Status",
+                        template: "#=StatusID#" + "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />",
+                    }, {
+                        command: ["edit", "destroy"],
+                        title: "&nbsp;", width: "150px"
+                }]
+            });
+
+        });
+
+        function imgIndex(dataItem) {
+            var data = $("#itemImage-grid").data("kendoGrid").dataSource.data();
+            return data.indexOf(dataItem);
+        }
+
+</script>
+}
+
+
+
+

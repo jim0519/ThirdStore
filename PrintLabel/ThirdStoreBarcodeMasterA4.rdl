@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="ThirdStoreDS">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString>Data Source=DESKTOP-B2Q8INJ\SQL2012;Initial Catalog=ThirdStore</ConnectString>
+        <Prompt>Specify a user name and password for data source ThirdStoreDS:</Prompt>
+      </ConnectionProperties>
+      <rd:SecurityType>DataBase</rd:SecurityType>
+      <rd:DataSourceID>ae1a955c-5351-4aaa-838f-b20c28e0d355</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet1">
+      <Query>
+        <DataSourceName>ThirdStoreDS</DataSourceName>
+        <CommandText>select Ref1 as JobItemLineRef, SKU as JobItemLineSKU from D_JobItemLine where HeaderID=2</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="JobItemLineRef">
+          <DataField>JobItemLineRef</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="JobItemLineSKU">
+          <DataField>JobItemLineSKU</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Tablix Name="Tablix1">
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>209.99999mm</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>297mm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Subreport Name="Subreport1">
+                          <ReportName>ThirdStoreBarcodeSub</ReportName>
+                          <Parameters>
+                            <Parameter Name="JobItemLineRef">
+                              <Value>=Fields!JobItemLineRef.Value</Value>
+                            </Parameter>
+                            <Parameter Name="JobItemLineSKU">
+                              <Value>=Fields!JobItemLineSKU.Value</Value>
+                            </Parameter>
+                          </Parameters>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                          </Style>
+                        </Subreport>
+                        <rd:Selected>true</rd:Selected>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember />
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="Details" />
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <Top>0mm</Top>
+            <Left>0mm</Left>
+            <Height>297mm</Height>
+            <Width>209.99999mm</Width>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+            </Style>
+          </Tablix>
+        </ReportItems>
+        <Height>297mm</Height>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Body>
+      <Width>210mm</Width>
+      <Page>
+        <PageHeight>297mm</PageHeight>
+        <PageWidth>210mm</PageWidth>
+        <LeftMargin>0mm</LeftMargin>
+        <RightMargin>0mm</RightMargin>
+        <TopMargin>0mm</TopMargin>
+        <BottomMargin>0mm</BottomMargin>
+        <ColumnSpacing>0.13cm</ColumnSpacing>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function GetCode128ImageBytescout(Byval codetext As String,Byval additionText As String) As Byte()
+	Try
+Dim barcode as new Bytescout.BarCode.Barcode
+            barcode.RegistrationName = "support@bytescout.com"
+            barcode.RegistrationKey = "BE75-6B80-111C-E8B1-11E_FORGUI"
+
+
+            barcode.Symbology = Bytescout.BarCode.SymbologyType.Code128
+
+
+            barcode.BackColor = System.Drawing.Color.White
+            barcode.ForeColor = System.Drawing.Color.Black
+
+			barcode.DrawCaption = true
+			barcode.CaptionPosition = Bytescout.BarCode.CaptionPosition.Below
+
+			barcode.Angle = Bytescout.BarCode.RotationAngle.Degrees0
+
+            barcode.RenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault
+            barcode.Margins = New Bytescout.BarCode.Margins(5, 5, 5, 5)
+			barcode.BarHeight = 50
+			barcode.NarrowBarWidth = 3
+			barcode.WideToNarrowRatio = 3
+			
+			barcode.AdditionalCaption = additionText
+			barcode.AdditionalCaptionPosition = Bytescout.BarCode.CaptionPosition.Above
+
+
+            barcode.Value = codetext
+
+            Return barcode.GetImageBytes()
+
+        Catch ex As Exception
+            Throw ex
+        End Try
+
+End Function</Code>
+  <CodeModules>
+    <CodeModule>Bytescout.BarCode, Version=5.0.0.1048, Culture=neutral, PublicKeyToken=f7dd1bd9d40a50eb</CodeModule>
+    <CodeModule>System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</CodeModule>
+  </CodeModules>
+  <rd:ReportUnitType>Mm</rd:ReportUnitType>
+  <rd:ReportServerUrl>http://localhost/ReportServer_SQL2012</rd:ReportServerUrl>
+  <rd:ReportID>28b9c4a1-2414-4857-9471-7482fbf1d0f6</rd:ReportID>
+</Report>

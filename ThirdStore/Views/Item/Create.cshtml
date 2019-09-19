@@ -1,0 +1,15 @@
+﻿@model ItemViewModel
+@section Scripts
+{
+}
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+
+    @Html.Partial("_CreateOrEdit", Model)
+}
+

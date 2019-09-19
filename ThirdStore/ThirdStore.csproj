@@ -45,16 +45,68 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.3.5.0\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mvc, Version=3.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.Mvc5.3.3.3\lib\net45\Autofac.Integration.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.WebApi, Version=3.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.WebApi2.3.4.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentValidation, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7de548da2fbae0f0, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentValidation.7.5.2\lib\net45\FluentValidation.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentValidation.Mvc, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7de548da2fbae0f0, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentValidation.Mvc5.7.5.2\lib\net45\FluentValidation.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="LINQtoCSV, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LINQtoCSV.1.5.0.0\lib\net35\LINQtoCSV.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.4.4.1\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Primitives, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Primitives.4.3.0\lib\net45\System.ComponentModel.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.7\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -99,9 +151,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -126,35 +175,191 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AccessControlController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
+    <Compile Include="Controllers\JobItemController.cs" />
+    <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Controllers\ValidationController.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Extensions\MappingExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Mapping\AutoMapperStartupTask.cs" />
+    <Compile Include="Models\AccessControl\CreateUserViewModel.cs" />
+    <Compile Include="Models\AccessControl\LoginViewModel.cs" />
+    <Compile Include="Models\Item\ItemGridViewModel.cs" />
+    <Compile Include="Models\Item\ItemListViewModel.cs" />
+    <Compile Include="Models\Item\ItemViewModel.cs" />
+    <Compile Include="Models\JobItem\JobItemShipOutViewModel.cs" />
+    <Compile Include="Models\JobItem\JobItemGridViewModel.cs" />
+    <Compile Include="Models\JobItem\JobItemListViewModel.cs" />
+    <Compile Include="Models\JobItem\JobItemViewModel.cs" />
+    <Compile Include="Models\Order\OrderGridViewModel.cs" />
+    <Compile Include="Models\Order\OrderListViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Validators\Item\ItemViewValidator.cs" />
+    <Compile Include="Validators\JobItem\JobItemViewValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\images\loading.gif" />
+    <Content Include="Content\jquery-ui.min.css" />
+    <Content Include="Content\kendo\css\kendo.common.min.css" />
+    <Content Include="Content\kendo\css\kendo.default.min.css" />
+    <Content Include="Content\kendo\css\kendo.rtl.min.css" />
+    <Content Include="Content\kendo\css\Default\editor.png" />
+    <Content Include="Content\kendo\css\Default\imagebrowser.png" />
+    <Content Include="Content\kendo\css\Default\indeterminate.gif" />
+    <Content Include="Content\kendo\css\Default\loading-image.gif" />
+    <Content Include="Content\kendo\css\Default\loading.gif" />
+    <Content Include="Content\kendo\css\Default\loading_2x.gif" />
+    <Content Include="Content\kendo\css\Default\slider-h.gif" />
+    <Content Include="Content\kendo\css\Default\slider-v.gif" />
+    <Content Include="Content\kendo\css\Default\sprite.png" />
+    <Content Include="Content\kendo\css\Default\sprite_2x.png" />
+    <Content Include="Content\kendo\css\Flat\editor.png" />
+    <Content Include="Content\kendo\css\Flat\imagebrowser.png" />
+    <Content Include="Content\kendo\css\Flat\indeterminate.gif" />
+    <Content Include="Content\kendo\css\Flat\loading-image.gif" />
+    <Content Include="Content\kendo\css\Flat\loading.gif" />
+    <Content Include="Content\kendo\css\Flat\loading_2x.gif" />
+    <Content Include="Content\kendo\css\Flat\slider-h.gif" />
+    <Content Include="Content\kendo\css\Flat\slider-v.gif" />
+    <Content Include="Content\kendo\css\Flat\sprite.png" />
+    <Content Include="Content\kendo\css\Flat\sprite_2x.png" />
+    <Content Include="Content\kendo\css\HighContrast\editor.png" />
+    <Content Include="Content\kendo\css\HighContrast\imagebrowser.png" />
+    <Content Include="Content\kendo\css\HighContrast\indeterminate.gif" />
+    <Content Include="Content\kendo\css\HighContrast\loading-image.gif" />
+    <Content Include="Content\kendo\css\HighContrast\loading.gif" />
+    <Content Include="Content\kendo\css\HighContrast\loading_2x.gif" />
+    <Content Include="Content\kendo\css\HighContrast\slider-h.gif" />
+    <Content Include="Content\kendo\css\HighContrast\slider-v.gif" />
+    <Content Include="Content\kendo\css\HighContrast\sprite.png" />
+    <Content Include="Content\kendo\css\HighContrast\sprite_2x.png" />
+    <Content Include="Content\kendo\css\MetroBlack\editor.png" />
+    <Content Include="Content\kendo\css\MetroBlack\imagebrowser.png" />
+    <Content Include="Content\kendo\css\MetroBlack\indeterminate.gif" />
+    <Content Include="Content\kendo\css\MetroBlack\loading-image.gif" />
+    <Content Include="Content\kendo\css\MetroBlack\loading.gif" />
+    <Content Include="Content\kendo\css\MetroBlack\loading_2x.gif" />
+    <Content Include="Content\kendo\css\MetroBlack\slider-h.gif" />
+    <Content Include="Content\kendo\css\MetroBlack\slider-v.gif" />
+    <Content Include="Content\kendo\css\MetroBlack\sprite.png" />
+    <Content Include="Content\kendo\css\MetroBlack\sprite_2x.png" />
+    <Content Include="Content\kendo\css\Metro\editor.png" />
+    <Content Include="Content\kendo\css\Metro\imagebrowser.png" />
+    <Content Include="Content\kendo\css\Metro\indeterminate.gif" />
+    <Content Include="Content\kendo\css\Metro\loading-image.gif" />
+    <Content Include="Content\kendo\css\Metro\loading.gif" />
+    <Content Include="Content\kendo\css\Metro\loading_2x.gif" />
+    <Content Include="Content\kendo\css\Metro\slider-h.gif" />
+    <Content Include="Content\kendo\css\Metro\slider-v.gif" />
+    <Content Include="Content\kendo\css\Metro\sprite.png" />
+    <Content Include="Content\kendo\css\Metro\sprite_2x.png" />
+    <Content Include="Content\kendo\css\Moonlight\editor.png" />
+    <Content Include="Content\kendo\css\Moonlight\imagebrowser.png" />
+    <Content Include="Content\kendo\css\Moonlight\indeterminate.gif" />
+    <Content Include="Content\kendo\css\Moonlight\loading-image.gif" />
+    <Content Include="Content\kendo\css\Moonlight\loading.gif" />
+    <Content Include="Content\kendo\css\Moonlight\loading_2x.gif" />
+    <Content Include="Content\kendo\css\Moonlight\slider-h.gif" />
+    <Content Include="Content\kendo\css\Moonlight\slider-v.gif" />
+    <Content Include="Content\kendo\css\Moonlight\sprite.png" />
+    <Content Include="Content\kendo\css\Moonlight\sprite_2x.png" />
+    <Content Include="Content\kendo\css\Silver\editor.png" />
+    <Content Include="Content\kendo\css\Silver\imagebrowser.png" />
+    <Content Include="Content\kendo\css\Silver\indeterminate.gif" />
+    <Content Include="Content\kendo\css\Silver\loading-image.gif" />
+    <Content Include="Content\kendo\css\Silver\loading.gif" />
+    <Content Include="Content\kendo\css\Silver\loading_2x.gif" />
+    <Content Include="Content\kendo\css\Silver\slider-h.gif" />
+    <Content Include="Content\kendo\css\Silver\slider-v.gif" />
+    <Content Include="Content\kendo\css\Silver\sprite.png" />
+    <Content Include="Content\kendo\css\Silver\sprite_2x.png" />
+    <Content Include="Content\kendo\css\textures\brushed-metal.png" />
+    <Content Include="Content\kendo\css\textures\dots1.png" />
+    <Content Include="Content\kendo\css\textures\dots10.png" />
+    <Content Include="Content\kendo\css\textures\dots11.png" />
+    <Content Include="Content\kendo\css\textures\dots12.png" />
+    <Content Include="Content\kendo\css\textures\dots13.png" />
+    <Content Include="Content\kendo\css\textures\dots2.png" />
+    <Content Include="Content\kendo\css\textures\dots3.png" />
+    <Content Include="Content\kendo\css\textures\dots4.png" />
+    <Content Include="Content\kendo\css\textures\dots5.png" />
+    <Content Include="Content\kendo\css\textures\dots6.png" />
+    <Content Include="Content\kendo\css\textures\dots7.png" />
+    <Content Include="Content\kendo\css\textures\dots8.png" />
+    <Content Include="Content\kendo\css\textures\dots9.png" />
+    <Content Include="Content\kendo\css\textures\glass-lighter.png" />
+    <Content Include="Content\kendo\css\textures\glass.png" />
+    <Content Include="Content\kendo\css\textures\highlight.png" />
+    <Content Include="Content\kendo\css\textures\hsv-gradient.png" />
+    <Content Include="Content\kendo\css\textures\hue.png" />
+    <Content Include="Content\kendo\css\textures\leather1.png" />
+    <Content Include="Content\kendo\css\textures\leather2.png" />
+    <Content Include="Content\kendo\css\textures\noise.png" />
+    <Content Include="Content\kendo\css\textures\stripe1.png" />
+    <Content Include="Content\kendo\css\textures\stripe2.png" />
+    <Content Include="Content\kendo\css\textures\stripe3.png" />
+    <Content Include="Content\kendo\css\textures\stripe4.png" />
+    <Content Include="Content\kendo\css\textures\stripe5.png" />
+    <Content Include="Content\kendo\css\textures\stripe6.png" />
+    <Content Include="Content\kendo\css\textures\transparency.png" />
+    <Content Include="Content\kendo\css\textures\transtexture.png" />
+    <Content Include="Content\kendo\css\Uniform\editor.png" />
+    <Content Include="Content\kendo\css\Uniform\imagebrowser.png" />
+    <Content Include="Content\kendo\css\Uniform\indeterminate.gif" />
+    <Content Include="Content\kendo\css\Uniform\loading-image.gif" />
+    <Content Include="Content\kendo\css\Uniform\loading.gif" />
+    <Content Include="Content\kendo\css\Uniform\loading_2x.gif" />
+    <Content Include="Content\kendo\css\Uniform\slider-h.gif" />
+    <Content Include="Content\kendo\css\Uniform\slider-v.gif" />
+    <Content Include="Content\kendo\css\Uniform\sprite.png" />
+    <Content Include="Content\kendo\css\Uniform\sprite_2x.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Content\kendo\css\images\kendoui.ttf" />
+    <Content Include="Content\kendo\css\images\kendoui.woff" />
+    <None Include="Properties\PublishProfiles\ThirdStorePublish.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\Common.js" />
+    <Content Include="Scripts\FileUpload\jquery.fileupload-image.js" />
+    <Content Include="Scripts\FileUpload\jquery.fileupload-process.js" />
+    <Content Include="Scripts\FileUpload\jquery.fileupload-ui.js" />
+    <Content Include="Scripts\FileUpload\jquery.fileupload-validate.js" />
+    <Content Include="Scripts\FileUpload\jquery.fileupload.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-migrate-3.0.0.min.js" />
+    <Content Include="Scripts\jquery-ui.min.js" />
+    <Content Include="Scripts\jquery.scannerdetection.js" />
+    <Content Include="Scripts\jquery.tabbable.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\jszip.min.js" />
+    <Content Include="Content\kendo\js\kendo.all.min.js" />
+    <Content Include="Scripts\FormCommon.js" />
+    <Content Include="Scripts\listGridCommon.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -168,10 +373,27 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\AccessControl\CreateUser.cshtml" />
+    <Content Include="Views\AccessControl\Login.cshtml" />
+    <Content Include="Views\Shared\Notifications.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Item\Create.cshtml" />
+    <Content Include="Views\Item\Edit.cshtml" />
+    <Content Include="Views\Item\List.cshtml" />
+    <Content Include="Views\Item\_CreateOrEdit.cshtml" />
+    <Content Include="Views\Shared\CommonList.cshtml" />
+    <Content Include="Views\JobItem\List.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateTimeNullable.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateNullable.cshtml" />
+    <Content Include="Views\JobItem\_CreateOrEdit.cshtml" />
+    <Content Include="Views\JobItem\Create.cshtml" />
+    <Content Include="Views\JobItem\Edit.cshtml" />
+    <Content Include="Views\JobItem\ShipOut.cshtml" />
+    <Content Include="Views\Order\List.cshtml" />
+    <Content Include="Views\Shared\FormPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -185,6 +407,24 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdStoreBusiness\ThirdStoreBusiness.csproj">
+      <Project>{68981aea-0e9f-4c4c-9c6f-7622974bf3fd}</Project>
+      <Name>ThirdStoreBusiness</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdStoreCommon\ThirdStoreCommon.csproj">
+      <Project>{f8735590-5fa5-49a6-956c-48f27800a081}</Project>
+      <Name>ThirdStoreCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdStoreData\ThirdStoreData.csproj">
+      <Project>{7985e23f-9a05-4b08-aa8c-e4fdfce75036}</Project>
+      <Name>ThirdStoreData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThirdStoreFramework\ThirdStoreFramework.csproj">
+      <Project>{2f53369e-d073-456a-b064-61063ebac5a9}</Project>
+      <Name>ThirdStoreFramework</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

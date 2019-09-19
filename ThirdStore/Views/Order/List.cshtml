@@ -1,0 +1,255 @@
+﻿@model OrderListViewModel
+@{
+    ViewBag.Title = "Order List";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    <table width="100%">
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(model => model.UpdateOrderFrom):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.UpdateOrderFrom)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(model => model.UpdateOrderTo):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.UpdateOrderTo)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="button" id="btnUpdateOrder" class="k-button" value="Update Orders Instructions" />
+                <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+                <script>
+                    $(document).ready(function () {
+                        $("#btnUpdateOrder").click(function (e) {
+                            if ($('#@Html.FieldIdFor(model => model.UpdateOrderFrom)').val() == "" || $('#@Html.FieldIdFor(model => model.UpdateOrderTo)').val() == "")
+                            {
+                                alert("Please input From Date and To Date.");
+                                return false;
+                            }
+
+                            var link = "@Html.Raw(Url.Action("UpdateOrderDeliveryInstruction", "Order"))"
+                            var postData = {
+                                UpdateOrderFrom: $('#@Html.FieldIdFor(model => model.UpdateOrderFrom)').val(),
+                                UpdateOrderTo: $('#@Html.FieldIdFor(model => model.UpdateOrderTo)').val()
+                            };
+                            //debugger;
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                data: postData,
+                                dataType: "json",
+                                beforeSend: function () {
+                                    $("#imgLoading").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoading").hide();
+                                },
+                                success: function (data) {
+                                    if (data.Result) {
+                                        alert("Update Order Success");
+                                    }
+                                    else {
+                                        if (data.Message != "")
+                                            alert(data.Message);
+                                        else
+                                            alert("Unknown error occurred.");
+                                    }
+                                    window.location = '@Url.Action("List")';
+                                },
+                                error: function (data) {
+                                    //debugger;
+                                    alert("error");
+                                }
+                            });
+                            return false;
+                        });
+                    });
+
+                </script>
+            </td>
+        </tr>
+    </table>
+
+    <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
+        <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
+        <div id="divOperationBtn" style="float:right">
+            
+        </div>
+    </div>
+
+    <table width="100%">
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchChannelOrderID):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchChannelOrderID)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.OrderTimeFrom):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.OrderTimeFrom)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.OrderTimeTo):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.OrderTimeTo)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchJobItemID):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchJobItemID)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="button" id="btnSearch" class="k-button" value="Search" />
+                <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+            </td>
+        </tr>
+    </table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="order-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#order-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("List", "Order"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "100",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["100", "300", "1000"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                }, {
+                                    field: "ChannelOrderID",
+                                    @*template: "<a href='@Url.Action("Edit")?ItemID=#=ID#' target='_blank' > #=SKU#</a>",*@
+                                    title: "Order ID"
+                                }, {
+                                    field: "OrderTime",
+                                    title: "Order Time",
+                                    width: 100,
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+                                }, {
+                                    field: "PaidTime",
+                                    title: "Paid Time",
+                                    width: 100,
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+
+                                }, {
+                                    field: "Ref1",
+                                    title: "Status",
+                                    width: 110
+                                }, {
+                                    field: "BuyerNote",
+                                    title: "Custom Delivery Instructions",
+                                    width: 200
+                                }, {
+                                    field: "CustomerID",
+                                    title: "Customer ID",
+                                    width: 250
+                                }, {
+                                    field: "ConsigneeName",
+                                    title: "Consignee Name",
+                                    width: 150
+                                }
+                            ]
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+    var selectedIds = [];
+    $(document).ready(function () {
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+            $('#@Html.FieldIdFor(model => model.OrderTimeFrom)').val("");
+            $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val("");
+
+            selectedIds = [];
+
+            RefreshGrid(false);
+
+            return false;
+        });
+    });
+
+    function additionalData() {
+        return {
+            OrderTimeFrom: $('#@Html.FieldIdFor(model => model.OrderTimeFrom)').val(),
+            OrderTimeTo: $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val(),
+            SearchChannelOrderID: $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val(),
+            SearchJobItemID: $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val()
+        };
+    }
+    </script>
+
+}
+

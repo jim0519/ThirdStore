@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:cl="http://schemas.microsoft.com/sqlserver/reporting/2010/01/componentdefinition" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/reportdefinition">
+  <AutoRefresh>0</AutoRefresh>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Image Name="Image1">
+            <Source>Database</Source>
+            <Value>=Code.GetCode128ImageBytescout(Parameters!JobItemLineRef.Value,Parameters!JobItemLineSKU.Value)</Value>
+            <MIMEType>image/jpeg</MIMEType>
+            <Sizing>FitProportional</Sizing>
+            <Top>28.39861mm</Top>
+            <Left>0mm</Left>
+            <Height>71.50139mm</Height>
+            <Width>149.9mm</Width>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+            </Style>
+          </Image>
+        </ReportItems>
+        <Height>99.9mm</Height>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Body>
+      <Width>149.9mm</Width>
+      <Page>
+        <PageHeight>10cm</PageHeight>
+        <PageWidth>15cm</PageWidth>
+        <ColumnSpacing>0.13cm</ColumnSpacing>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="JobItemLineRef">
+      <DataType>String</DataType>
+      <Prompt>JobItemLineRef</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="JobItemLineSKU">
+      <DataType>String</DataType>
+      <Prompt>JobItemLineSKU</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function GetCode128ImageBytescout(Byval codetext As String,Byval additionText As String) As Byte()
+	Try
+Dim barcode as new Bytescout.BarCode.Barcode
+            barcode.RegistrationName = "support@bytescout.com"
+            barcode.RegistrationKey = "BE75-6B80-111C-E8B1-11E_FORGUI"
+
+
+            barcode.Symbology = Bytescout.BarCode.SymbologyType.Code128
+
+
+            barcode.BackColor = System.Drawing.Color.White
+            barcode.ForeColor = System.Drawing.Color.Black
+
+			barcode.DrawCaption = true
+			barcode.CaptionPosition = Bytescout.BarCode.CaptionPosition.Below
+
+			barcode.Angle = Bytescout.BarCode.RotationAngle.Degrees0
+
+            barcode.RenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault
+            barcode.Margins = New Bytescout.BarCode.Margins(5, 5, 5, 5)
+			barcode.BarHeight = 50
+			barcode.NarrowBarWidth = 3
+			barcode.WideToNarrowRatio = 3
+			
+			barcode.AdditionalCaption = additionText
+			barcode.AdditionalCaptionPosition = Bytescout.BarCode.CaptionPosition.Above
+
+
+            barcode.Value = codetext
+
+            Return barcode.GetImageBytes()
+
+        Catch ex As Exception
+            Throw ex
+        End Try
+
+End Function</Code>
+  <CodeModules>
+    <CodeModule>Bytescout.BarCode, Version=5.0.0.1048, Culture=neutral, PublicKeyToken=f7dd1bd9d40a50eb</CodeModule>
+    <CodeModule>System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</CodeModule>
+  </CodeModules>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>28b9c4a1-2414-4857-9471-7482fbf1d0f6</rd:ReportID>
+</Report>

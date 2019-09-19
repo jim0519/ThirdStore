@@ -650,7 +650,7 @@ var i,
 	},
 
 	// CSS string/identifier serialization
-	// https://drafts.csswg.org/cssom/#common-serializing-idioms
+	// https://drafts.csswg.org/cssom/#common-serializing-idiThirdStore
 	rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,
 	fcssescape = function( ch, asCodePoint ) {
 		if ( asCodePoint ) {
@@ -8393,9 +8393,9 @@ jQuery.parseXML = function( data ) {
 	}
 
 	// Support: IE 9 - 11 only
-	// IE throws on parseFromString with invalid input.
+	// IE throws on parseFrThirdStoretring with invalid input.
 	try {
-		xml = ( new window.DOMParser() ).parseFromString( data, "text/xml" );
+		xml = ( new window.DOMParser() ).parseFrThirdStoretring( data, "text/xml" );
 	} catch ( e ) {
 		xml = undefined;
 	}

@@ -1,0 +1,333 @@
+﻿@model ItemListViewModel
+@{
+    ViewBag.Title = "SKU List";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
+        <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
+        <div id="divOperationBtn" style="float:right">
+            <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+            @if (Model.ShowSyncInventory)
+            {
+                <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
+                @*<input type="button" id="btnImportData" class="k-button" value="Import Data" />*@
+            }
+            <input type="button" id="btnEdit" class="k-button" value="Edit" />
+            <input type="button" id="btnCreateNew" class="k-button" value="Create New SKU" />
+            <script>
+                $(document).ready(function () {
+
+                    $('#btnImportData').click(function () {
+                        var link="@Html.Raw(Url.Action("ImportSelloData", "Item"))"
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            dataType: "json",
+                            success: function (data) {
+                                if (data.Result) {
+                                    alert("Import Data Success");
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
+                                //debugger;
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+                    });
+
+                    $('#btnCreateNew').click(function () {
+
+                        //var link = '@Url.Action("Create", new {FromItemID="_selectedItemID_" })'.replace('_selectedItemID_', selectedItemID);
+                        var link="@Html.Raw(Url.Action("Create", "Item"))"
+                        location.href = link;
+                    });
+
+                    $('#btnEdit').click(function (e) {
+                        //debugger;
+
+                        if (selectedIds.length == 0) {
+                            alert("Please select more than one item to edit");
+                            return false;
+                        }
+
+                        e.preventDefault();
+                        var ids = selectedIds.join(",");
+                        //debugger;
+                        $('#bulk-update-item-form #itemIdsBulkUpdate').val(ids);
+                        var window = $("#bulkUpdateItem-window");
+                        if (!window.data("kendoWindow")) {
+                            window.kendoWindow({
+                                modal: true,
+                                width: "500px",
+                                title: "Bulk Update Item",
+                                actions: ["Close"]
+                            });
+                        }
+                        window.data('kendoWindow').center().open();
+                        return;
+                    });
+
+                    //Update Selected button
+                    $('#btnSyncInventory').click(function () {
+                        //debugger;
+                        if (selectedIds.length == 0) {
+                            alert("Please select more than one sku to sync");
+                            return false;
+                        }
+
+                        if (selectedIds.length > 0) {
+                            //e.preventDefault();
+                            var ids = selectedIds.join(",");
+                            var postData = {
+                                selectedIDs: ids
+                            };
+                            var link = '@Url.Action("SyncInventory", "Item")';
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                //contentType: "application/json; charset=utf-8",
+                                data: postData,
+                                dataType: "json",
+                                beforeSend: function () {
+                                    $("#imgLoading").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoading").hide();
+                                },
+                                success: function (data) {
+                                    if (data.Result) {
+                                        alert("Sync Inventory Finished");
+                                    }
+                                    else {
+                                        if (data.Message != "")
+                                            alert(data.Message);
+                                        else
+                                            alert("Unknown error occurred.");
+                                    }
+                                },
+                                error: function (data) {
+                                    //debugger;
+                                    alert("error");
+                                }
+                            });
+                        }
+
+                        return false;
+                    });
+
+                });
+            </script>
+        </div>
+    </div>
+
+    <table width="100%">
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchSKU):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchSKU)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchType):
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.SearchType, Model.SearchTypes)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchName):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchName)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchSupplier):
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.SearchSupplier,Model.Suppliers)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchIgnoreListing):
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.SearchIgnoreListing, Model.YesOrNo)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="button" id="btnSearch" class="k-button" value="Search" />
+                <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+            </td>
+        </tr>
+    </table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="item-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#item-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("List", "Item"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "50",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["20", "50", "100"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            toolbar: ["excel"],
+                            excel: {
+                                allPages: true,
+                                fileName: "Item.xlsx"
+                            },
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                }, {
+                                    field: "SKU",
+                                    template: "<a href='@Url.Action("Edit")?ItemID=#=ID#' target='_blank' > #=SKU#</a>",
+                                    title: "SKU"
+                                }, {
+                                    field: "Type",
+                                    title: "Item Type"
+                                }, {
+                                    field: "Name",
+                                    title: "Name"
+                                }, {
+                                    field: "Supplier",
+                                    title: "Supplier"
+                                }, {
+                                    field: "IgnoreListing",
+                                    title: "Is Ignore Listing",
+                                    template: "#= !!IgnoreListing#"
+                                }, {
+                                    field: "Price",
+                                    title: "Price"
+                                }
+                            ]
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+    var selectedIds = [];
+    $(document).ready(function () {
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+
+            $('#@Html.FieldIdFor(model => model.SearchSKU)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchType)').val("0");
+            $('#@Html.FieldIdFor(model => model.SearchName)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
+            $('#@Html.FieldIdFor(model => model.SearchIgnoreListing)').val("-1");
+
+            selectedIds = [];
+
+            RefreshGrid(false);
+
+            return false;
+        });
+
+    });
+    function additionalData() {
+        return {
+            SearchSKU: $('#@Html.FieldIdFor(model => model.SearchSKU)').val(),
+            SearchType: $('#@Html.FieldIdFor(model => model.SearchType)').val(),
+            SearchName: $('#@Html.FieldIdFor(model => model.SearchName)').val(),
+            SearchSupplier: $('#@Html.FieldIdFor(model => model.SearchSupplier)').val(),
+            SearchIgnoreListing: $('#@Html.FieldIdFor(model => model.SearchIgnoreListing)').val()
+        };
+    }
+    </script>
+
+}
+
+    <div id="bulkUpdateItem-window" style="display:none;">
+        @using (Html.BeginForm("BulkUpdateItem", "Item", FormMethod.Post, new { id = "bulk-update-item-form" }))
+        {
+            <input type="hidden" id="itemIdsBulkUpdate" name="itemIdsBulkUpdate" value="" />
+            <table style="text-align:left;">
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.BulkUpdate.IsActive):
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(model => model.BulkUpdate.IsActive, Model.YesOrNo)
+                    </td>
+                    <td>
+                        @Html.LabelFor(model => model.BulkUpdate.IgnoreListing):
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(model => model.BulkUpdate.IgnoreListing, Model.YesOrNo)
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <input type="submit" class="k-button" value="Submit" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>

@@ -1,0 +1,14 @@
+﻿@model JobItemViewModel
+@section Scripts
+{
+}
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "opForm",name = "opForm" }))
+{
+    @Html.Partial("_CreateOrEdit", Model)
+
+}
