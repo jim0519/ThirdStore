@@ -58,7 +58,12 @@ namespace ThirdStore.Controllers
                 pageIndex: command.Page - 1,
                 pageSize:command.PageSize);
 
-            var orderGridViewList = orders.Select(i => i.ToModel());
+            var orderGridViewList = orders.Select(i => {
+                var viewModel = i.ToModel();
+                if (i.OrderLines.Count > 0)
+                    viewModel.OrderTransactions = i.OrderLines.Select(l => l.Ref2.ToString()).Aggregate((current, next) => current + ";" + next);
+                return viewModel;
+            });
 
             var gridModel = new DataSourceResult() { Data = orderGridViewList, Total = orders.TotalCount };
             //return View();
@@ -80,6 +85,21 @@ namespace ThirdStore.Controllers
             {
                 return Json(new { Result = false, Message = ex.Message });
             }
+        }
+
+        public ActionResult ScreenshotDisplay(string orderTran)
+        {
+            if (!string.IsNullOrWhiteSpace(orderTran) && orderTran.Split('-').Count() == 2)
+            {
+                var itemID = orderTran.Split('-')[0];
+                var tranID= orderTran.Split('-')[1];
+                var htmlStr = _orderService.GetOrderScreenshot(orderTran);
+                htmlStr = $"<a href='http://cgi.ebay.com.au/ws/eBayISAPI.dll?ViewItemVersion&item={itemID}&tid={tranID}&view=all' target='_blank'>http://cgi.ebay.com.au/ws/eBayISAPI.dll?ViewItemVersion&item={itemID}&tid={tranID}&view=all</a><br /><br />" + htmlStr;
+                return Content(htmlStr);
+            }
+            else
+                return Redirect("~/");
+            
         }
 
     }

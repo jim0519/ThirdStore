@@ -150,7 +150,7 @@
                         if (!window.data("kendoWindow")) {
                             window.kendoWindow({
                                 modal: true,
-                                width: "500px",
+                                width: "400px",
                                 title: "Bulk Update Job Item",
                                 actions: ["Close"]
                             });
@@ -263,6 +263,14 @@
         </tr>
         <tr>
             <td>
+                @Html.LabelFor(model => model.SearchInspector):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchInspector)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.LabelFor(model => model.SearchType):
             </td>
             <td>
@@ -336,14 +344,14 @@
                                     // Cancel the changes
                                     this.cancelChanges();
                                 },
-                                pageSize: "50",
+                                pageSize: "100",
                                 serverPaging: true,
                                 serverFiltering: true,
                                 serverSorting: true
                             },
                             pageable: {
                                 refresh: true,
-                                pageSizes: ["20", "50", "100"]
+                                pageSizes: ["100", "200", "500"]
                             },
                             editable: {
                                 confirmation: false,
@@ -399,6 +407,8 @@
                             ]
                         });
                     });
+
+                    
                 </script>
 
             </td>
@@ -421,6 +431,7 @@
             $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchStatus)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchLocation)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
 
             selectedIds = [];
@@ -443,6 +454,7 @@
             SearchSupplier: $('#@Html.FieldIdFor(model => model.SearchSupplier)').val(),
             SearchStatus: $('#@Html.FieldIdFor(model => model.SearchStatus)').val(),
             SearchLocation: $('#@Html.FieldIdFor(model => model.SearchLocation)').val(),
+            SearchInspector: $('#@Html.FieldIdFor(model => model.SearchInspector)').val(),
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val()
         };
     }
@@ -463,11 +475,21 @@
                     <td>
                         @Html.DropDownListFor(model => model.BulkUpdate.StatusID, Model.JobItemStatuses)
                     </td>
+                </tr>
+                <tr>
                     <td>
                         @Html.LabelFor(model => model.BulkUpdate.Location):
                     </td>
                     <td>
                         @Html.EditorFor(model => model.BulkUpdate.Location)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.BulkUpdate.ItemPrice):
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => model.BulkUpdate.ItemPrice)
                     </td>
                 </tr>
 

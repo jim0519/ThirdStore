@@ -35,5 +35,7 @@ namespace ThirdStoreBusiness.Order
         D_Order_Header UpdateOrder(D_Order_Header order);
 
         void DeleteOrder(D_Order_Header order);
+
+        string GetOrderScreenshot(string orderTran);
     }
 }

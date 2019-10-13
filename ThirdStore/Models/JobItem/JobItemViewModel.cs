@@ -66,7 +66,7 @@ namespace ThirdStore.Models.JobItem
             public string ImageURL { get; set; }
             public string ImageName { get; set; }
             public int DisplayOrder { get; set; }
-            public int StatusID { get; set; }
+            public bool StatusID { get; set; }
         }
 
 

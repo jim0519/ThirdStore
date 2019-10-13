@@ -51,5 +51,7 @@ namespace ThirdStore.Models.Order
         public System.DateTime EditTime { get; set; }
         public string EditBy { get; set; }
         public DateTime? ShipmentTime { get; set; }
+
+        public string OrderTransactions { get; set; }
     }
 }

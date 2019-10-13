@@ -14,5 +14,7 @@ namespace ThirdStore.Models.Item
         public string Supplier { get; set; }
         public bool IgnoreListing { get; set; }
         public decimal Price { get; set; }
+        public DateTime EditTime { get; set; }
+        public string EditBy { get; set; }
     }
 }

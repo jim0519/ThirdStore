@@ -28,6 +28,7 @@ namespace ThirdStoreBusiness.JobItem
             ThirdStoreJobItemCondition? jobItemCondition = null,
             ThirdStoreSupplier? jobItemSupplier = null,
             string location = null,
+            string inspector=null,
             string trackingNumber=null,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
@@ -63,5 +64,7 @@ namespace ThirdStoreBusiness.JobItem
         bool CanConsistInv(string jobItemIDs);
 
         IList<string> ConvertToJobItemReference(IList<string> invJobItemIDs);
+
+        ThirdStoreReturnMessage SyncInventory(int[] jobItemIDs);
     }
 }

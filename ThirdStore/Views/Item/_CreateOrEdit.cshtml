@@ -140,8 +140,14 @@
         <td class="adminTitle">
             @Html.LabelFor(m => m.Ref1)
         </td>
-        <td  colspan="3">
+        <td>
             @Html.EditorFor(model => model.Ref1)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.Ref2)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.Ref2)
         </td>
     </tr>
 </table>

@@ -73,6 +73,7 @@ namespace ThirdStoreBusiness.JobItem
             ThirdStoreJobItemCondition? jobItemCondition = null,
             ThirdStoreSupplier? jobItemSupplier = null,
             string location = null,
+            string inspector = null,
             string trackingNumber = null,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
@@ -122,6 +123,11 @@ namespace ThirdStoreBusiness.JobItem
             if (location != null)
             {
                 query = query.Where(i => i.Location.Contains(location));
+            }
+
+            if(inspector!=null)
+            {
+                query = query.Where(i => i.Ref2.Contains(inspector));
             }
 
             if (trackingNumber != null)
@@ -272,10 +278,12 @@ namespace ThirdStoreBusiness.JobItem
                 //var listingItems = from item in _itemRepository.Table
                 //                   where item.IsActive && !item.IgnoreListing && !notInItemType.Contains( item.Type)
                 //                   select item;
-                var listingItems = _itemRepository.Table;
-                listingItems = listingItems.Where(itm => itm.IsActive && !itm.IgnoreListing && !notInItemType.Contains(itm.Type));
+                var qlistingItems = _itemRepository.Table;
+                qlistingItems = qlistingItems.Where(itm => itm.IsActive && !itm.IgnoreListing && !notInItemType.Contains(itm.Type));
                 if (itemids != null && itemids.Count > 0)
-                    listingItems = listingItems.Where(itm => itemids.Contains(itm.ID));
+                    qlistingItems = qlistingItems.Where(itm => itemids.Contains(itm.ID));
+
+                var listingItems = qlistingItems.ToList();
 
                 var notInStatus = new int[] { ThirdStoreJobItemStatus.PENDING.ToValue(), ThirdStoreJobItemStatus.SHIPPED.ToValue() };
                 var inType = new int[] { ThirdStoreJobItemType.SELFSTORED.ToValue() };
@@ -306,7 +314,7 @@ namespace ThirdStoreBusiness.JobItem
                                 };
 
                 var queryItem = (from item in listingItems
-                                join itemR in _itemRelationship.Table on item.ID equals itemR.ItemID
+                                 join itemR in _itemRelationship.Table on item.ID equals itemR.ItemID
                                 group itemR by new { itemR.ItemID } into grpItemR
                                 select grpItemR).ToList();
 
@@ -367,82 +375,115 @@ namespace ThirdStoreBusiness.JobItem
 
                     foreach (var itmInv in totalItemQtyWCondition)
                     {
-                        
-                        var addProductListing=new ExportProductListing() {ItemID=parentItem.FirstOrDefault().ItemID, SKU = parentItem.FirstOrDefault().SKU, Condition = itmInv.ConditionID.ToEnumName<ThirdStoreJobItemCondition>(), Qty = itmInv.TotalQty, SKUWSuffix = (itmInv.ConditionID.Equals(ThirdStoreJobItemCondition.NEW.ToValue()) ? parentItem.FirstOrDefault().SKU: (parentItem.FirstOrDefault().SKU + Constants.UsedSKUSuffix)) };
+                        var strSKUSuffix = parentItem.FirstOrDefault().SKU;
+                        var itm = listingItems.FirstOrDefault(i => i.ID.Equals(parentItem.FirstOrDefault().ItemID));
+                        if (itmInv.ConditionID.Equals(ThirdStoreJobItemCondition.USED.ToValue()) )
+                        {
+                            if ((strSKUSuffix + Constants.UsedSKUSuffix).Length <= 25)
+                            {
+                                strSKUSuffix += Constants.UsedSKUSuffix;
+                            }
+                            else if ((strSKUSuffix + Constants.UsedSKUSuffix).Length > 25 && !string.IsNullOrWhiteSpace(itm.Ref2))
+                            {
+                                strSKUSuffix = itm.Ref2.Trim() + Constants.UsedSKUSuffix;
+                            }
+                            else
+                            {
+                                LogManager.Instance.Error($"SKU {strSKUSuffix + Constants.UsedSKUSuffix} length is longer than 25");
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            if(strSKUSuffix.Length>25  )
+                            {
+                                if (!string.IsNullOrWhiteSpace(itm.Ref2))
+                                {
+                                    strSKUSuffix = itm.Ref2.Trim();
+                                }
+                                else
+                                {
+                                    LogManager.Instance.Error($"SKU {strSKUSuffix} length is longer than 25");
+                                    continue;
+                                }
+                            }
+                        }
+
+                        var addProductListing=new ExportProductListing() {ItemID=parentItem.FirstOrDefault().ItemID, SKU = parentItem.FirstOrDefault().SKU, Condition = itmInv.ConditionID.ToEnumName<ThirdStoreJobItemCondition>(), Qty = itmInv.TotalQty, SKUWSuffix = strSKUSuffix };
                         if (itmInv.TotalQty>0)
                         {
-                            //#region New Calculate Inv Job Items
-                            //var relatedInv = from jobItmInv in queryInventory
-                            //                 join itemR in parentItem on jobItmInv.BottomItemID equals itemR.BottomItemID
-                            //                 where jobItmInv.ConditionID.Equals(itmInv.ConditionID)
-                            //                 && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
-                            //                            && itemR.Qty % jobItmInv.RelationQty == 0
-                            //                            && jobItmInv.StatusID != 3
-                            //                 select jobItmInv;
+                            #region New Calculate Inv Job Items
+                            var relatedInv = from jobItmInv in queryInventory
+                                             join itemR in parentItem on jobItmInv.BottomItemID equals itemR.BottomItemID
+                                             where jobItmInv.ConditionID.Equals(itmInv.ConditionID)
+                                             && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
+                                                        && itemR.Qty % jobItmInv.RelationQty == 0
+                                                        && jobItmInv.StatusID != 3
+                                             select jobItmInv;
 
-                            //var invJobItemIDs = SortInvJobItemIDs(relatedInv.ToList(), parentItem.Select(i => i).ToList());
-                            ////var invJobItemReferences = ConvertToJobItemReference(invJobItemIDs);
+                            var invJobItemIDs = SortInvJobItemIDs(relatedInv.ToList(), parentItem.Select(i => i).ToList());
+                            //var invJobItemReferences = ConvertToJobItemReference(invJobItemIDs);
 
-                            ////addProductListing.FirstInvJobItemIDs= (CanConsistInv(invJobItemIDs.FirstOrDefault())? invJobItemIDs.FirstOrDefault():string.Empty);
-                            //addProductListing.FirstInvJobItemIDs = invJobItemIDs.FirstOrDefault(jids=>CanConsistInv(jids));
-                            //if (string.IsNullOrEmpty(addProductListing.FirstInvJobItemIDs))
-                            //{
-                            //    addProductListing.JobItemInvIDs = invJobItemIDs.Aggregate((current, next) => current + ";" + next);
-                            //}
-                            //else
-                            //{
-                            //    if (invJobItemIDs.Where(i => !i.Equals(addProductListing.FirstInvJobItemIDs)).Count() > 0)
-                            //        addProductListing.JobItemInvIDs = invJobItemIDs.Where(i => !i.Equals(addProductListing.FirstInvJobItemIDs)).Aggregate((current, next) => current + ";" + next);
-                            //}
-                            //if(!string.IsNullOrEmpty(addProductListing.JobItemInvIDs))
-                            //    addProductListing.JobItemInvList= ConvertToJobItemReference(addProductListing.JobItemInvIDs.Split(';')).Aggregate((current, next) => current + ";" + next);
-
-                            //#endregion
-
-                            #region Old Calculate Inv Job Items
-                            //var dicStockList = new Dictionary<int, int[]>();
-
-                            //for (int i = 1; i <= itmInv.TotalQty; i++)
-                            //{
-                            var firstItemJobItemIDs = new List<int>();
-                            foreach (var itemR in parentItem)
+                            //addProductListing.FirstInvJobItemIDs= (CanConsistInv(invJobItemIDs.FirstOrDefault())? invJobItemIDs.FirstOrDefault():string.Empty);
+                            addProductListing.FirstInvJobItemIDs = invJobItemIDs.FirstOrDefault(jids => CanConsistInv(jids))??string.Empty;
+                            if (string.IsNullOrEmpty(addProductListing.FirstInvJobItemIDs)&& invJobItemIDs.Count>0)
                             {
-                                var itemInvWCond = from jobItmInv in queryInventory
-                                                   where jobItmInv.ConditionID.Equals(itmInv.ConditionID)
-                                                   && jobItmInv.BottomItemID.Equals(itemR.BottomItemID)
-                                                   && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
-                                                   && itemR.Qty % jobItmInv.RelationQty == 0
-                                                   && jobItmInv.StatusID != 3//not in Allocated
-                                                                             //&& !dicStockList.SelectMany(sl=>sl.Value).Contains( jobItmInv.JobItemID)
-                                                   select jobItmInv;
-                                //||aggrQty<=line.SumQty
-                                var jobItemIDs = itemInvWCond.TakeWhileAggregate(0, (aggrQty, line) => aggrQty + line.SumQty, (aggrQty, line) => aggrQty < itemR.Qty, (aggrQty, line) => aggrQty > itemR.Qty).Select(line => line.JobItemID);//TODO: Sum Qty for the first item need to be exact itemR.Qty
-                                if (jobItemIDs.Count() == 0)
-                                {
-                                    firstItemJobItemIDs.Clear();
-                                    break;
-                                }
-                                foreach (var jiID in jobItemIDs)
-                                    if (!firstItemJobItemIDs.Contains(jiID))
-                                        firstItemJobItemIDs.Add(jiID);
+                                addProductListing.JobItemInvIDs = invJobItemIDs.Aggregate((current, next) => current + ";" + next);
                             }
-                            //}
-                            //.Add(new ExportProductListing() { SKU = parentItem.FirstOrDefault().SKU, Condition = itmInv.ConditionID.ToEnumName<ThirdStoreJobItemCondition>(), Qty = itmInv.TotalQty, FirstInvJobItemIDs = string.Empty });
-                            var arrFirstItemJobItemIDs = firstItemJobItemIDs.ToArray();
-                            //var ss = (from jobItmInv in queryInventory
-                            //          join itemR in parentItem.AsQueryable() on jobItmInv.BottomItemID equals itemR.BottomItemID
-                            //          select new { jobItmInv.JobItemID }).ToList();
-                            var continueJobItemIDs = (from jobItmInv in queryInventory
-                                                      join itemR in parentItem on jobItmInv.BottomItemID equals itemR.BottomItemID
-                                                      where jobItmInv.ConditionID.Equals(itmInv.ConditionID) && !arrFirstItemJobItemIDs.Contains(jobItmInv.JobItemID)
-                                                      && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
-                                                      && itemR.Qty % jobItmInv.RelationQty == 0
-                                                      && jobItmInv.StatusID != 3//not in Allocated
-                                                      select GetJobItemReference(jobItmInv.CreateTime, jobItmInv.JobItemReference)).Distinct().ToList();
-                            addProductListing.FirstInvJobItemIDs = (firstItemJobItemIDs.Count > 0 ? firstItemJobItemIDs.Select(id => id.ToString()).Aggregate((current, next) => current + "," + next) : string.Empty);
-                            addProductListing.JobItemInvList = (continueJobItemIDs.Count() > 0 ? continueJobItemIDs.Aggregate((current, next) => current + ";" + next) : string.Empty);
+                            else
+                            {
+                                if (invJobItemIDs.Where(i => !i.Equals(addProductListing.FirstInvJobItemIDs)).Count() > 0)
+                                    addProductListing.JobItemInvIDs = invJobItemIDs.Where(i => !i.Equals(addProductListing.FirstInvJobItemIDs)).Aggregate((current, next) => current + ";" + next);
+                            }
+                            if (!string.IsNullOrEmpty(addProductListing.JobItemInvIDs))
+                                addProductListing.JobItemInvList = ConvertToJobItemReference(addProductListing.JobItemInvIDs.Split(';')).Aggregate((current, next) => current + ";" + next);
 
                             #endregion
+
+                            //#region Old Calculate Inv Job Items
+                            ////var dicStockList = new Dictionary<int, int[]>();
+
+                            ////for (int i = 1; i <= itmInv.TotalQty; i++)
+                            ////{
+                            //var firstItemJobItemIDs = new List<int>();
+                            //foreach (var itemR in parentItem)
+                            //{
+                            //    var itemInvWCond = from jobItmInv in queryInventory
+                            //                       where jobItmInv.ConditionID.Equals(itmInv.ConditionID)
+                            //                       && jobItmInv.BottomItemID.Equals(itemR.BottomItemID)
+                            //                       && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
+                            //                       && itemR.Qty % jobItmInv.RelationQty == 0
+                            //                       && jobItmInv.StatusID != 3//not in Allocated
+                            //                                                 //&& !dicStockList.SelectMany(sl=>sl.Value).Contains( jobItmInv.JobItemID)
+                            //                       select jobItmInv;
+                            //    //||aggrQty<=line.SumQty
+                            //    var jobItemIDs = itemInvWCond.TakeWhileAggregate(0, (aggrQty, line) => aggrQty + line.SumQty, (aggrQty, line) => aggrQty < itemR.Qty, (aggrQty, line) => aggrQty > itemR.Qty).Select(line => line.JobItemID);//TODO: Sum Qty for the first item need to be exact itemR.Qty
+                            //    if (jobItemIDs.Count() == 0)
+                            //    {
+                            //        firstItemJobItemIDs.Clear();
+                            //        break;
+                            //    }
+                            //    foreach (var jiID in jobItemIDs)
+                            //        if (!firstItemJobItemIDs.Contains(jiID))
+                            //            firstItemJobItemIDs.Add(jiID);
+                            //}
+                            ////}
+                            ////.Add(new ExportProductListing() { SKU = parentItem.FirstOrDefault().SKU, Condition = itmInv.ConditionID.ToEnumName<ThirdStoreJobItemCondition>(), Qty = itmInv.TotalQty, FirstInvJobItemIDs = string.Empty });
+                            //var arrFirstItemJobItemIDs = firstItemJobItemIDs.ToArray();
+                            ////var ss = (from jobItmInv in queryInventory
+                            ////          join itemR in parentItem.AsQueryable() on jobItmInv.BottomItemID equals itemR.BottomItemID
+                            ////          select new { jobItmInv.JobItemID }).ToList();
+                            //var continueJobItemIDs = (from jobItmInv in queryInventory
+                            //                          join itemR in parentItem on jobItmInv.BottomItemID equals itemR.BottomItemID
+                            //                          where jobItmInv.ConditionID.Equals(itmInv.ConditionID) && !arrFirstItemJobItemIDs.Contains(jobItmInv.JobItemID)
+                            //                          && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
+                            //                          && itemR.Qty % jobItmInv.RelationQty == 0
+                            //                          && jobItmInv.StatusID != 3//not in Allocated
+                            //                          select GetJobItemReference(jobItmInv.CreateTime, jobItmInv.JobItemReference)).Distinct().ToList();
+                            //addProductListing.FirstInvJobItemIDs = (firstItemJobItemIDs.Count > 0 ? firstItemJobItemIDs.Select(id => id.ToString()).Aggregate((current, next) => current + "," + next) : string.Empty);
+                            //addProductListing.JobItemInvList = (continueJobItemIDs.Count() > 0 ? continueJobItemIDs.Aggregate((current, next) => current + ";" + next) : string.Empty);
+
+                            //#endregion
                         }
                         else
                         {
@@ -494,7 +535,7 @@ namespace ThirdStoreBusiness.JobItem
                               select new
                               {
                                   SKU = grpUpdates.Key.SKUWSuffix,
-                                  Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+grpUpdates.FirstOrDefault().item.Name,
+                                  Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+(grpUpdates.FirstOrDefault().jobItem!=null&& !string.IsNullOrWhiteSpace( grpUpdates.FirstOrDefault().jobItem.ItemName)? grpUpdates.FirstOrDefault().jobItem.ItemName: grpUpdates.FirstOrDefault().item.Name),
                                   DefaultPrice = (grpUpdates.FirstOrDefault().jobItem!=null? grpUpdates.Sum(ji => ji.jobItem.ItemPrice):grpUpdates.FirstOrDefault().item.Price),
                                   Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),//TODO: Add first quantity job item ids and rest ids
                                   Images = GenerateUpdateImages((grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),
@@ -536,7 +577,7 @@ namespace ThirdStoreBusiness.JobItem
                             select new
                             {
                                 SKU = grpUpdates.Key.SKUWSuffix,
-                                Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+ grpUpdates.FirstOrDefault().item.Name ,
+                                Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix) + (grpUpdates.FirstOrDefault().jobItem != null && !string.IsNullOrWhiteSpace(grpUpdates.FirstOrDefault().jobItem.ItemName) ? grpUpdates.FirstOrDefault().jobItem.ItemName : grpUpdates.FirstOrDefault().item.Name),
                                 DefaultPrice = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Sum(ji => ji.jobItem.ItemPrice) : grpUpdates.FirstOrDefault().item.Price),
                                 Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item),//TODO: Add first quantity job item ids and rest ids
                                 Images = GenerateAddImages(GenerateUpdateImages((grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem):null), grpUpdates.FirstOrDefault().item)),
@@ -684,8 +725,11 @@ namespace ThirdStoreBusiness.JobItem
 
         private IList<string> SortInvJobItemIDs(IList<JobItemInv> relatedInv,IList<V_ItemRelationship> itemStructure)
         {
-            var grpRelatedInv = relatedInv.OrderBy(ri => ri.CreateTime).GroupBy(ri => ri.JobItemID);
             var retList = new List<string>();
+            if (relatedInv == null || relatedInv.Count == 0)
+                return retList;
+            var grpRelatedInv = relatedInv.OrderBy(ri => ri.CreateTime).GroupBy(ri => ri.JobItemID);
+            //var grpRelatedInv = relatedInv.OrderBy(ri => ri.CreateTime).GroupBy(ri => ri.JobItemID).OrderByDescending(g => g.Count()).ThenBy(g => g.k);
             var remainingJobItemInvs = new List<JobItemInv>();
             //var waitForProcess = new List<JobItemInv>();
             //var inProcess = new List<JobItemInv>();
@@ -799,7 +843,7 @@ namespace ThirdStoreBusiness.JobItem
                 {
                     foreach (var jobItem in firstInvJobItems)
                     {
-                        foreach (var jobItmImg in jobItem.JobItemImages.OrderBy(img => img.DisplayOrder))
+                        foreach (var jobItmImg in jobItem.JobItemImages.Where(img=>!img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
                         {
                             if (i <12)
                             {
@@ -858,10 +902,10 @@ namespace ThirdStoreBusiness.JobItem
                 if (!string.IsNullOrEmpty(localListing.JobItemInvIDs))
                 {
                     var jobItemInvListNode = string.Format("<input type='hidden' id='{0}' value='{1}' />", Constants.JobItemInvList, localListing.JobItemInvList);
-                    //var jobItemInvIDsNode= string.Format("<input type='hidden' id='{0}' value='{1}' />", Constants.JobItemInvIDs, localListing.JobItemInvIDs);
+                    var jobItemInvIDsNode = string.Format("<input type='hidden' id='{0}' value='{1}' />", Constants.JobItemInvIDs, localListing.JobItemInvIDs);
                     strDesc.Append($"{Constants.JobItemInvList}: {localListing.JobItemInvList}" );
                     strDesc.Append(jobItemInvListNode);
-                    //strDesc.Append(jobItemInvIDsNode);
+                    strDesc.Append(jobItemInvIDsNode);
                     strDesc.Append("<br />");
                 }
 
@@ -1097,7 +1141,35 @@ namespace ThirdStoreBusiness.JobItem
             }
         }
 
+        public ThirdStoreReturnMessage SyncInventory(int[] jobItemIDs)
+        {
+            try
+            {
+                if(jobItemIDs==null||jobItemIDs.Count()==0)
+                {
+                    return new ThirdStoreReturnMessage() { IsSuccess = true };
+                }
 
+                var strJobItemIDs = jobItemIDs.Select(id=>id.ToString()).Aggregate((current, next) => current + "," + next);
+                var sqlStr = new StringBuilder();
+                sqlStr.Append("select * from fn_GetAffectedItemsByJobItems(@JobItemIDs)");
+
+                var paraJobItemIDs = new SqlParameter();
+                paraJobItemIDs.ParameterName = "JobItemIDs";
+                paraJobItemIDs.DbType = DbType.String;
+                paraJobItemIDs.Value = strJobItemIDs;
+
+                var query = _dbContext.SqlQuery<int>(sqlStr.ToString(), paraJobItemIDs).ToList();
+
+                return this.SyncInventory(query);
+
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                return new ThirdStoreReturnMessage() { IsSuccess = false, ErrorMesage = ex.Message };
+            }
+        }
 
         protected class JobItemInv
         {

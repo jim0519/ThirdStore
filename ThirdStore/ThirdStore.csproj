@@ -208,6 +208,8 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\images\active-false.gif" />
+    <Content Include="Content\images\active-true.gif" />
     <Content Include="Content\images\loading.gif" />
     <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\kendo\css\kendo.common.min.css" />
@@ -391,6 +393,7 @@
     <Content Include="Views\JobItem\ShipOut.cshtml" />
     <Content Include="Views\Order\List.cshtml" />
     <Content Include="Views\Shared\FormPage.cshtml" />
+    <Content Include="Views\Order\ScreenshoptDisplay.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -29,8 +29,8 @@ namespace ThirdStoreCommon.Models.Item
         public int SupplierID { get; set; }
         public bool IgnoreListing { get; set; }
         public bool IsActive { get; set; }
-        public string Ref1 { get; set; }
-        public string Ref2 { get; set; }
+        public string Ref1 { get; set; }//Reference SKU
+        public string Ref2 { get; set; }//Neto Alias SKU
         public string Ref3 { get; set; }
         public string Ref4 { get; set; }
         public string Ref5 { get; set; }

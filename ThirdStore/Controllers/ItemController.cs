@@ -193,7 +193,7 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult Edit(ItemViewModel model)
         {
-            var allowEditItemUserIDs = new int[] { 1,4, 6, 7, 14, 17 };
+            var allowEditItemUserIDs = new int[] { 1,4, 6, 7,10, 14,16, 17 };
             if (!allowEditItemUserIDs.Contains(_workContext.CurrentUser.ID))
             {
                 ErrorNotification("You do not have permission to process this page.");

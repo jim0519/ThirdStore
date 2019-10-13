@@ -136,6 +136,7 @@
 
                 <script>
                     $(document).ready(function () {
+                        var OrderTransactionsColumnTemplate = "#if(OrderTransactions!='' ){var orderTrans=OrderTransactions.split(';'); for(var i = 0; i < orderTrans.length; i = i+1){# <a href='@Url.Action("ScreenshotDisplay","Order")?orderTran=#=orderTrans[i]#' target='_blank'>#=orderTrans[i]#</a> #} }# ";
                         $("#order-grid").kendoGrid({
                             dataSource: {
                                 type: "json",
@@ -184,6 +185,10 @@
                                     field: "ChannelOrderID",
                                     @*template: "<a href='@Url.Action("Edit")?ItemID=#=ID#' target='_blank' > #=SKU#</a>",*@
                                     title: "Order ID"
+                                }, {
+                                    field: "OrderTransactions",
+                                    template: OrderTransactionsColumnTemplate,
+                                    title: "Order Transactions"
                                 }, {
                                     field: "OrderTime",
                                     title: "Order Time",

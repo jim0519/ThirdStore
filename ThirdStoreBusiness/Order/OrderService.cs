@@ -330,12 +330,12 @@ namespace ThirdStoreBusiness.Order
             {
                 var updateOrderObj = new UpdateOrder();
                 var updateOrderOrders = new List<UpdateOrderOrder>();
-                var lstAllocatedJobItemID = new List<string>();
+                var lstTotalAllocatedJobItemID = new List<string>();
                 foreach (var order in orders)
                 {
                     //var eBayOrderLineItemIDs = order.OrderLines.Select(l => new {LineID=l.ID,OrderLineItemID=l.Ref2 });
                     var lstCustomInstruction = new List<string>();
-                    var lstFirstInvJobItems = new List<string>();
+                    var lstAllocateInvJobItemIDs = new List<string>();
                     foreach (var orderLine in order.OrderLines)
                     {
                         var soldItemSnapshot = _eBayAPICallManager.GetSoldItemSnapshot(orderLine.Ref2);
@@ -346,40 +346,42 @@ namespace ThirdStoreBusiness.Order
                             htmlDoc.LoadHtml(description);
                             var nodeJID = htmlDoc.GetElementbyId(Constants.FirstInvJobItems);
                             var nodeRef = htmlDoc.GetElementbyId(Constants.FirstInvJobItemsRef);
+                            var nodeJobItemInvIDs = htmlDoc.GetElementbyId(Constants.JobItemInvIDs);
                             var orderCustomInstruction = "";
                             if (nodeJID != null&& nodeRef!=null)
                             {
-                                var firstInvJobItemIDs = nodeJID.Attributes["value"].Value;
+                                var allocateInvJobItemIDs = nodeJID.Attributes["value"].Value;
                                 var allocateInvJobItemRefs = nodeRef.InnerText;
-                                var firstInvJobItems = _jobItemService.GetJobItemsByIDs(firstInvJobItemIDs.Split(',').Select(id=>Convert.ToInt32(id)).ToList());
 
-                                //if(orderLine.Qty>1)
+                                lstAllocateInvJobItemIDs.Add(allocateInvJobItemIDs);
+
+                                //if (orderLine.Qty > 1)
                                 //{
-                                //    var nodeJobItemInvIDs= htmlDoc.GetElementbyId(Constants.JobItemInvIDs);
-                                //    if(nodeJobItemInvIDs!=null)
-                                //    {
-                                //        var arrJobItemInvIDs = nodeJobItemInvIDs.Attributes["value"].Value.Split(';');
-                                //        //var arrJobItemInvRefs = _jobItemService.ConvertToJobItemReference(arrJobItemInvIDs);
-                                //        int i = 2;
-                                //        foreach(var jobItemInvIDs in arrJobItemInvIDs)
-                                //        {
-                                //            if (!_jobItemService.CanConsistInv(jobItemInvIDs))
-                                //                continue;
+                                    if (orderLine.Qty > 1&&nodeJobItemInvIDs != null)
+                                    {
+                                        var arrJobItemInvIDs = nodeJobItemInvIDs.Attributes["value"].Value.Split(';');
+                                        //var arrJobItemInvRefs = _jobItemService.ConvertToJobItemReference(arrJobItemInvIDs);
+                                        int i = 2;
+                                        foreach (var jobItemInvIDs in arrJobItemInvIDs)
+                                        {
+                                            if (!_jobItemService.CanConsistInv(jobItemInvIDs))
+                                                continue;
 
-                                //            if (i > orderLine.Qty)
-                                //                break;
+                                            if (i > orderLine.Qty)
+                                                break;
 
-
-
-                                //            i++;
-                                //        }
-                                //    }
+                                            lstAllocateInvJobItemIDs.Add(jobItemInvIDs);
+                                            i++;
+                                        }
+                                    }
                                 //}
-                                orderLine.Ref5 = allocateInvJobItemRefs;
-                                lstFirstInvJobItems.Add(firstInvJobItemIDs);
+
+                                var allocateInvJobItems = _jobItemService.GetJobItemsByIDs(lstAllocateInvJobItemIDs.SelectMany(jiids=>jiids.Split(',')).Select(s=>Convert.ToInt32(s)).ToList());
+                                orderLine.Ref5 = _jobItemService.ConvertToJobItemReference(lstAllocateInvJobItemIDs).Aggregate((current, next) => current + "," + next);
+                                
 
                                 var jobItemRefs = Constants.FirstInvJobItemsRef+": ";
-                                foreach(var ji in firstInvJobItems)
+                                foreach(var ji in allocateInvJobItems)
                                 {
                                     var refStr = (!string.IsNullOrEmpty(ji.DesignatedSKU) ? ji.DesignatedSKU : ji.JobItemLines.FirstOrDefault().SKU) + " "+(!string.IsNullOrEmpty(ji.Location)?ji.Location+" ":string.Empty) + _jobItemService.GetJobItemReference(ji);
                                     jobItemRefs += refStr+",";
@@ -390,11 +392,15 @@ namespace ThirdStoreBusiness.Order
                                 orderCustomInstruction += jobItemRefs;
                             }
 
-                            var nodeJL = htmlDoc.GetElementbyId(Constants.JobItemInvList);
-                            if (nodeJL != null)
+
+
+                            //var nodeJL = htmlDoc.GetElementbyId(Constants.JobItemInvList);
+                            if (nodeJobItemInvIDs != null)
                             {
-                                var jobItemInvList = nodeJL.Attributes["value"].Value;
-                                orderCustomInstruction +=" "+ Constants.JobItemInvList+": "+jobItemInvList;
+                                var arrJobItemInvIDs = nodeJobItemInvIDs.Attributes["value"].Value.Split(';');
+                                var remainingJobItemInvList = arrJobItemInvIDs.Where(jiid=> !lstAllocateInvJobItemIDs.Contains(jiid));
+                                if(remainingJobItemInvList.Count()>0)
+                                    orderCustomInstruction +=" "+ Constants.JobItemInvList+": "+_jobItemService.ConvertToJobItemReference(remainingJobItemInvList.ToList()).Aggregate((current, next) => current + ";" + next);
                             }
 
                             if(!string.IsNullOrEmpty(orderCustomInstruction))
@@ -405,7 +411,7 @@ namespace ThirdStoreBusiness.Order
                     }
 
                     //add allocated job item to list
-                    lstAllocatedJobItemID.AddRange(lstFirstInvJobItems.SelectMany(jiid => jiid.Split(',')));
+                    lstTotalAllocatedJobItemID.AddRange(lstAllocateInvJobItemIDs.SelectMany(jiid => jiid.Split(',')));
                     
                     var customInstruction = (lstCustomInstruction.Count>0?"Front Door. "+lstCustomInstruction.Aggregate((current, next) => current + ";" + next):string.Empty);
                     if(!string.IsNullOrEmpty(customInstruction))
@@ -423,7 +429,7 @@ namespace ThirdStoreBusiness.Order
                 _orderRepository.Update(orders);
 
                 //Update job items status
-                var jobItems= _jobItemService.GetJobItemsByIDs(lstAllocatedJobItemID.Select(id=>Convert.ToInt32( id)).ToList());
+                var jobItems= _jobItemService.GetJobItemsByIDs(lstTotalAllocatedJobItemID.Select(id=>Convert.ToInt32( id)).ToList());
                 foreach(var jobItem in jobItems)
                 {
                     if (jobItem.StatusID != ThirdStoreJobItemStatus.SHIPPED.ToValue())
@@ -433,6 +439,7 @@ namespace ThirdStoreBusiness.Order
                     }
                 }
 
+                _jobItemService.SyncInventory(jobItems.Select(ji=>ji.ID).ToArray());
 
                 //var eBayOrderLineItemIDs = from o in orders
                 //                           from line in o.OrderLines
@@ -503,6 +510,12 @@ namespace ThirdStoreBusiness.Order
             query = query.OrderByDescending(o => o.OrderTime);
 
             return new PagedList<D_Order_Header>(query, pageIndex, pageSize);
+        }
+
+        public string GetOrderScreenshot(string orderTran)
+        {
+            var item = _eBayAPICallManager.GetSoldItemSnapshot(orderTran);
+            return item?.Description;
         }
     }
 }

@@ -5,4 +5,10 @@
             return false;
         }
     });
+
+    $('form').submit(function () {
+        $(this).find("input[type='submit']").each(function () {
+            $(this).attr('disabled', 'disabled');
+        });
+    });
 });

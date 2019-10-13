@@ -34,6 +34,7 @@
         }
         //updateMasterCheckbox();
     });
+    
 
     $('#btnSearch').click(function () {
         //search
@@ -75,6 +76,26 @@ function onDataBound(e) {
     });
 
     updateMasterCheckbox();
+    //debugger;
+    var grid = $('div[id$=grid]'),
+        gridView = $('div[id$=grid]').data('kendoGrid'),
+        topPager,
+        pager = $('#div .k-pager-wrap'),
+        id = pager.attr('id') + '_top';
+    if (gridView.topPager == undefined) {
+        topPager = $('<div/>', {
+            'id': id,
+            'class': 'k-pager-wrap pagerTop'
+        }).insertBefore(grid.children("table"));
+        // copy options for bottom pager to top pager
+        gridView.topPager = new kendo.ui.Pager(topPager, $.extend({}, gridView.options.pageable, { dataSource: gridView.dataSource }));
+
+        // cloning the pageable options will use the id from the bottom pager
+        gridView.options.pagerId = id;
+
+        // DataSource change event is not fired, so call this manually
+        gridView.topPager.refresh();
+    }
 }
 
 function updateMasterCheckbox() {

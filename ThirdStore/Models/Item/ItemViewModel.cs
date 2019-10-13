@@ -37,6 +37,8 @@ namespace ThirdStore.Models.Item
         public int IsActive { get; set; }
         [Display(Name = "Reference SKU")]
         public string Ref1 { get; set; }
+        [Display(Name = "Neto Alias SKU")]
+        public string Ref2 { get; set; }
 
         public IList<SelectListItem> ItemTypes { get; set; }
         public IList<SelectListItem> YesOrNo { get; set; }

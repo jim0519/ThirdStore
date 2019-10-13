@@ -52,11 +52,13 @@ namespace ThirdStore.Infrastructure
                 //.ForMember(dest => dest.Supplier, mce => mce.MapFrom(s => s.SupplierID.ToEnumName<ThirdStoreSupplier>()))
             Mapper.CreateMap<D_JobItem, JobItemViewModel>();
             Mapper.CreateMap<D_JobItemLine, JobItemViewModel.JobItemLineViewModel>();
-            Mapper.CreateMap<M_JobItemImage, JobItemViewModel.JobItemImageViewModel>();
+            Mapper.CreateMap<M_JobItemImage, JobItemViewModel.JobItemImageViewModel>()
+                .ForMember(dest=>dest.StatusID,mce=>mce.MapFrom(s=>Convert.ToBoolean( s.StatusID)));
 
             Mapper.CreateMap<JobItemViewModel,D_JobItem>();
             Mapper.CreateMap<JobItemViewModel.JobItemLineViewModel, D_JobItemLine>();
-            Mapper.CreateMap<JobItemViewModel.JobItemImageViewModel, M_JobItemImage>();
+            Mapper.CreateMap<JobItemViewModel.JobItemImageViewModel, M_JobItemImage>()
+                .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));
 
             //Order
             Mapper.CreateMap<D_Order_Header, OrderGridViewModel>();

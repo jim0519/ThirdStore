@@ -799,6 +799,66 @@ GETDATE() as EditTime,
 
 
 
+/****** Object:  UserDefinedFunction [dbo].[fn_SplitString]    Script Date: 28/09/2019 10:32:45 AM ******/
+--DROP FUNCTION [dbo].[fn_SplitString]
+--GO
+
+
+CREATE FUNCTION [dbo].[fn_SplitString]
+(
+	@str VARCHAR(MAX),
+	@delimiter varchar(10)
+)
+RETURNS TABLE
+AS
+	RETURN
+	
+	SELECT  Split.a.value('.', 'VARCHAR(1000)') AS SplittedValue  
+	 FROM  
+	 (
+		 SELECT
+			 CAST ('<M>' + REPLACE(@str, @delimiter, '</M><M>') + '</M>' AS XML) AS Data  
+	 ) AS A CROSS APPLY Data.nodes ('/M') AS Split(a);
+GO
+
+
+
+--/****** Object:  UserDefinedFunction [dbo].[fn_GetAffectedItems]    Script Date: 28/09/2019 10:41:19 AM ******/
+--DROP FUNCTION [dbo].[fn_GetAffectedItemsByJobItems]
+--GO
+
+
+CREATE FUNCTION [dbo].[fn_GetAffectedItemsByJobItems]
+(
+	@JobItemIDs varchar(MAX)
+)
+RETURNS TABLE
+AS
+	RETURN
+
+select
+distinct 
+ITEM.ID
+--ITEM.SKU
+from V_SKURelationship_Recursive I
+inner join
+(
+	select 
+	distinct
+	case when H.DesignatedSKU<>'' then H.DesignatedSKU else L.SKU end HSKU,
+	H.*
+	from D_JobItem H
+	inner join D_JobItemLine L on H.ID=L.HeaderID
+	where 
+	H.ID in (select SplittedValue as ID from fn_SplitString(@JobItemIDs,','))
+) AFF on I.SKU=AFF.HSKU
+inner join V_SKURelationship_Recursive O on I.BottomSKU=O.BottomSKU
+inner join D_Item ITEM on ITEM.SKU=O.SKU and ITEM.IgnoreListing=0
+	
+GO
+
+
+
 
 --read neto product xml data
 DECLARE @xml XML

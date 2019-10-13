@@ -35,6 +35,7 @@ namespace ThirdStore.Models.JobItem
         public string SearchLocation { get; set; }
         public string SearchTrackingNumber { get; set; }
         public string SearchReference { get; set; }
+        public string SearchInspector { get; set; }
         public bool ShowSyncInventory { get; set; }
 
         public IList<SelectListItem> Suppliers { get; set; }
@@ -47,6 +48,7 @@ namespace ThirdStore.Models.JobItem
         {
             public int StatusID { get; set; }
             public string Location { get; set; }
+            public decimal ItemPrice { get; set; }
         }
     }
 }

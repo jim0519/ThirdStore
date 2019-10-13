@@ -1,5 +1,17 @@
 ﻿@model JobItemViewModel
 
+@*<style>
+    /*Batch Edit Mode*/
+    .k-edit-cell input {
+        width: 100%;
+    }
+
+    /*InLine Edit Mode*/
+    .k-grid-edit-row input {
+        width: 100%;
+    }
+</style>*@
+
 @Html.HiddenFor(model => model.ID)
 @*<!-- The Templates plugin is included to render the upload/download listings -->
     <script src="https://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
@@ -238,14 +250,14 @@
                                         }
                                     }
                                 },
-                                Qty: { editable: true, type: "number", validation: { required: true, min:1 }, defaultValue:1 },
+                                Qty: { editable: false, type: "number", validation: { required: true, min:1 }, defaultValue:1 },
 
                                 IsOrginalPackage: { editable: true, type: "boolean" },
-                                Weight: { editable: true, type: "number" },
-                                Length: { editable: true, type: "number" },
-                                Width: { editable: true, type: "number" },
-                                Height: { editable: true, type: "number" },
-                                CubicWeight: {editable: true, type: "number" }
+                                Weight: { editable: true, type: "number"},
+                                Length: { editable: true, type: "number"},
+                                Width: { editable: true, type: "number"},
+                                Height: { editable: true, type: "number"},
+                                CubicWeight: { editable: true, type: "number"}
                             }
                         }
                     },
@@ -327,41 +339,41 @@
                 }, {
                         field: "ItemID",
                         template: "<input type='hidden' name='JobItemViewLines[#= index(data)#].ItemID' value='#=ItemID#' />",
-                    hidden: true
+                        hidden: true
                 }, {
                         field: "SKU",
                         template: "#=SKU#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].SKU' value='#=SKU#' />",
-                        width:250
+                        width:200
                 }, {
                         field: "Qty",
-                    title: "Quantity",
+                    title: "Qty",
                         template: "#=Qty#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Qty' value='#=Qty#' />",
                         width:70
                     }, {
                         field: "Weight",
                         title: "Weight",
                         template: "#=Weight#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Weight' value='#=Weight#' />",
-                        width:190
+                        width: 100, editor: editNumber
                     }, {
                         field: "Length",
                         title: "Length",
                         template: "#=Length#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Length' value='#=Length#' />",
-                        width: 190
+                        width: 100, editor: editNumber
                     }, {
                         field: "Width",
                         title: "Width",
                         template: "#=Width#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Width' value='#=Width#' />",
-                        width: 190
+                        width: 100, editor: editNumber
                     }, {
                         field: "Height",
                         title: "Height",
                         template: "#=Height#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Height' value='#=Height#' />",
-                        width: 190
+                        width: 100, editor: editNumber
                     }, {
                         field: "CubicWeight",
                         title: "CbcWgt",
                         template: "#=CubicWeight#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].CubicWeight' value='#=CubicWeight#' />",
-                        width:30
+                        width: 100, editor: editNumber
                     },
                     //{
                     //    field: "CreateBy",
@@ -388,7 +400,7 @@
                         , { name: "destroy", text: "Del" }
                 //    </text>
                 //}
-                    ], title: "&nbsp;", width: "50px"
+                    ], title: "&nbsp;", width: "100px"
                 }]
             });
         });
@@ -398,7 +410,15 @@
         var data = $("#jobItemLine-grid").data("kendoGrid").dataSource.data();
         //debugger;
         return data.indexOf(dataItem);
-    }
+        }
+
+        function editNumber(container, options) {
+            $('<input data-bind="value:' + options.field + '" name="' + options.field + '"/>')
+                .appendTo(container)
+                .kendoNumericTextBox({
+                    spinners: false
+                });
+        }
 
     </script>
 }
@@ -425,7 +445,7 @@
                     async: false,
                     data: $("#opForm").serialize(),
                     success: function (response) {
-                        debugger;
+                        //debugger;
                         if (response.Result)
                             //$(form).submit();
                             isValid = true;
@@ -488,7 +508,7 @@
                     data: data,
                     success: function (response) {
                         //code after success
-                        debugger;
+                        //debugger;
 
                         if (response.ImageList != undefined) {
                             var grid = $("#jobItemImage-grid").data("kendoGrid");
@@ -498,7 +518,7 @@
                             $.each(response.ImageList, function (i, item) {
                                 //debugger;
                                 //alert(key + ": " + value);
-                                var newImage = { ID: 0, ImageID: item['ImageID'], ImageName: item['ImageName'], ImageURL: item['ImageURL'],DisplayOrder: newRowIndex, StatusID: 1};
+                                var newImage = { ID: 0, ImageID: item['ImageID'], ImageName: item['ImageName'], ImageURL: item['ImageURL'],DisplayOrder: newRowIndex, StatusID: true};
                                 data.push(newImage);
                                 newRowIndex++;
                             });
@@ -547,7 +567,7 @@
                                 DisplayOrder: {
                                     editable: true, type: "number"
                                 },
-                                StatusID: { editable: true, type: "number" }
+                                StatusID: { editable: true, type: "boolean" }
                             }
                         }
                     },
@@ -627,7 +647,10 @@
                 }, {
                         field: "StatusID",
                         title: "Status",
-                        template: "#=StatusID#" + "<input type='hidden' name='JobItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />",
+                        headerAttributes: { style: "text-align:center" },
+                        attributes: { style: "text-align:center" },
+                        template: '<img src="@Url.Content("~/Content/images/")active-#=StatusID#.gif" />' + "<input type='hidden' name='JobItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />"
+                        //template: "#=StatusID#" + "<input type='hidden' name='JobItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />",
                     }, {
                     command: ["edit"
                         @*@if(Model.ID==0)

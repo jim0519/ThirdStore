@@ -90,6 +90,7 @@ namespace ThirdStore.Controllers
                 jobItemCondition: jobItemCondition,
                 jobItemSupplier:supplier,
                 location:model.SearchLocation,
+                inspector:model.SearchInspector,
                 trackingNumber:model.SearchTrackingNumber,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
@@ -415,6 +416,8 @@ namespace ThirdStore.Controllers
                     return Json(new { Result = false, Message = "Job item can only contain one item." });
                 }
             }
+
+            //if(model.JobItemViewLines.Any(l=>l.Qty>1))
             return Json(new { Result=true});
         }
 
@@ -595,6 +598,11 @@ namespace ThirdStore.Controllers
                         if (!string.IsNullOrEmpty(bulkUpdate.Location))
                         {
                             jobItem.Location = bulkUpdate.Location.Trim();
+                        }
+
+                        if (bulkUpdate.ItemPrice>0)
+                        {
+                            jobItem.ItemPrice = bulkUpdate.ItemPrice;
                         }
 
                         _jobItemService.UpdateJobItem(jobItem);
