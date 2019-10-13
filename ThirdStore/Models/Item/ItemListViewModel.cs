@@ -21,7 +21,7 @@ namespace ThirdStore.Models.Item
         public int SearchType { get; set; }
         public string SearchName { get; set; }
         public int SearchSupplier { get; set; }
-        public int SearchIgnoreListing { get; set; }
+        public int SearchReadyForList { get; set; }
         public bool ShowSyncInventory { get; set; }
 
         public IList<SelectListItem> Suppliers { get; set; }
@@ -32,7 +32,7 @@ namespace ThirdStore.Models.Item
         public class BulkUpdateItemModel
         {
             public int IsActive { get; set; }
-            public int IgnoreListing { get; set; }
+            public int IsReadyForList { get; set; }
         }
     }
 }

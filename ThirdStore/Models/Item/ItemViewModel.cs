@@ -33,7 +33,7 @@ namespace ThirdStore.Models.Item
         public decimal Height { get; set; }
         [Display(Name ="Supplier")]
         public int SupplierID { get; set; }
-        public int IgnoreListing { get; set; }
+        public int IsReadyForList { get; set; }
         public int IsActive { get; set; }
         [Display(Name = "Reference SKU")]
         public string Ref1 { get; set; }

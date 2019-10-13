@@ -46,7 +46,7 @@ namespace ThirdStoreBusiness.Item
             ThirdStoreItemType? itemType = null, 
             string name = null,
             ThirdStoreSupplier? supplier = null,
-            int ignoreListing = -1,
+            int isReadyForList = -1,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -66,10 +66,10 @@ namespace ThirdStoreBusiness.Item
                 var supplierID = supplier.Value.ToValue();
                 query = query.Where(i => i.SupplierID.Equals(supplierID));
             }
-            if(ignoreListing != -1)
+            if(isReadyForList != -1)
             {
-                var blIgnoreListing = Convert.ToBoolean(ignoreListing);
-                query = query.Where(l => l.IgnoreListing.Equals(blIgnoreListing));
+                var blIsReadyForList = Convert.ToBoolean(isReadyForList);
+                query = query.Where(l => l.IsReadyForList.Equals(blIsReadyForList));
             }
 
             query = query.OrderByDescending(i=>i.SKU);

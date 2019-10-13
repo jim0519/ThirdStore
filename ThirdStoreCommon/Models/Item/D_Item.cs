@@ -27,7 +27,7 @@ namespace ThirdStoreCommon.Models.Item
         public decimal Width { get; set; }
         public decimal Height { get; set; }
         public int SupplierID { get; set; }
-        public bool IgnoreListing { get; set; }
+        public bool IsReadyForList { get; set; }
         public bool IsActive { get; set; }
         public string Ref1 { get; set; }//Reference SKU
         public string Ref2 { get; set; }//Neto Alias SKU

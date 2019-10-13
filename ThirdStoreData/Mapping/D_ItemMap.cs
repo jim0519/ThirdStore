@@ -71,7 +71,7 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Width).HasColumnName("Width");
             this.Property(t => t.Height).HasColumnName("Height");
             this.Property(t => t.SupplierID).HasColumnName("SupplierID");
-            this.Property(t => t.IgnoreListing).HasColumnName("IgnoreListing");
+            this.Property(t => t.IsReadyForList).HasColumnName("IsReadyForList");
             this.Property(t => t.IsActive).HasColumnName("IsActive");
             this.Property(t => t.CreateTime).HasColumnName("CreateTime");
             this.Property(t => t.CreateBy).HasColumnName("CreateBy");

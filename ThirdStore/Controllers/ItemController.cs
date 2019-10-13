@@ -66,7 +66,7 @@ namespace ThirdStore.Controllers
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
             model.SearchIgnoreListing  = -1;
 
-            model.BulkUpdate.IgnoreListing = -1;
+            model.BulkUpdate.IsReadyForList = -1;
             model.BulkUpdate.IsActive = -1;
 
             var showSyncInvUsers = new int[] { 1,4 , 17 };
@@ -86,7 +86,7 @@ namespace ThirdStore.Controllers
                 itemType: itemType, 
                 name:model.SearchName,
                 supplier: supplier,
-                ignoreListing: model.SearchIgnoreListing,
+                isReadyForList: model.SearchIgnoreListing,
                 pageIndex: command.Page - 1,
                 pageSize:command.PageSize);
 
@@ -109,7 +109,7 @@ namespace ThirdStore.Controllers
                 return Redirect("~/"); ;
             }
 
-            var newItemViewModel = new ItemViewModel() { IsActive=1,Type=ThirdStoreItemType.SINGLE.ToValue(),IgnoreListing=1};
+            var newItemViewModel = new ItemViewModel() { IsActive=1,Type=ThirdStoreItemType.SINGLE.ToValue(),IsReadyForList=0};
 
             FillDropDownDS(newItemViewModel);
 
@@ -532,7 +532,7 @@ namespace ThirdStore.Controllers
                     newItem.Width = d.Width;
                     newItem.Height = d.Height;
                     newItem.SupplierID = d.SupplierID;
-                    newItem.IgnoreListing = d.IgnoreListing;
+                    newItem.IsReadyForList = d.IsReadyForList;
                     newItem.IsActive = d.IsActive;
                     newItem.Ref1 = d.Ref1;
                     newItem.Ref2 = d.Ref2;
@@ -645,7 +645,7 @@ namespace ThirdStore.Controllers
                     newItem.Width = d.Width / 100;
                     newItem.Height = d.Height / 100;
                     newItem.SupplierID =ThirdStoreSupplier.A.ToValue();
-                    newItem.IgnoreListing = true;
+                    newItem.IsReadyForList = false;
                     newItem.IsActive = true;
                     newItem.Ref5 = d.CategoryPath;
                     newItem.CreateTime = DateTime.Now;
@@ -742,7 +742,7 @@ namespace ThirdStore.Controllers
                     item.Length = (length.ToString().Replace(".", "").Length > 10 ? 0 : length);
                     item.Height = (height.ToString().Replace(".", "").Length > 10 ? 0 : height);
                     item.SupplierID = ThirdStoreSupplier.S.ToValue();
-                    item.IgnoreListing = true;
+                    item.IsReadyForList = false;
                     item.IsActive = true;
                     item.Image1 = sd.Image1;
                     item.Image2 = sd.Image2;
@@ -1008,7 +1008,7 @@ namespace ThirdStore.Controllers
                         itemObj.Width = d.Width;
                         itemObj.Height = d.Height;
                         itemObj.SupplierID = d.SupplierID;
-                        itemObj.IgnoreListing = d.IgnoreListing;
+                        itemObj.IsReadyForList = d.IsReadyForList;
                         itemObj.IsActive = d.IsActive;
                         itemObj.Ref1 = d.Ref1;
                         itemObj.Ref2 = d.Ref2;
@@ -1163,9 +1163,9 @@ namespace ThirdStore.Controllers
                             item.IsActive = Convert.ToBoolean(bulkUpdate.IsActive);
                         }
 
-                        if (bulkUpdate.IgnoreListing != -1)
+                        if (bulkUpdate.IsReadyForList != -1)
                         {
-                            item.IgnoreListing = Convert.ToBoolean(bulkUpdate.IgnoreListing);
+                            item.IsReadyForList = Convert.ToBoolean(bulkUpdate.IsReadyForList);
                         }
 
                         _itemService.UpdateItem(item);
@@ -1206,7 +1206,7 @@ namespace ThirdStore.Controllers
         public decimal Width { get; set; }
         public decimal Height { get; set; }
         public int SupplierID { get; set; }
-        public bool IgnoreListing { get; set; }
+        public bool IsReadyForList { get; set; }
         public bool IsActive { get; set; }
         public string Ref1 { get; set; }
         public string Ref2 { get; set; }

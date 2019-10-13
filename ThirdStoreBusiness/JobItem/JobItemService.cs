@@ -279,7 +279,7 @@ namespace ThirdStoreBusiness.JobItem
                 //                   where item.IsActive && !item.IgnoreListing && !notInItemType.Contains( item.Type)
                 //                   select item;
                 var qlistingItems = _itemRepository.Table;
-                qlistingItems = qlistingItems.Where(itm => itm.IsActive && !itm.IgnoreListing && !notInItemType.Contains(itm.Type));
+                qlistingItems = qlistingItems.Where(itm => itm.IsActive && itm.IsReadyForList && !notInItemType.Contains(itm.Type));
                 if (itemids != null && itemids.Count > 0)
                     qlistingItems = qlistingItems.Where(itm => itemids.Contains(itm.ID));
 

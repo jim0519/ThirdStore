@@ -27,7 +27,7 @@ namespace ThirdStoreBusiness.Item
              ThirdStoreItemType? itemType = null,
             string name = null,
             ThirdStoreSupplier? supplier = null,
-            int ignoreListing=-1,
+            int isReadyForList = -1,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 

@@ -170,10 +170,10 @@
         </tr>
         <tr>
             <td>
-                @Html.LabelFor(model => model.SearchIgnoreListing):
+                @Html.LabelFor(model => model.SearchReadyForList):
             </td>
             <td>
-                @Html.DropDownListFor(model => model.SearchIgnoreListing, Model.YesOrNo)
+                @Html.DropDownListFor(model => model.SearchReadyForList, Model.YesOrNo)
             </td>
         </tr>
         <tr>
@@ -254,9 +254,9 @@
                                     field: "Supplier",
                                     title: "Supplier"
                                 }, {
-                                    field: "IgnoreListing",
-                                    title: "Is Ignore Listing",
-                                    template: "#= !!IgnoreListing#"
+                                    field: "IsReadyForList",
+                                    title: "Is Ready For List",
+                                    template: "#= !!IsReadyForList#"
                                 }, {
                                     field: "Price",
                                     title: "Price"
@@ -324,10 +324,10 @@
                         @Html.DropDownListFor(model => model.BulkUpdate.IsActive, Model.YesOrNo)
                     </td>
                     <td>
-                        @Html.LabelFor(model => model.BulkUpdate.IgnoreListing):
+                        @Html.LabelFor(model => model.BulkUpdate.IsReadyForList):
                     </td>
                     <td>
-                        @Html.DropDownListFor(model => model.BulkUpdate.IgnoreListing, Model.YesOrNo)
+                        @Html.DropDownListFor(model => model.BulkUpdate.IsReadyForList, Model.YesOrNo)
                     </td>
                 </tr>
 
