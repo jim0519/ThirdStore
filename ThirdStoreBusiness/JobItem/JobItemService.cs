@@ -532,7 +532,9 @@ namespace ThirdStoreBusiness.JobItem
                               //where onlineListings.Any(ol => ol.SKU.ToLower().Equals(record.localListing.SKUWSuffix.ToLower()))
                               join ol in onlineListings on record.localListing.SKUWSuffix.ToLower() equals ol.SKU.ToLower()
                                group new { record.localListing, record.jobItem, record.item,onlineListing=ol } by new { record.localListing.SKUWSuffix } into grpUpdates
-                              select new
+                               where grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
+                               || grpUpdates.FirstOrDefault().jobItem != null//no need to sync if condition is used and do not have first job item inv
+                               select new
                               {
                                   SKU = grpUpdates.Key.SKUWSuffix,
                                   Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+(grpUpdates.FirstOrDefault().jobItem!=null&& !string.IsNullOrWhiteSpace( grpUpdates.FirstOrDefault().jobItem.ItemName)? grpUpdates.FirstOrDefault().jobItem.ItemName: grpUpdates.FirstOrDefault().item.Name),
@@ -631,7 +633,8 @@ namespace ThirdStoreBusiness.JobItem
                     itm.DefaultPrice = updateObj.DefaultPrice;
                     itm.IsActive = true;
                     itm.Description = updateObj.Description;
-                    itm.Images = updateObj.Images;
+                    if(updateObj.Images!=null)
+                        itm.Images = updateObj.Images;
                     itm.ShippingHeight = updateObj.ShippingHeight;
                     itm.ShippingLength = updateObj.ShippingLength;
                     itm.ShippingWidth = updateObj.ShippingWidth;
@@ -659,7 +662,8 @@ namespace ThirdStoreBusiness.JobItem
                     itm.DefaultPrice = addObj.DefaultPrice;
                     itm.IsActive = true;
                     itm.Description = addObj.Description;
-                    itm.Images = addObj.Images;
+                    if (addObj.Images != null)
+                        itm.Images = addObj.Images;
                     itm.ShippingHeight = addObj.ShippingHeight;
                     itm.ShippingLength = addObj.ShippingLength;
                     itm.ShippingWidth = addObj.ShippingWidth;
@@ -810,6 +814,9 @@ namespace ThirdStoreBusiness.JobItem
 
         private AddItemItemImages GenerateAddImages(UpdateItemItemImages updateItemItemImages)
         {
+            if (updateItemItemImages == null)
+                return default(AddItemItemImages);
+
             var retObj = new AddItemItemImages();
             var lstImgs = new List<AddItemItemImage>();
             foreach(var upImg in updateItemItemImages.Image)
@@ -820,13 +827,23 @@ namespace ThirdStoreBusiness.JobItem
             return retObj;
         }
 
-        private UpdateItemItemImages GenerateUpdateImages(IEnumerable<D_JobItem> firstInvJobItems, D_Item item, GetItemResponseItem onlineListing=null)
+        private UpdateItemItemImages GenerateUpdateImages( IEnumerable<D_JobItem> firstInvJobItems, D_Item item, GetItemResponseItem onlineListing=null)
         {
             try
             {
+                
+
                 var retImageObj = new UpdateItemItemImages();
                 int i = 0;
                 var lstItemImages = new List<UpdateItemItemImage>();
+
+                //if ((firstInvJobItems == null || firstInvJobItems.Count() == 0)
+                //    && localListing.Condition.Equals(ThirdStoreJobItemCondition.USED.ToName())
+                //    && onlineListing != null)
+                //{
+                //    return default(UpdateItemItemImages);
+                //}
+
                 if (item.ItemImages.Count > 0)
                 {
                     foreach (var itmImg in item.ItemImages.OrderBy(img=>img.DisplayOrder))
@@ -879,6 +896,14 @@ namespace ThirdStoreBusiness.JobItem
             {
                 var strDesc = new StringBuilder();
                 //var firstInvJobItemNode = "";
+
+                //if((firstInvJobItems==null||firstInvJobItems.Count()==0)
+                //    &&localListing.Condition.Equals(ThirdStoreJobItemCondition.USED.ToName())
+                //    &&onlineListing!=null)
+                //{
+                //    strDesc.Append(onlineListing.Description);
+                //    return strDesc.ToString();
+                //}
 
                 if (firstInvJobItems != null && firstInvJobItems.Count() > 0)
                 {

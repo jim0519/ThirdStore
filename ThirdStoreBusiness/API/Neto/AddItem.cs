@@ -30,7 +30,14 @@ namespace ThirdStoreBusiness.API.Neto
         }
         #endregion
 
+        #region Images
         public AddItemItemImages Images { get; set; }
+        public bool ShouldSerializeImages()
+        {
+            return Images != null;
+        }
+        #endregion
+
         [System.Xml.Serialization.XmlElementAttribute("WarehouseQuantity")]
         public AddItemItemWarehouseQuantity[] WarehouseQuantity { get; set; }
 
