@@ -257,7 +257,8 @@
                                 Length: { editable: true, type: "number"},
                                 Width: { editable: true, type: "number"},
                                 Height: { editable: true, type: "number"},
-                                CubicWeight: { editable: true, type: "number"}
+                                CubicWeight: { editable: true, type: "number" },
+                                Ref1: { editable: true, type: "number" }
                             }
                         }
                     },
@@ -311,6 +312,7 @@
                                     var widthWidget = e.container.find("[name='Width']").data("kendoNumericTextBox");
                                     var weightWidget = e.container.find("[name='Weight']").data("kendoNumericTextBox");
                                     var cubicWeightWidget = e.container.find("[name='CubicWeight']").data("kendoNumericTextBox");
+                                    var cbmWidget = e.container.find("[name='Ref1']").data("kendoNumericTextBox");
                                     lengthWidget.value(response.ItemLength);
                                     lengthWidget.trigger("change");
                                     heightWidget.value(response.ItemHeight);
@@ -321,6 +323,8 @@
                                     weightWidget.trigger("change");
                                     cubicWeightWidget.value(response.ItemCubicWeight);
                                     cubicWeightWidget.trigger("change");
+                                    cbmWidget.value(response.ItemCubicMeter);
+                                    cbmWidget.trigger("change");
 
                                     //$("[name='Length']", e.container).val(response.ItemLength);
                                 }
@@ -348,32 +352,50 @@
                         field: "Qty",
                     title: "Qty",
                         template: "#=Qty#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Qty' value='#=Qty#' />",
-                        width:70
+                        width: 70,
+                        hidden: true
                     }, {
                         field: "Weight",
                         title: "Weight",
                         template: "#=Weight#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Weight' value='#=Weight#' />",
-                        width: 100, editor: editNumber
+                        width: 100,
+                        format: "{0:n4}",
+                        editor: editNumber
                     }, {
                         field: "Length",
                         title: "Length",
                         template: "#=Length#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Length' value='#=Length#' />",
-                        width: 100, editor: editNumber
+                        width: 100,
+                        format: "{0:n4}",
+                        editor: editNumber
                     }, {
                         field: "Width",
                         title: "Width",
                         template: "#=Width#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Width' value='#=Width#' />",
-                        width: 100, editor: editNumber
+                        width: 100,
+                        format: "{0:n4}",
+                        editor: editNumber
                     }, {
                         field: "Height",
                         title: "Height",
                         template: "#=Height#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Height' value='#=Height#' />",
-                        width: 100, editor: editNumber
+                        width: 100,
+                        format: "{0:n4}",
+                        editor: editNumber
                     }, {
                         field: "CubicWeight",
                         title: "CbcWgt",
                         template: "#=CubicWeight#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].CubicWeight' value='#=CubicWeight#' />",
-                        width: 100, editor: editNumber
+                        width: 100,
+                        format: "{0:n4}",
+                        editor: editNumber
+                    }, {
+                        field: "Ref1",
+                        title: "CBM",
+                        template: "#=Ref1#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].Ref1' value='#=Ref1#' />",
+                        width: 100,
+                        format: "{0:n4}",
+                        editor: editNumber
                     },
                     //{
                     //    field: "CreateBy",
@@ -416,7 +438,9 @@
             $('<input data-bind="value:' + options.field + '" name="' + options.field + '"/>')
                 .appendTo(container)
                 .kendoNumericTextBox({
-                    spinners: false
+                    spinners: false,
+                    format: "n4",
+                    decimals: 4
                 });
         }
 

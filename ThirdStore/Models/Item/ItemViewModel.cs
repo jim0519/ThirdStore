@@ -25,11 +25,17 @@ namespace ThirdStore.Models.Item
         public string Description { get; set; }
         public decimal Cost { get; set; }
         public decimal Price { get; set; }
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
         public decimal GrossWeight { get; set; }
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
         public decimal NetWeight { get; set; }
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
         public decimal CubicWeight { get; set; }
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
         public decimal Length { get; set; }
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
         public decimal Width { get; set; }
+        [DisplayFormat(DataFormatString = "{0:0.0000}", ApplyFormatInEditMode = true)]
         public decimal Height { get; set; }
         [Display(Name ="Supplier")]
         public int SupplierID { get; set; }

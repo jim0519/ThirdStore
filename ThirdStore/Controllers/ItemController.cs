@@ -374,7 +374,7 @@ namespace ThirdStore.Controllers
             {
                 return Json(new { Result = false });
             }
-            return Json(new { Result = true,ItemID=item.ID, ItemLength= item.Length, ItemHeight=item.Height, ItemWidth=item.Width, ItemWeight=item.GrossWeight,ItemCubicWeight=item.Length*item.Width*item.Height*250 });
+            return Json(new { Result = true,ItemID=item.ID, ItemLength= item.Length, ItemHeight=item.Height, ItemWidth=item.Width, ItemWeight=item.GrossWeight,ItemCubicWeight=item.Length*item.Width*item.Height*250, ItemCubicMeter= item.Length * item.Width * item.Height });
         }
 
         [HttpPost]
