@@ -288,7 +288,7 @@
             $('#@Html.FieldIdFor(model => model.SearchType)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchName)').val("");
             $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
-            $('#@Html.FieldIdFor(model => model.SearchIgnoreListing)').val("-1");
+            $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val("-1");
 
             selectedIds = [];
 
@@ -304,7 +304,7 @@
             SearchType: $('#@Html.FieldIdFor(model => model.SearchType)').val(),
             SearchName: $('#@Html.FieldIdFor(model => model.SearchName)').val(),
             SearchSupplier: $('#@Html.FieldIdFor(model => model.SearchSupplier)').val(),
-            SearchIgnoreListing: $('#@Html.FieldIdFor(model => model.SearchIgnoreListing)').val()
+            SearchReadyForList: $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val()
         };
     }
     </script>

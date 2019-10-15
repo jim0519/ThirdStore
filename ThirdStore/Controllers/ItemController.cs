@@ -64,7 +64,7 @@ namespace ThirdStore.Controllers
 
             model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
-            model.SearchIgnoreListing  = -1;
+            model.SearchReadyForList  = -1;
 
             model.BulkUpdate.IsReadyForList = -1;
             model.BulkUpdate.IsActive = -1;
@@ -86,7 +86,7 @@ namespace ThirdStore.Controllers
                 itemType: itemType, 
                 name:model.SearchName,
                 supplier: supplier,
-                isReadyForList: model.SearchIgnoreListing,
+                isReadyForList: model.SearchReadyForList,
                 pageIndex: command.Page - 1,
                 pageSize:command.PageSize);
 
