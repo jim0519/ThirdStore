@@ -487,6 +487,7 @@ namespace ThirdStoreBusiness.Order
             DateTime? orderTimeTo = null, 
             string channelOrderID = null, 
             string jobItemID = null, 
+            string customerID=null,
             int pageIndex = 0, 
             int pageSize = int.MaxValue)
         {
@@ -503,6 +504,9 @@ namespace ThirdStoreBusiness.Order
 
             if (channelOrderID != null)
                 query = query.Where(o => o.ChannelOrderID.Contains(channelOrderID));
+
+            if (customerID != null)
+                query = query.Where(o => o.CustomerID.Contains(customerID));
 
             if(jobItemID!=null)
                 query=query.Where(o => o.BuyerNote.Contains(jobItemID)||o.OrderLines.Any(l=>l.Ref5.Contains(jobItemID)));

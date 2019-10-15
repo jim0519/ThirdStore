@@ -30,5 +30,7 @@ namespace ThirdStore.Models.Order
 
         [Display(Name = "Order Time To"), UIHint("DateTimeNullable")]
         public DateTime? OrderTimeTo { get; set; }
+
+        public string SearchCustomerID { get; set; }
     }
 }

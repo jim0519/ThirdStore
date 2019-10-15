@@ -99,6 +99,14 @@
         </tr>
         <tr>
             <td>
+                @Html.LabelFor(model => model.SearchCustomerID):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchCustomerID)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.LabelFor(model => model.OrderTimeFrom):
             </td>
             <td>
@@ -236,6 +244,7 @@
             $('#@Html.FieldIdFor(model => model.OrderTimeFrom)').val("");
             $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val("");
             $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val("");
             $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val("");
 
             selectedIds = [];
@@ -251,6 +260,7 @@
             OrderTimeFrom: $('#@Html.FieldIdFor(model => model.OrderTimeFrom)').val(),
             OrderTimeTo: $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val(),
             SearchChannelOrderID: $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val(),
+            SearchCustomerID: $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val(),
             SearchJobItemID: $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val()
         };
     }

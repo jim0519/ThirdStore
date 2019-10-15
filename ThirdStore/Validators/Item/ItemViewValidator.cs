@@ -21,7 +21,9 @@ namespace ThirdStore.Validators.Item
                 .WithMessage("SKU must not be duplicated")
                 .Must((item, sku) => (item.ID > 0 && itemService.GetItemByID(item.ID).SKU.ToLower().Equals(sku.ToLower()))
                 || (item.ID == 0 && !itemService.IsDuplicateSKU(sku)))
-                .WithMessage("SKU cannot be changed");
+                .WithMessage("SKU cannot be changed")
+                .Must((item,sku)=>sku.Length<=23||(!string.IsNullOrWhiteSpace( item.Ref2)&& item.Ref2.Length<=23))
+                .WithMessage("SKU Length cannot exceed 23, or you must have a neto alias sku whose length is less than or equal to 23.");
             //.Must((item, sku) =>);
 
             RuleFor(x => x.Type)

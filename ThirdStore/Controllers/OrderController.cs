@@ -55,6 +55,7 @@ namespace ThirdStore.Controllers
                 orderTimeTo:model.OrderTimeTo,
                 channelOrderID:model.SearchChannelOrderID,
                 jobItemID:model.SearchJobItemID,
+                customerID:model.SearchCustomerID,
                 pageIndex: command.Page - 1,
                 pageSize:command.PageSize);
 
