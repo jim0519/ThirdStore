@@ -58,6 +58,7 @@ namespace ThirdStore.Models.JobItem
             public decimal Width { get; set; }
             public decimal Height { get; set; }
             public decimal CubicWeight { get; set; }
+            public string Ref1 { get; set; }
         }
 
         public class JobItemImageViewModel : BaseEntityViewModel
