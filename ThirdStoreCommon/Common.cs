@@ -95,7 +95,7 @@ namespace ThirdStoreCommon
 
     public sealed class ThirdStoreCacheKey
     {
-        
+        public const string ThirdStoreJobItemConditionListCache = "ThirdStoreJobItemConditionListCache";
     }
 
     public class ThirdStoreReturnMessage

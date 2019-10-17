@@ -56,7 +56,7 @@ namespace ThirdStoreCommon.Infrastructure
         private void InitializeCache()
         {
             _cacheManager = _containerManager.Resolve<ICacheManager>();
-            //_cacheManager.Get(ThirdStoreCacheKey.OrderStatusList, CacheFunc.GetOrderStatusList);
+            _cacheManager.Get(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache, CacheFunc.GetThirdStoreJobItemCondition);
             //_cacheManager.Get(ThirdStoreCacheKey.OrderTypeList, CacheFunc.GetOrderTypeList);
             //_cacheManager.Get(ThirdStoreCacheKey.PaymentStatusList, CacheFunc.GetPaymentStatusList);
 

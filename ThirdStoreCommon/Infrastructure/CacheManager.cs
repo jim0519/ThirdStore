@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
 using System.Text.RegularExpressions;
+using ThirdStoreCommon.Models;
 
 namespace ThirdStoreCommon.Infrastructure
 {
@@ -197,9 +198,14 @@ namespace ThirdStoreCommon.Infrastructure
 
     public class CacheFunc
     {
-        public static Func<IList<string>> GetOrderTypeList = () =>
+        public static Func<IList<SelectOptionEntity>> GetThirdStoreJobItemCondition = () =>
         {
-            return new List<string>() { "ECM", "ECV", "CVMAGENTO", "CMNOP", "MANUAL", "RESEND", "FAULTY" };
+            var retList = new List<SelectOptionEntity>();
+            foreach (ThirdStoreJobItemCondition enumValue in Enum.GetValues(typeof(ThirdStoreJobItemCondition)))
+            {
+                retList.Add(new SelectOptionEntity() { ID = enumValue.ToValue(), Code = enumValue.ToName(), Name = (enumValue.Equals(ThirdStoreJobItemCondition.USED) ? "Used/Defect" : enumValue.ToName().FirstCharToUpper()) });
+            }
+            return retList;
         };
 
         public static Func<IList<string>> GetOrderStatusList = () =>

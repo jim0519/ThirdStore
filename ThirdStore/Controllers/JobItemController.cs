@@ -23,6 +23,7 @@ using System.Globalization;
 using System.IO;
 using System.Drawing;
 using ThirdStoreCommon.Infrastructure;
+using ThirdStoreCommon.Models;
 
 namespace ThirdStore.Controllers
 {
@@ -34,12 +35,14 @@ namespace ThirdStore.Controllers
         //private readonly IReportPrintService _reportPrintService;
         private readonly IDbContext _dbContext;
         private readonly IWorkContext _workContext;
+        private readonly ICacheManager _cacheManager;
         public JobItemController(IJobItemService jobItemService,
             IItemService itemService,
             IImageService imageService,
             //IReportPrintService reportPrintService,
             IDbContext dbContext,
-            IWorkContext workContext)
+            IWorkContext workContext,
+            ICacheManager cacheManager)
         {
             _jobItemService = jobItemService;
             _itemService = itemService;
@@ -47,6 +50,7 @@ namespace ThirdStore.Controllers
             //_reportPrintService = reportPrintService;
             _dbContext = dbContext;
             _workContext = workContext;
+            _cacheManager = cacheManager;
         }
 
         public ActionResult List()
@@ -59,7 +63,8 @@ namespace ThirdStore.Controllers
             model.Suppliers = ThirdStoreSupplier.P.ToSelectList(false).ToList();
             model.Suppliers.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
-            model.JobItemConditions = ThirdStoreJobItemCondition.NEW.ToSelectList(false).ToList();
+            //model.JobItemConditions = ThirdStoreJobItemCondition.NEW.ToSelectList(false).ToList();
+            model.JobItemConditions = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).ToSelectListByList().ToList();
             model.JobItemConditions.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
             model.JobItemStatuses = ThirdStoreJobItemStatus.PENDING.ToSelectList(false).ToList();
@@ -97,6 +102,7 @@ namespace ThirdStore.Controllers
 
             var jobItemGridViewList = jobItems.Select(i => {
                 var viewModel = i.ToModel();
+                viewModel.Condition = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).FirstOrDefault(itm=>itm.ID.Equals(i.ConditionID)).Name;
                 if (i.JobItemLines.Count > 0)
                     viewModel.SKUs = i.JobItemLines.Select(l => l.SKU + ":" + l.Qty).Aggregate((current, next) => current + "," + next);
                 viewModel.Reference = _jobItemService.GetJobItemReference(i);
@@ -625,7 +631,7 @@ namespace ThirdStore.Controllers
             model.JobItemTypes = ThirdStoreJobItemType.SELFSTORED.ToSelectList(false).ToList();
             //model.Suppliers = ThirdStoreSupplier.P.ToSelectList(false).ToList();
             model.JobItemStatuses = ThirdStoreJobItemStatus.PENDING.ToSelectList(false).ToList();
-            model.JobItemConditions = ThirdStoreJobItemCondition.NEW.ToSelectList(false).ToList();
+            model.JobItemConditions = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).ToSelectListByList().ToList();
         }
 
 

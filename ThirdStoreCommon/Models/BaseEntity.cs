@@ -17,4 +17,10 @@ namespace ThirdStoreCommon.Models
         [XmlIgnoreAttribute]
         public string xmlString { get; set; }
     }
+
+    public class SelectOptionEntity:BaseEntity
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+    }
 }

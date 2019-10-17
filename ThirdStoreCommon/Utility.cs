@@ -710,6 +710,16 @@ namespace ThirdStoreCommon
             return str.Substring(startIndex, stopIndex - startIndex+1);
         }
 
+        public static string FirstCharToUpper(this string input)
+        {
+            switch (input)
+            {
+                case null: return string.Empty;
+                case "": return string.Empty;
+                default: return char.ToUpper(input.First()) + input.Substring(1).ToLower();
+            }
+        }
+
         //public static
 
         public static IEnumerable<TSource> TakeWhileAggregate<TSource, TAccumulate>(
