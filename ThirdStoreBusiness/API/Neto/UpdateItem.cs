@@ -18,7 +18,7 @@ namespace ThirdStoreBusiness.API.Neto
         public string Name { get; set; }
         public bool ShouldSerializeName()
         {
-            return !string.IsNullOrEmpty(Name);
+            return !string.IsNullOrWhiteSpace(Name);
         }
         #endregion
 
@@ -102,6 +102,14 @@ namespace ThirdStoreBusiness.API.Neto
         public bool ShouldSerializeShippingWeight()
         {
             return ShippingWeight.HasValue;
+        }
+        #endregion
+
+        #region UPC
+        public string UPC { get; set; }
+        public bool ShouldSerializeUPC()
+        {
+            return !string.IsNullOrWhiteSpace(UPC);
         }
         #endregion
     }

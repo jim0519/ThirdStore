@@ -547,9 +547,10 @@ namespace ThirdStoreBusiness.JobItem
                                   ShippingWeight = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Weight) : grpUpdates.FirstOrDefault().item.GrossWeight),
                                   //PrimarySupplier = grpUpdates.FirstOrDefault().item.SupplierID.ToEnumName<ThirdStoreSupplier>(),
                                   //ListingTemplateID=(grpUpdates.FirstOrDefault().jobItem.ConditionID==ThirdStoreJobItemCondition.NEW.ToValue()?1:8),
-                                  Quantity=grpUpdates.FirstOrDefault().localListing.Qty
+                                  Quantity=grpUpdates.FirstOrDefault().localListing.Qty,
+                                  UPC= grpUpdates.FirstOrDefault().item.Ref3
 
-                              })
+                               })
                               //.Where(u=>u.SKU.Contains("PIPE-CHAIR-511-BKX2"))
                               .ToList();
 
@@ -589,7 +590,8 @@ namespace ThirdStoreBusiness.JobItem
                                 ShippingWeight = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Weight) : grpUpdates.FirstOrDefault().item.GrossWeight),
                                 PrimarySupplier = grpUpdates.FirstOrDefault().item.SupplierID.ToEnumName<ThirdStoreSupplier>(),
                                 ListingTemplateID =(grpUpdates.FirstOrDefault().localListing.Condition== ThirdStoreJobItemCondition.NEW.ToName()?5:2),
-                                Quantity = grpUpdates.FirstOrDefault().localListing.Qty
+                                Quantity = grpUpdates.FirstOrDefault().localListing.Qty,
+                                UPC = grpUpdates.FirstOrDefault().item.Ref3
                             }).ToList() ;
                            #endregion
 
@@ -641,6 +643,7 @@ namespace ThirdStoreBusiness.JobItem
                     itm.ShippingWeight = updateObj.ShippingWeight;
                     var warehouseQty = new UpdateItemItemWarehouseQuantity[] { new UpdateItemItemWarehouseQuantity() { WarehouseID = 1.ToString(), Quantity = updateObj.Quantity.ToString(), Action = UpdateItemItemWarehouseQuantityAction.set } };
                     itm.WarehouseQuantity = warehouseQty;
+                    itm.UPC = updateObj.UPC;
 
                     updateItems.Add(itm);
                 }
@@ -675,6 +678,8 @@ namespace ThirdStoreBusiness.JobItem
 
                     var warehouseQty = new AddItemItemWarehouseQuantity[] { new AddItemItemWarehouseQuantity() { WarehouseID = 1.ToString(), Quantity = addObj.Quantity.ToString(), Action = UpdateItemItemWarehouseQuantityAction.set } };
                     itm.WarehouseQuantity = warehouseQty;
+
+                    itm.UPC = addObj.UPC;
 
                     addItems.Add(itm);
                 }
