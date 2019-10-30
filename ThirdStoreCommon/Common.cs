@@ -56,6 +56,7 @@ namespace ThirdStoreCommon
     {
         SELFSTORED=1,
         DISTRIBUTED=2,
+        PARTS=3
     }
 
     public enum ThirdStoreJobItemCondition
