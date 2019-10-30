@@ -24,6 +24,7 @@ using System.IO;
 using System.Drawing;
 using ThirdStoreCommon.Infrastructure;
 using ThirdStoreCommon.Models;
+using System.Text.RegularExpressions;
 
 namespace ThirdStore.Controllers
 {
@@ -423,6 +424,11 @@ namespace ThirdStore.Controllers
                 }
             }
 
+            if (!Regex.IsMatch(model.PricePercentage.ToString(), @"^[0-1]\.\d{1,2}$"))
+            {
+                return Json(new { Result = false, Message = "Percentage only can be decimal and 2 decimal places." });
+            }
+
             //if(model.JobItemViewLines.Any(l=>l.Qty>1))
             return Json(new { Result=true});
         }
@@ -609,6 +615,11 @@ namespace ThirdStore.Controllers
                         if (bulkUpdate.ItemPrice>0)
                         {
                             jobItem.ItemPrice = bulkUpdate.ItemPrice;
+                        }
+
+                        if(bulkUpdate.PricePercentage>0)
+                        {
+                            jobItem.PricePercentage = bulkUpdate.PricePercentage;
                         }
 
                         _jobItemService.UpdateJobItem(jobItem);

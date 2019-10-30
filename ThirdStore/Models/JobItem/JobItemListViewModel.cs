@@ -49,6 +49,9 @@ namespace ThirdStore.Models.JobItem
             public int StatusID { get; set; }
             public string Location { get; set; }
             public decimal ItemPrice { get; set; }
+            [RegularExpression(@"^[0-1]\.\d{1,2}$", ErrorMessage = "Percentage only can be decimal and 2 decimal places")]
+            [DisplayFormat(DataFormatString = "{0:0.00}", ApplyFormatInEditMode = true)]
+            public decimal PricePercentage { get; set; } = 0;
         }
     }
 }

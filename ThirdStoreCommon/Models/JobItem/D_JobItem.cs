@@ -29,6 +29,7 @@ namespace ThirdStoreCommon.Models.JobItem
         public string Ref4 { get; set; }
         public string Ref5 { get; set; }
         public string Note { get; set; }
+        public decimal PricePercentage { get; set; } = 1;
 
 
         public System.DateTime CreateTime { get; set; }

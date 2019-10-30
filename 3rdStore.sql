@@ -668,6 +668,19 @@ IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_Note')
 GO
 
 
+--Add PricePercentage
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_JobItem' AND C.Name='PricePercentage')
+	ALTER TABLE dbo.D_JobItem ADD
+		PricePercentage decimal(18,2) NOT NULL CONSTRAINT DF_D_JobItem_PricePercentage DEFAULT 1
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_PricePercentage')
+	ALTER TABLE dbo.D_JobItem
+		DROP CONSTRAINT DF_D_JobItem_PricePercentage
+GO
+
+
 
 --insert fake data
 
@@ -972,3 +985,28 @@ and SKUSpec.SKU is null
  from 
 OZPlazaItemSpecificNameValue T1
 group by T1.SKU
+
+
+
+
+select 
+ID as NetoProductID,
+SKU,
+Name,
+DefaultPrice as Price
+from NetoProducts NP
+where  not exists (
+select 1 from
+(
+	select 
+	case when LEN(SKU)>25 and Ref2<>'' then Ref2 else SKU end as SKU
+	from D_Item
+	union
+	select 
+	case when LEN(SKU)>23 and Ref2<>'' then Ref2+'_D' else SKU+'_D' end as SKU
+	from D_Item
+) L
+where NP.SKU=L.SKU
+)
+
+--^0\.\d{1,2}$

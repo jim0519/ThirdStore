@@ -466,6 +466,7 @@
     <div id="bulkUpdateJobItem-window" style="display:none;">
         @using (Html.BeginForm("BulkUpdateJobItem", "JobItem", FormMethod.Post, new { id = "bulk-update-jobitem-form" }))
         {
+            @Html.ValidationSummary()
             <input type="hidden" id="jobItemIdsBulkUpdate" name="jobItemIdsBulkUpdate" value="" />
             <table style="text-align:left;">
                 <tr>
@@ -492,7 +493,14 @@
                         @Html.EditorFor(model => model.BulkUpdate.ItemPrice)
                     </td>
                 </tr>
-
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.BulkUpdate.PricePercentage):
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => model.BulkUpdate.PricePercentage)
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         <input type="submit" class="k-button" value="Submit" />

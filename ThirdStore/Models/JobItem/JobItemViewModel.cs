@@ -40,6 +40,9 @@ namespace ThirdStore.Models.JobItem
         [Display(Name = "Sequence#")]
         public string Reference { get; set; }
         public string Note { get; set; }
+        //[RegularExpression(@"^[0-1]\.\d{1,2}$", ErrorMessage = "Percentage only can be decimal and 2 decimal places")]
+        [DisplayFormat(DataFormatString = "{0:0.00}", ApplyFormatInEditMode = true)]
+        public decimal PricePercentage { get; set; } = 1;
 
 
         public IList<SelectListItem> JobItemTypes { get; set; }

@@ -63,121 +63,129 @@
 
 @helper BasicInfo()
 {
-    <table style="width:100%;">
-        <tr>
-            <td>
-                @Html.LabelFor(m => m.JobItemCreateTime)
-            </td>
-            <td>
-                @Html.EditorFor(model => model.JobItemCreateTime)
-            </td>
-            <td>
-                @Html.LabelFor(m => m.Reference)
-            </td>
-            <td>
-                @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @readonly = "readonly" } })
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(m => m.Type)
+<table style="width:100%;">
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.JobItemCreateTime)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.JobItemCreateTime)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.Reference)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @readonly = "readonly" } })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.Type)
 
-            </td>
-            <td>
-                @Html.DropDownListFor(model => model.Type, Model.JobItemTypes)
+        </td>
+        <td>
+            @Html.DropDownListFor(model => model.Type, Model.JobItemTypes)
 
-            </td>
-            <td>
-                @Html.LabelFor(m => m.ItemName)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.ItemName)
 
-            </td>
-            <td>
-                @Html.EditorFor(model => model.ItemName)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.ItemName)
 
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(m => m.ConditionID)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.ConditionID)
 
-            </td>
-            <td>
+        </td>
+        <td>
 
-                @Html.DropDownListFor(model => model.ConditionID, Model.JobItemConditions)
-            </td>
-            <td>
-                @Html.LabelFor(m => m.ItemPrice)
-            </td>
-            <td>
-                @Html.EditorFor(model => model.ItemPrice)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(m => m.ItemDetail)
+            @Html.DropDownListFor(model => model.ConditionID, Model.JobItemConditions)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.ItemPrice)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.ItemPrice)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.ItemDetail)
 
-            </td>
-            <td>
+        </td>
+        <td>
 
-                @Html.TextAreaFor(model => model.ItemDetail, 4, 30, null)
-            </td>
-            <td>
-                @Html.LabelFor(m => m.Note)
-            </td>
-            <td>
-                @Html.TextAreaFor(model => model.Note, 4, 30, null)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(m => m.Location)
-            </td>
-            <td>
-                @Html.EditorFor(model => model.Location)
-            </td>
-            <td>
-                @Html.LabelFor(m => m.StatusID)
-            </td>
-            <td>
-                @Html.DropDownListFor(model => model.StatusID, Model.JobItemStatuses)
+            @Html.TextAreaFor(model => model.ItemDetail, 4, 30, null)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.Note)
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.Note, 4, 30, null)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.Location)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.Location)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.StatusID)
+        </td>
+        <td>
+            @Html.DropDownListFor(model => model.StatusID, Model.JobItemStatuses)
 
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(m => m.DesignatedSKU)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.DesignatedSKU)
 
-            </td>
-            <td>
-                @Html.EditorFor(model => model.DesignatedSKU)
-                @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
-            </td>
-            <td>
-                @Html.LabelFor(m => m.ShipTime)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.DesignatedSKU)
+            @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
+        </td>
+        <td>
+            @Html.LabelFor(m => m.ShipTime)
 
-            </td>
-            <td>
-                @Html.EditorFor(model => model.ShipTime)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.ShipTime)
 
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @*@Html.LabelFor(m => m.Ref1)*@
-                @Html.LabelFor(m => m.Ref2)
-            </td>
-            <td>
-                @Html.EditorFor(model => model.Ref2)
-                @*@Html.EditorFor(model => model.Ref1, new { htmlAttributes = new { @readonly = "readonly" } })*@
-            </td>
-            <td>
-                @Html.LabelFor(m => m.TrackingNumber)
-            </td>
-            <td>
-                @Html.EditorFor(model => model.TrackingNumber)
-            </td>
-        </tr>
-    </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @*@Html.LabelFor(m => m.Ref1)*@
+            @Html.LabelFor(m => m.Ref2)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.Ref2)
+            @*@Html.EditorFor(model => model.Ref1, new { htmlAttributes = new { @readonly = "readonly" } })*@
+        </td>
+        <td>
+            @Html.LabelFor(m => m.TrackingNumber)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.TrackingNumber)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.PricePercentage)
+        </td>
+        <td colspan="3">
+            @Html.EditorFor(model => model.PricePercentage)
+        </td>
+    </tr>
+</table>
 
 }
 
@@ -461,7 +469,7 @@
             $("#tabs").tabs();
 
             $("input[type=submit]").click(function () {
-                //debugger;
+                debugger;
                 var isValid = true;
                 $.ajax({
                     url: '@Url.Action("ValidateInput", "JobItem")',
