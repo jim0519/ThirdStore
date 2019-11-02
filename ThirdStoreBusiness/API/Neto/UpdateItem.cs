@@ -26,7 +26,7 @@ namespace ThirdStoreBusiness.API.Neto
         public decimal? DefaultPrice { get; set; }
         public bool ShouldSerializeDefaultPrice()
         {
-            return DefaultPrice.HasValue;
+            return DefaultPrice.HasValue&&DefaultPrice.Value>0;
         }
         #endregion
 

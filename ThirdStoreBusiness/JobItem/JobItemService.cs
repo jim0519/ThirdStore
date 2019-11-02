@@ -532,15 +532,15 @@ namespace ThirdStoreBusiness.JobItem
                               //where onlineListings.Any(ol => ol.SKU.ToLower().Equals(record.localListing.SKUWSuffix.ToLower()))
                               join ol in onlineListings on record.localListing.SKUWSuffix.ToLower() equals ol.SKU.ToLower()
                                group new { record.localListing, record.jobItem, record.item,onlineListing=ol } by new { record.localListing.SKUWSuffix } into grpUpdates
-                               where grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
-                               || grpUpdates.FirstOrDefault().jobItem != null//no need to sync if condition is used and do not have first job item inv
+                               //where grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
+                               //|| grpUpdates.FirstOrDefault().jobItem != null//no need to sync if condition is used and do not have first job item inv
                                select new
                               {
                                   SKU = grpUpdates.Key.SKUWSuffix,
                                   Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+(grpUpdates.FirstOrDefault().jobItem!=null&& !string.IsNullOrWhiteSpace( grpUpdates.FirstOrDefault().jobItem.ItemName)? grpUpdates.FirstOrDefault().jobItem.ItemName: grpUpdates.FirstOrDefault().item.Name),
                                   DefaultPrice = (grpUpdates.FirstOrDefault().jobItem!=null? grpUpdates.Sum(ji => ji.jobItem.ItemPrice*(ji.jobItem.PricePercentage>0?ji.jobItem.PricePercentage:1)):grpUpdates.FirstOrDefault().item.Price),
                                   Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),//TODO: Add first quantity job item ids and rest ids
-                                  Images = GenerateUpdateImages((grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),
+                                  Images = GenerateUpdateImages(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),
                                   ShippingHeight = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji=>ji.jobItem.JobItemLines).Max(jil=>jil.Height) : grpUpdates.FirstOrDefault().item.Height),//TODO: Determine which height should be used
                                   ShippingLength = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Length) : grpUpdates.FirstOrDefault().item.Length),
                                   ShippingWidth = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Width) : grpUpdates.FirstOrDefault().item.Width),
@@ -583,7 +583,7 @@ namespace ThirdStoreBusiness.JobItem
                                 Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix) + (grpUpdates.FirstOrDefault().jobItem != null && !string.IsNullOrWhiteSpace(grpUpdates.FirstOrDefault().jobItem.ItemName) ? grpUpdates.FirstOrDefault().jobItem.ItemName : grpUpdates.FirstOrDefault().item.Name),
                                 DefaultPrice = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Sum(ji => ji.jobItem.ItemPrice * (ji.jobItem.PricePercentage > 0 ? ji.jobItem.PricePercentage : 1)) : grpUpdates.FirstOrDefault().item.Price),
                                 Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item),//TODO: Add first quantity job item ids and rest ids
-                                Images = GenerateAddImages(GenerateUpdateImages((grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem):null), grpUpdates.FirstOrDefault().item)),
+                                Images = GenerateAddImages(GenerateUpdateImages(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem):null), grpUpdates.FirstOrDefault().item)),
                                 ShippingHeight = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Height) : grpUpdates.FirstOrDefault().item.Height),//TODO: Determine which height should be used
                                 ShippingLength = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Length) : grpUpdates.FirstOrDefault().item.Length),
                                 ShippingWidth = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Width) : grpUpdates.FirstOrDefault().item.Width),
@@ -635,7 +635,7 @@ namespace ThirdStoreBusiness.JobItem
                     itm.DefaultPrice = updateObj.DefaultPrice;
                     itm.IsActive = true;
                     itm.Description = updateObj.Description;
-                    if(updateObj.Images!=null)
+                    //if(updateObj.Images!=null)
                         itm.Images = updateObj.Images;
                     itm.ShippingHeight = updateObj.ShippingHeight;
                     itm.ShippingLength = updateObj.ShippingLength;
@@ -665,7 +665,7 @@ namespace ThirdStoreBusiness.JobItem
                     itm.DefaultPrice = addObj.DefaultPrice;
                     itm.IsActive = true;
                     itm.Description = addObj.Description;
-                    if (addObj.Images != null)
+                    //if (addObj.Images != null)
                         itm.Images = addObj.Images;
                     itm.ShippingHeight = addObj.ShippingHeight;
                     itm.ShippingLength = addObj.ShippingLength;
@@ -832,7 +832,7 @@ namespace ThirdStoreBusiness.JobItem
             return retObj;
         }
 
-        private UpdateItemItemImages GenerateUpdateImages( IEnumerable<D_JobItem> firstInvJobItems, D_Item item, GetItemResponseItem onlineListing=null)
+        private UpdateItemItemImages GenerateUpdateImages(ExportProductListing localListing, IEnumerable<D_JobItem> firstInvJobItems, D_Item item, GetItemResponseItem onlineListing=null)
         {
             try
             {
@@ -842,12 +842,13 @@ namespace ThirdStoreBusiness.JobItem
                 int i = 0;
                 var lstItemImages = new List<UpdateItemItemImage>();
 
-                //if ((firstInvJobItems == null || firstInvJobItems.Count() == 0)
-                //    && localListing.Condition.Equals(ThirdStoreJobItemCondition.USED.ToName())
-                //    && onlineListing != null)
-                //{
-                //    return default(UpdateItemItemImages);
-                //}
+                if ((firstInvJobItems == null || firstInvJobItems.Count() == 0)
+                    && localListing.Condition.Equals(ThirdStoreJobItemCondition.USED.ToName())
+                    //&& localListing.Qty == 0 //commented because qty may be 1 and there is allocated job item
+                    && onlineListing != null)
+                {
+                    return default(UpdateItemItemImages);
+                }
 
                 if (item.ItemImages.Count > 0)
                 {
@@ -902,13 +903,14 @@ namespace ThirdStoreBusiness.JobItem
                 var strDesc = new StringBuilder();
                 //var firstInvJobItemNode = "";
 
-                //if((firstInvJobItems==null||firstInvJobItems.Count()==0)
-                //    &&localListing.Condition.Equals(ThirdStoreJobItemCondition.USED.ToName())
-                //    &&onlineListing!=null)
-                //{
-                //    strDesc.Append(onlineListing.Description);
-                //    return strDesc.ToString();
-                //}
+                if ((firstInvJobItems == null || firstInvJobItems.Count() == 0)
+                    && localListing.Condition.Equals(ThirdStoreJobItemCondition.USED.ToName())
+                    //&&localListing.Qty==0 //commented because qty may be 1 and there is allocated job item
+                    && onlineListing != null)
+                {
+                    //strDesc.Append(onlineListing.Description);
+                    return string.Empty;
+                }
 
                 if (firstInvJobItems != null && firstInvJobItems.Count() > 0)
                 {
