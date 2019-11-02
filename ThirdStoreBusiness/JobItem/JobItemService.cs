@@ -538,7 +538,7 @@ namespace ThirdStoreBusiness.JobItem
                               {
                                   SKU = grpUpdates.Key.SKUWSuffix,
                                   Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+(grpUpdates.FirstOrDefault().jobItem!=null&& !string.IsNullOrWhiteSpace( grpUpdates.FirstOrDefault().jobItem.ItemName)? grpUpdates.FirstOrDefault().jobItem.ItemName: grpUpdates.FirstOrDefault().item.Name),
-                                  DefaultPrice = (grpUpdates.FirstOrDefault().jobItem!=null? grpUpdates.Sum(ji => ji.jobItem.ItemPrice):grpUpdates.FirstOrDefault().item.Price),
+                                  DefaultPrice = (grpUpdates.FirstOrDefault().jobItem!=null? grpUpdates.Sum(ji => ji.jobItem.ItemPrice*(ji.jobItem.PricePercentage>0?ji.jobItem.PricePercentage:1)):grpUpdates.FirstOrDefault().item.Price),
                                   Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),//TODO: Add first quantity job item ids and rest ids
                                   Images = GenerateUpdateImages((grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),
                                   ShippingHeight = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji=>ji.jobItem.JobItemLines).Max(jil=>jil.Height) : grpUpdates.FirstOrDefault().item.Height),//TODO: Determine which height should be used
@@ -581,7 +581,7 @@ namespace ThirdStoreBusiness.JobItem
                             {
                                 SKU = grpUpdates.Key.SKUWSuffix,
                                 Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix) + (grpUpdates.FirstOrDefault().jobItem != null && !string.IsNullOrWhiteSpace(grpUpdates.FirstOrDefault().jobItem.ItemName) ? grpUpdates.FirstOrDefault().jobItem.ItemName : grpUpdates.FirstOrDefault().item.Name),
-                                DefaultPrice = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Sum(ji => ji.jobItem.ItemPrice) : grpUpdates.FirstOrDefault().item.Price),
+                                DefaultPrice = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Sum(ji => ji.jobItem.ItemPrice * (ji.jobItem.PricePercentage > 0 ? ji.jobItem.PricePercentage : 1)) : grpUpdates.FirstOrDefault().item.Price),
                                 Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item),//TODO: Add first quantity job item ids and rest ids
                                 Images = GenerateAddImages(GenerateUpdateImages((grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem):null), grpUpdates.FirstOrDefault().item)),
                                 ShippingHeight = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.SelectMany(ji => ji.jobItem.JobItemLines).Max(jil => jil.Height) : grpUpdates.FirstOrDefault().item.Height),//TODO: Determine which height should be used
