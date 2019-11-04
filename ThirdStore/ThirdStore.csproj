@@ -333,7 +333,6 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Content\kendo\css\images\kendoui.ttf" />
     <Content Include="Content\kendo\css\images\kendoui.woff" />
-    <None Include="Properties\PublishProfiles\ThirdStore20191030050308 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\ThirdStorePublish.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\Common.js" />
