@@ -71,7 +71,7 @@ namespace ThirdStore.Controllers
             model.JobItemStatuses = ThirdStoreJobItemStatus.PENDING.ToSelectList(false).ToList();
             model.JobItemStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
-            var showSyncInvUsers = new int[] {1,4, 17 };
+            var showSyncInvUsers = new int[] {1,4, 14,17 };
             if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
                 model.ShowSyncInventory = true;
 
@@ -481,6 +481,28 @@ namespace ThirdStore.Controllers
                 return Json(new { Result = false, ex.Message });
             }
             
+        }
+
+        [HttpPost]
+        public ActionResult SyncByJobItem(string selectedIDs)
+        {
+            try
+            {
+                var ids = selectedIDs
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => Convert.ToInt32(x))
+                    .ToArray();
+
+                var retMessage = _jobItemService.SyncInventory(ids);
+                if (retMessage.IsSuccess)
+                    return Json(new { Result = true });
+                else
+                    return Json(new { Result = false, Message = retMessage.ErrorMesage });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = false, ErrMsg = ex.Message });
+            }
         }
 
         [HttpPost]

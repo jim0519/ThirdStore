@@ -87,9 +87,13 @@
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
             @*<input type="button" id="btnImportData" class="k-button" value="Import Data" />*@
+            @if (Model.ShowSyncInventory)
+            {
+                <img id="imgLoadingJobItem" src="~/Content/images/loading.gif" style="display:none;" />
+                <input type="button" id="btnSyncByJobItem" class="k-button" value="Sync Inventory" />
+            }
             <input type="button" id="btnPrintLabel" class="k-button" value="Print Label" />
             <input type="button" id="btnEdit" class="k-button" value="Edit" />
-            @*<input type="button" id="btnShipOut" class="k-button" value="Ship Out" />*@
             <input type="button" id="btnCreateNew" class="k-button" value="Create New Item" />
             <script>
                 $(document).ready(function () {
@@ -125,6 +129,53 @@
                                 alert("error");
                             }
                         });
+                        return false;
+                    });
+
+                    $('#btnSyncByJobItem').click(function () {
+                        //debugger;
+                        if (selectedIds.length == 0) {
+                            alert("Please select more than one job item to sync");
+                            return false;
+                        }
+
+                        if (selectedIds.length > 0) {
+                            //e.preventDefault();
+                            var ids = selectedIds.join(",");
+                            var postData = {
+                                selectedIDs: ids
+                            };
+                            var link = '@Url.Action("SyncByJobItem", "JobItem")';
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                //contentType: "application/json; charset=utf-8",
+                                data: postData,
+                                dataType: "json",
+                                beforeSend: function () {
+                                    $("#imgLoadingJobItem").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoadingJobItem").hide();
+                                },
+                                success: function (data) {
+                                    if (data.Result) {
+                                        alert("Sync Inventory Finished");
+                                    }
+                                    else {
+                                        if (data.Message != "")
+                                            alert(data.Message);
+                                        else
+                                            alert("Unknown error occurred.");
+                                    }
+                                },
+                                error: function (data) {
+                                    //debugger;
+                                    alert("error");
+                                }
+                            });
+                        }
+
                         return false;
                     });
 
