@@ -35,13 +35,15 @@ namespace ThirdStore.Models.JobItem
         public string SearchLocation { get; set; }
         public string SearchTrackingNumber { get; set; }
         public string SearchReference { get; set; }
-        public string SearchInspector { get; set; }
+        [UIHint("MultiSelectString")]
+        public List<string> SearchInspector { get; set; }
         public bool ShowSyncInventory { get; set; }
 
         public IList<SelectListItem> Suppliers { get; set; }
         public IList<SelectListItem> JobItemTypes { get; set; }
         public IList<SelectListItem> JobItemConditions { get; set; }
         public IList<SelectListItem> JobItemStatuses { get; set; }
+        public IList<SelectListItem> InspectorList { get; set; }
 
         public BulkUpdateJobItemModel BulkUpdate { get; set; }
         public class BulkUpdateJobItemModel

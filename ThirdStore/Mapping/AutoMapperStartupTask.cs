@@ -57,7 +57,7 @@ namespace ThirdStore.Infrastructure
                 .ForMember(dest=>dest.StatusID,mce=>mce.MapFrom(s=>Convert.ToBoolean( s.StatusID)));
 
             Mapper.CreateMap<JobItemViewModel,D_JobItem>()
-                .ForMember(dest => dest.Ref2, mce => mce.MapFrom(s => string.Join("",s.Ref2)));
+                .ForMember(dest => dest.Ref2, mce => mce.MapFrom(s =>(s.Ref2!=null&&s.Ref2.Count>0 ? string.Join("", s.Ref2) :string.Empty)));
             Mapper.CreateMap<JobItemViewModel.JobItemLineViewModel, D_JobItemLine>();
             Mapper.CreateMap<JobItemViewModel.JobItemImageViewModel, M_JobItemImage>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));

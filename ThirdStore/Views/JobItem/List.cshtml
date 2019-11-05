@@ -317,7 +317,7 @@
                 @Html.LabelFor(model => model.SearchInspector):
             </td>
             <td>
-                @Html.EditorFor(model => model.SearchInspector)
+                @Html.EditorFor(model => model.SearchInspector, new { SelectList = Model.InspectorList })
             </td>
         </tr>
         <tr>
@@ -482,8 +482,11 @@
             $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchStatus)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchLocation)').val("");
-            $('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
+            //$('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
+            var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
+            inspectorMultiselect.value("");
+            inspectorMultiselect.trigger("change");
 
             selectedIds = [];
 

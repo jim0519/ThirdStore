@@ -75,6 +75,9 @@ namespace ThirdStore.Controllers
             model.JobItemStatuses = ThirdStoreJobItemStatus.PENDING.ToSelectList(false).ToList();
             model.JobItemStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
+            model.InspectorList = new MultiSelectList(_userService.GetAllUsers().Where(u => !string.IsNullOrWhiteSpace(u.Description)).Select(u => new { ID = u.Description, Name = u.Description }), "ID", "Name").ToList();
+            model.InspectorList.Insert(0, new SelectListItem { Text = "All", Value = "" });
+
             var showSyncInvUsers = new int[] {1,4, 14,17 };
             if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
                 model.ShowSyncInventory = true;
@@ -89,6 +92,8 @@ namespace ThirdStore.Controllers
             ThirdStoreJobItemCondition? jobItemCondition = model.SearchCondition > 0 ? (ThirdStoreJobItemCondition?)(model.SearchCondition) : null;
             ThirdStoreJobItemType? jobItemType = model.SearchType > 0 ? (ThirdStoreJobItemType?)(model.SearchType) : null;
             ThirdStoreSupplier? supplier = model.SearchSupplier > 0 ? (ThirdStoreSupplier?)(model.SearchSupplier) : null;
+            var inspector = model.SearchInspector!=null&& !model.SearchInspector.Contains("") ? model.SearchInspector : null;
+
             var jobItems = _jobItemService.SearchJobItems(
                 id:model.SearchID,
                 reference:model.SearchReference,
@@ -100,7 +105,7 @@ namespace ThirdStore.Controllers
                 jobItemCondition: jobItemCondition,
                 jobItemSupplier:supplier,
                 location:model.SearchLocation,
-                inspector:model.SearchInspector,
+                inspector: inspector,
                 trackingNumber:model.SearchTrackingNumber,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);

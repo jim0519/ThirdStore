@@ -73,7 +73,7 @@ namespace ThirdStoreBusiness.JobItem
             ThirdStoreJobItemCondition? jobItemCondition = null,
             ThirdStoreSupplier? jobItemSupplier = null,
             string location = null,
-            string inspector = null,
+             List<string> inspector = null,
             string trackingNumber = null,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
@@ -127,7 +127,13 @@ namespace ThirdStoreBusiness.JobItem
 
             if(inspector!=null)
             {
-                query = query.Where(i => i.Ref2.Contains(inspector));
+                //query = query.Where(i => i.Ref2.Contains(inspector));
+                //var sysHoldReasonsStr = inspector.Select(r => r.ToEnumName<SystemHoldReason>());
+                //query = query.Where(o => inspector.Any(s => o.Ref2.Contains(s)));
+                foreach(var sp in inspector)
+                {
+                    query = query.Where(i => i.Ref2.Contains(sp));
+                }
             }
 
             if (trackingNumber != null)
