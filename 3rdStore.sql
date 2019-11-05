@@ -1010,3 +1010,72 @@ where NP.SKU=L.SKU
 )
 
 --^0\.\d{1,2}$
+
+
+
+
+
+update T_User
+set
+Description='C'
+where id in (4)
+
+update T_User
+set
+Description='K'
+where id in (6)
+
+update T_User
+set
+Description='W'
+where id in (11)
+
+update T_User
+set
+Description='Q'
+where id in (15)
+
+update T_User
+set
+Description='L'
+where id in (13)
+
+update T_User
+set
+Description='S'
+where id in (9)
+
+update T_User
+set
+Description='T'
+where id in (7)
+
+update T_User
+set
+Description='Y'
+where id in (8)
+
+update T_User
+set
+Description='D'
+where id in (10)
+
+update T_User
+set
+Description='Z'
+where id in (16)
+
+update T_User
+set
+Description='A'
+where id in (5)
+
+update T_User
+set
+Description='J'
+where id in (12)
+
+update T_User
+set
+Description='E'
+where id in (18)

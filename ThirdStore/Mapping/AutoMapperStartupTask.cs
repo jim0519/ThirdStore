@@ -50,12 +50,14 @@ namespace ThirdStore.Infrastructure
                 .ForMember(dest => dest.Status, mce => mce.MapFrom(s => s.StatusID.ToEnumName<ThirdStoreJobItemStatus>()))
                 .ForMember(dest => dest.Condition, mce => mce.MapFrom(s => s.ConditionID.ToEnumName<ThirdStoreJobItemCondition>()));
                 //.ForMember(dest => dest.Supplier, mce => mce.MapFrom(s => s.SupplierID.ToEnumName<ThirdStoreSupplier>()))
-            Mapper.CreateMap<D_JobItem, JobItemViewModel>();
+            Mapper.CreateMap<D_JobItem, JobItemViewModel>()
+                .ForMember((dest => dest.Ref2), mce => mce.MapFrom(s => s.Ref2.ToCharArray().Select(c => c.ToString()).ToList()));
             Mapper.CreateMap<D_JobItemLine, JobItemViewModel.JobItemLineViewModel>();
             Mapper.CreateMap<M_JobItemImage, JobItemViewModel.JobItemImageViewModel>()
                 .ForMember(dest=>dest.StatusID,mce=>mce.MapFrom(s=>Convert.ToBoolean( s.StatusID)));
 
-            Mapper.CreateMap<JobItemViewModel,D_JobItem>();
+            Mapper.CreateMap<JobItemViewModel,D_JobItem>()
+                .ForMember(dest => dest.Ref2, mce => mce.MapFrom(s => string.Join("",s.Ref2)));
             Mapper.CreateMap<JobItemViewModel.JobItemLineViewModel, D_JobItemLine>();
             Mapper.CreateMap<JobItemViewModel.JobItemImageViewModel, M_JobItemImage>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));

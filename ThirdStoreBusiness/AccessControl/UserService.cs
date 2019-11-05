@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Security;
 using System.Web;
+using ThirdStoreCommon.Infrastructure;
 
 namespace ThirdStoreBusiness.AccessControl
 {
@@ -166,6 +167,13 @@ namespace ThirdStoreBusiness.AccessControl
                 return null;
             var user = GetUserByEmail(email);
             return user;
+        }
+
+        public IList<T_User> GetAllUsers()
+        {
+            //var allUsers=_cacheManager.Get<IList<T_User>>(ThirdStoreCacheKey.ThirdStoreUserListCache, () => { return _userRepository.Table.Where(u => u.StatusID == 1).ToList(); });
+            var query = _userRepository.Table.Where(u => u.StatusID == 1);
+            return query.ToList();
         }
     }
 }

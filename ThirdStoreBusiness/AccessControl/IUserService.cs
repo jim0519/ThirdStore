@@ -16,6 +16,8 @@ namespace ThirdStoreBusiness.AccessControl
 
         bool RegisterUser(T_User user);
 
+        IList<T_User> GetAllUsers();
+
         bool ValidateUser(string email, string password);
 
         bool SignIn(string email, string password);

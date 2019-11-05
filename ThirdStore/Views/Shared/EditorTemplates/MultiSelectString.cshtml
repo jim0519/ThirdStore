@@ -1,0 +1,10 @@
+﻿@model List<string>
+
+@Html.ListBoxFor(model => model, (IEnumerable<SelectListItem>)ViewData["SelectList"], new { style = "width:300px;" })
+<script>
+    $(document).ready(function() {
+        $("#@ViewData.TemplateInfo.GetFullHtmlFieldId(string.Empty)").kendoMultiSelect({
+            autoClose: false
+        }).data("kendoMultiSelect");
+    });
+</script>

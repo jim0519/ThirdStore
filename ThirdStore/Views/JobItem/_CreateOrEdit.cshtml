@@ -167,8 +167,9 @@
             @Html.LabelFor(m => m.Ref2)
         </td>
         <td>
-            @Html.EditorFor(model => model.Ref2)
+            @*@Html.EditorFor(model => model.Ref2)*@
             @*@Html.EditorFor(model => model.Ref1, new { htmlAttributes = new { @readonly = "readonly" } })*@
+            @Html.EditorFor(model => model.Ref2, new { SelectList = Model.InspectorList })
         </td>
         <td>
             @Html.LabelFor(m => m.TrackingNumber)

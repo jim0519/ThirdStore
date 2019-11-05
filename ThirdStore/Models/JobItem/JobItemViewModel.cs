@@ -36,7 +36,8 @@ namespace ThirdStore.Models.JobItem
         
         //public string Ref1 { get; set; }
         [Display(Name = "Inspectors")]
-        public string Ref2 { get; set; }
+        [UIHint("MultiSelectString")]
+        public List<string> Ref2 { get; set; }
         [Display(Name = "Sequence#")]
         public string Reference { get; set; }
         public string Note { get; set; }
@@ -48,6 +49,7 @@ namespace ThirdStore.Models.JobItem
         public IList<SelectListItem> JobItemTypes { get; set; }
         public IList<SelectListItem> JobItemConditions { get; set; }
         public IList<SelectListItem> JobItemStatuses { get; set; }
+        public IList<SelectListItem> InspectorList { get; set; }
         public IList<JobItemLineViewModel> JobItemViewLines { get; set; }
         public IList<JobItemImageViewModel> JobItemViewImages { get; set; }
 

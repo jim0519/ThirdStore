@@ -25,6 +25,7 @@ using System.Drawing;
 using ThirdStoreCommon.Infrastructure;
 using ThirdStoreCommon.Models;
 using System.Text.RegularExpressions;
+using ThirdStoreBusiness.AccessControl;
 
 namespace ThirdStore.Controllers
 {
@@ -37,13 +38,15 @@ namespace ThirdStore.Controllers
         private readonly IDbContext _dbContext;
         private readonly IWorkContext _workContext;
         private readonly ICacheManager _cacheManager;
+        private readonly IUserService _userService;
         public JobItemController(IJobItemService jobItemService,
             IItemService itemService,
             IImageService imageService,
             //IReportPrintService reportPrintService,
             IDbContext dbContext,
             IWorkContext workContext,
-            ICacheManager cacheManager)
+            ICacheManager cacheManager,
+            IUserService userService)
         {
             _jobItemService = jobItemService;
             _itemService = itemService;
@@ -52,6 +55,7 @@ namespace ThirdStore.Controllers
             _dbContext = dbContext;
             _workContext = workContext;
             _cacheManager = cacheManager;
+            _userService = userService;
         }
 
         public ActionResult List()
@@ -184,6 +188,7 @@ namespace ThirdStore.Controllers
             {
                 editItemViewModel = jobItem.ToCreateNewModel();
                 editItemViewModel.Reference = _jobItemService.GetJobItemReference(jobItem);
+                //editItemViewModel.Ref2 = jobItem.Ref2.ToCharArray().Select(c => c.ToString()).ToList();
             }
 
             FillDropDownDS(editItemViewModel);
@@ -665,6 +670,11 @@ namespace ThirdStore.Controllers
             //model.Suppliers = ThirdStoreSupplier.P.ToSelectList(false).ToList();
             model.JobItemStatuses = ThirdStoreJobItemStatus.PENDING.ToSelectList(false).ToList();
             model.JobItemConditions = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).ToSelectListByList().ToList();
+            //model.InspectorList = _userService.GetAllUsers().Where(u=>!string.IsNullOrWhiteSpace( u.Description)).Select(u=>new {ID=u.Description, Name=u.Description }).ToSelectListByList().ToList();
+            model.InspectorList=new MultiSelectList(_userService.GetAllUsers().Where(u => !string.IsNullOrWhiteSpace(u.Description)).Select(u => new { ID = u.Description, Name = u.Description }), "ID", "Name", model.Ref2).ToList();
+            //var userList = _userService.GetAllUsers().Where(u => !string.IsNullOrWhiteSpace(u.Description)).Select(d=>d.Description);
+            //var jobItemsInspectors = _jobItemService.GetAllJobItems().Select(ji=>ji.Ref2.ToUpper()).Where(r=>!string.IsNullOrWhiteSpace( r)).SelectMany(r=>r.ToCharArray().Select(c => c.ToString())).Distinct();
+            //var result = jobItemsInspectors.Where(ins=>!userList.Contains(ins));
         }
 
 
