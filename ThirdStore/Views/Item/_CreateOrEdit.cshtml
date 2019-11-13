@@ -154,8 +154,14 @@
         <td class="adminTitle">
             @Html.LabelFor(m => m.Ref3)
         </td>
-        <td colspan="3">
+        <td>
             @Html.EditorFor(model => model.Ref3)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.Ref4)
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.Ref4, 4, 30, null)
         </td>
     </tr>
 </table>

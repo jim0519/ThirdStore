@@ -47,6 +47,8 @@ namespace ThirdStore.Models.Item
         public string Ref2 { get; set; }
         [Display(Name = "UPC")]
         public string Ref3 { get; set; }
+        [Display(Name = "Notes")]
+        public string Ref4 { get; set; }
 
         public IList<SelectListItem> ItemTypes { get; set; }
         public IList<SelectListItem> YesOrNo { get; set; }
