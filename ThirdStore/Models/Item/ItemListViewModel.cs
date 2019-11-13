@@ -20,6 +20,7 @@ namespace ThirdStore.Models.Item
         public string SearchSKU { get; set; }
         public int SearchType { get; set; }
         public string SearchName { get; set; }
+        public string SearchAliasSKU { get; set; }
         public int SearchSupplier { get; set; }
         public int SearchReadyForList { get; set; }
         public bool ShowSyncInventory { get; set; }

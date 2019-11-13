@@ -7,6 +7,7 @@ using ThirdStoreCommon.Models.Item;
 using ThirdStoreData;
 using ThirdStoreCommon;
 using ThirdStoreCommon.Infrastructure;
+using System.Text.RegularExpressions;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -45,6 +46,7 @@ namespace ThirdStoreBusiness.Item
         public IPagedList<D_Item> SearchItems(string sku = null, 
             ThirdStoreItemType? itemType = null, 
             string name = null,
+            string aliasSKU = null,
             ThirdStoreSupplier? supplier = null,
             int isReadyForList = -1,
             int pageIndex = 0,
@@ -61,6 +63,15 @@ namespace ThirdStoreBusiness.Item
             }
             if (name != null)
                 query = query.Where(i => i.Name.Contains(name.ToLower()));
+
+            if(aliasSKU!=null)
+            {
+                if(Regex.IsMatch( aliasSKU, "(_D){1}$"))
+                {
+                    aliasSKU = Regex.Replace(aliasSKU, "(_D){1}$", "");
+                    query = query.Where(i => i.Ref2.Contains(aliasSKU));
+                }
+            }
             if (supplier.HasValue)
             {
                 var supplierID = supplier.Value.ToValue();

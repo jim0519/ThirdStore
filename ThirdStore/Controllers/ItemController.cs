@@ -85,6 +85,7 @@ namespace ThirdStore.Controllers
                 sku:model.SearchSKU,
                 itemType: itemType, 
                 name:model.SearchName,
+                aliasSKU:model.SearchAliasSKU,
                 supplier: supplier,
                 isReadyForList: model.SearchReadyForList,
                 pageIndex: command.Page - 1,

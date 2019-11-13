@@ -26,6 +26,7 @@ namespace ThirdStoreBusiness.Item
         IPagedList<D_Item> SearchItems(string sku = null,
              ThirdStoreItemType? itemType = null,
             string name = null,
+            string aliasSKU = null,
             ThirdStoreSupplier? supplier = null,
             int isReadyForList = -1,
             int pageIndex = 0,
