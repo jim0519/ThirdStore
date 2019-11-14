@@ -947,6 +947,28 @@ namespace ThirdStoreBusiness.JobItem
                     strDesc.Append("<br />");
                 }
 
+                if (firstInvJobItems != null && firstInvJobItems.Count() > 0)
+                {
+                    int i;
+                    if (item.ItemImages.Count >= 6)
+                        i = 6;
+                    else
+                        i = item.ItemImages.Count;
+                    var rnd = new Random();
+                    foreach(var jobItem in firstInvJobItems)
+                    {
+                        foreach (var jobItmImg in jobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
+                        {
+                            if (i <12)
+                            {
+                                strDesc.Append($"<img src='https://www.3rdstore.com.au/assets/alt_{i}/{localListing.SKUWSuffix}.jpg?{rnd.Next(1,int.MaxValue)}' style='margin-bottom:10px;' />");
+                                i++;
+                            }
+                        }
+                    }
+                    strDesc.Append("<br />");
+                }
+
                 strDesc.Append(item.Description);
                 strDesc.Append("<br />");
 
