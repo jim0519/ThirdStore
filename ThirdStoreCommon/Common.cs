@@ -22,6 +22,9 @@ namespace ThirdStoreCommon
         public const string JobItemInvList = "JobItemInvList";
         public const string JobItemInvIDs = "JobItemInvIDs";
         public const string FirstInvJobItemsRef = "FirstInvJobItemsRef";
+
+        //public const string DSZSKUListURL = "https://www.dropshipzone.com.au/rsdropship/download/downloadSkuList/";
+        public const string DSZSKUListURL = "http://dropshipzone.com.au/sample/Standard/sku_list.csv";
     }
 
 

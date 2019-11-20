@@ -22,6 +22,7 @@ using ThirdStoreBusiness.Image;
 using ThirdStoreBusiness.API.eBay;
 using ThirdStoreBusiness.Order;
 using ThirdStoreBusiness.ReportPrint;
+using LINQtoCSV;
 
 namespace ThirdStoreFramework
 {
@@ -48,8 +49,8 @@ namespace ThirdStoreFramework
                 .As<HttpRequestBase>()
                 .InstancePerLifetimeScope();
 
-            //builder.RegisterType<CsvContext>().InstancePerLifetimeScope();
-
+            builder.RegisterType<CsvContext>().InstancePerLifetimeScope();
+            builder.Register(c=>new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default }).InstancePerLifetimeScope();
             var assemblies = typeFinder.GetAssemblies().ToArray();
             //PerHttpRequest
 

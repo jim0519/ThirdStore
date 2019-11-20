@@ -473,6 +473,15 @@ namespace ThirdStore.Controllers
         {
             try
             {
+                var type2 = System.Type.GetType("ThirdStoreBusiness.ScheduleTask.UpdateDSDataAndSync, ThirdStoreBusiness");
+                object instance;
+                if (!ThirdStoreWebContext.Instance.TryResolve(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope(), out instance))
+                {
+                    //not resolved
+                    instance = ThirdStoreWebContext.Instance.ResolveUnregistered(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope());
+                }
+                ThirdStoreBusiness.ScheduleTask.ITask task = instance as ThirdStoreBusiness.ScheduleTask.ITask;
+                task.Execute();
                 //               var syncItemQuery = @"select I.ID
                 //from D_Item I
                 //where I.SKU in (select distinct SKU from OKSKUList20190830)

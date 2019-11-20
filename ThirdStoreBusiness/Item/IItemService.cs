@@ -43,5 +43,7 @@ namespace ThirdStoreBusiness.Item
         void DeleteItem(D_Item item);
 
         void DeleteChildItem(D_Item_Relationship childItem);
+
+        void UpdateChannelData();
     }
 }

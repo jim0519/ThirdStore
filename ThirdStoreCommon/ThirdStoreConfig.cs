@@ -79,6 +79,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string ThirdStoreDSZData
+        {
+            get
+            {
+                return AppDomain.CurrentDomain.BaseDirectory + "\\ThirdStoreDSZData";
+            }
+        }
+
 
     }
 

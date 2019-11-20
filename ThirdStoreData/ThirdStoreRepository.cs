@@ -238,6 +238,12 @@ namespace ThirdStoreData
             }
         }
 
+        public void Clear()
+        {
+            var dbSet = this.Entities as DbSet<T>;
+            dbSet.RemoveRange(dbSet);
+        }
+
         private IDbSet<T> Entities
         {
             get

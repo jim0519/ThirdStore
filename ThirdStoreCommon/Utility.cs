@@ -591,6 +591,8 @@ namespace ThirdStoreCommon
                         case TypeCode.Byte:
                         case TypeCode.Char:
                         case TypeCode.DateTime:
+                            p.SetValue(obj, DateTime.Now, null);
+                            break;
                         case TypeCode.DBNull:
                         case TypeCode.Empty:
                         case TypeCode.Object:

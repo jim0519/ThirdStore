@@ -19,6 +19,8 @@ using System.Data.Entity;
 using System.Data.Entity.SqlServer;
 using ThirdStoreBusiness.ReportPrint;
 using HtmlAgilityPack;
+using LINQtoCSV;
+using System.IO;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -33,6 +35,8 @@ namespace ThirdStoreBusiness.JobItem
         private readonly INetoAPICallManager _netoAPIManager;
         private readonly IImageService _imageService;
         private readonly IReportPrintService _reportPrintService;
+        private readonly CsvContext _csvContext;
+        private readonly CsvFileDescription _csvFileDescription;
 
         public JobItemService(IRepository<D_JobItem> jobItemRepository,
             IRepository<D_JobItemLine> jobItemLineRepository,
@@ -53,6 +57,8 @@ namespace ThirdStoreBusiness.JobItem
             _netoAPIManager = netoAPIManager;
             _imageService = imageService;
             _reportPrintService = reportPrintService;
+            _csvContext = new CsvContext();
+            _csvFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default };
         }
 
         public IList<D_JobItem> GetAllJobItems()
@@ -506,8 +512,9 @@ namespace ThirdStoreBusiness.JobItem
                 //lstExportProductListing = lstExportProductListing.Where(l => (l.SKU == "TestAPIAddSKU-5" || l.SKU == "TestAPIAddSKU") && l.Condition == ThirdStoreJobItemCondition.NEW.ToName()).ToList();
 
                 #endregion
-                var syncSKUs = lstExportProductListing.Select(epl => epl.SKUWSuffix).ToArray();
+
                 #region Get Online Products from Neto
+                var syncSKUs = lstExportProductListing.Select(epl => epl.SKUWSuffix).ToArray();
                 //var onlineListings = _netoAPIManager.GetNetoProducts(true);
                 var onlineListings = _netoAPIManager.GetNetoProductBySKUs(syncSKUs,true);
                 //var onlineListings = _netoAPIManager.GetNetoProductBySKUs(new string[] 
@@ -519,6 +526,38 @@ namespace ThirdStoreBusiness.JobItem
                 //    "TestAPISKU-NewImage",
                 //    "TestAPISKU-NewImage-DEF"
                 //});
+                #endregion
+
+                #region Finalize ExportProductListing (decide what qty need to be sync)
+
+                var di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreDSZData);
+                if (di.Exists)
+                {
+                    FileInfo[] files = di.GetFiles().ToArray();
+                    if (files.Count() > 0)
+                    {
+                        var dszDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                        var dszData = _csvContext.Read<DSZSKUModel>(dszDataFile.FullName, _csvFileDescription);
+                        var tmpExportProductListing = new List<ExportProductListing>();
+                        foreach (var epl in lstExportProductListing)
+                        {
+                            if (epl.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
+                                && epl.Qty == 0)
+                            {
+                                var dszSKU = dszData.FirstOrDefault(d => d.SKU.ToLower().Equals(epl.SKU.ToLower()));
+                                if (dszSKU != null
+                                    && dszSKU.InventoryQty > 0)
+                                {
+                                    epl.Qty = 1;
+                                }
+                            }
+                            tmpExportProductListing.Add(epl);
+                        }
+                        lstExportProductListing = tmpExportProductListing;
+                    }
+                }
+
+
                 #endregion
 
                 #region Generate Product Inventory Feed

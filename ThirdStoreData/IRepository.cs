@@ -20,5 +20,6 @@ namespace ThirdStoreData
         void Update(IEnumerable<T> entities, params Expression<Func<T, object>>[] properties);
         void Insert(IEnumerable<T> entities);
         void Delete(IEnumerable<T> entities);
+        void Clear(); 
     }
 }
