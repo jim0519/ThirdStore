@@ -17,7 +17,7 @@ namespace ThirdStoreCommon
         public const string MinDate = "1970-01-01";
         public const string MaxDate = "2050-12-31";
         public const string UsedSKUSuffix = "_D";
-        public const string UsedNameSuffix = "RTS ";
+        public const string UsedNameSuffix = "RETURNs ";
         public const string FirstInvJobItems = "FirstInvJobItems";
         public const string JobItemInvList = "JobItemInvList";
         public const string JobItemInvIDs = "JobItemInvIDs";
