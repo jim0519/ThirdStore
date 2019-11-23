@@ -50,7 +50,8 @@ namespace ThirdStoreBusiness.ScheduleTask
                     if (files.Count() > 0)
                     {
                         var top2DataFile = files.OrderByDescending(fi => fi.CreationTime).Take(2);
-                        if(top2DataFile.Count()==2)
+                        var syncDSPriceBelow = Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow);
+                        if (top2DataFile.Count()==2)
                         {
                             var latestDataFile = top2DataFile.First();
                             var secondLatestDataFile = top2DataFile.Last();
@@ -77,8 +78,8 @@ namespace ThirdStoreBusiness.ScheduleTask
 
                             syncItemIDs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
                                               join itm in _itemService.GetAllItems() on sku.ToLower() equals itm.SKU.ToLower()
-                                           where itm.Cost<=50
-                                              select itm.ID).ToList();
+                                           where itm.Cost<= syncDSPriceBelow
+                                           select itm.ID).ToList();
 
                         }
                         else if(top2DataFile .Count()==1)
@@ -88,7 +89,7 @@ namespace ThirdStoreBusiness.ScheduleTask
 
                             syncItemIDs = (from ld in latestData
                                            join itm in _itemService.GetAllItems() on ld.SKU.ToLower() equals itm.SKU.ToLower()
-                                           where ld.InventoryQty > 0 && itm.Cost <= 50
+                                           where ld.InventoryQty > 0 && itm.Cost <= syncDSPriceBelow
                                            select itm.ID).ToList();
                         }
                     }

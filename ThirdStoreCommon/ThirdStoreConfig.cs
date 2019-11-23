@@ -88,6 +88,15 @@ namespace ThirdStoreCommon
         }
 
 
+        public string SyncDSPriceBelow
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings["SyncDSPriceBelow"];
+            }
+        }
+
+
     }
 
     #region eBay API Contexts

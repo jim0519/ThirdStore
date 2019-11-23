@@ -546,7 +546,8 @@ namespace ThirdStoreBusiness.JobItem
                             {
                                 var dszSKU = dszData.FirstOrDefault(d => d.SKU.ToLower().Equals(epl.SKU.ToLower()));
                                 if (dszSKU != null
-                                    && dszSKU.InventoryQty > 0)
+                                    && dszSKU.InventoryQty > 0
+                                    &&dszSKU.Price<=Convert.ToDecimal( ThirdStoreConfig.Instance.SyncDSPriceBelow))
                                 {
                                     epl.Qty = 1;
                                 }
@@ -994,13 +995,14 @@ namespace ThirdStoreBusiness.JobItem
                     else
                         i = item.ItemImages.Count;
                     var rnd = new Random();
+                    var imgSKU = (onlineListing != null ? onlineListing.SKU : localListing.SKUWSuffix);
                     foreach(var jobItem in firstInvJobItems)
                     {
                         foreach (var jobItmImg in jobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
                         {
                             if (i <12)
                             {
-                                strDesc.Append($"<img src='https://www.3rdstore.com.au/assets/alt_{i}/{localListing.SKUWSuffix}.jpg?{rnd.Next(1,int.MaxValue)}' style='margin-bottom:10px;' />");
+                                strDesc.Append($"<img src='https://www.3rdstore.com.au/assets/alt_{i}/{imgSKU}.jpg?{rnd.Next(1,int.MaxValue)}' style='margin-bottom:10px;' />");
                                 i++;
                             }
                         }
