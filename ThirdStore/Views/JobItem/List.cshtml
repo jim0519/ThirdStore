@@ -90,6 +90,7 @@
             @if (Model.ShowSyncInventory)
             {
                 <img id="imgLoadingJobItem" src="~/Content/images/loading.gif" style="display:none;" />
+                <input type="button" id="btnUpdateDSZ" class="k-button" value="Update DSZ Data and Sync" />
                 <input type="button" id="btnSyncByJobItem" class="k-button" value="Sync Inventory" />
             }
             <input type="button" id="btnPrintLabel" class="k-button" value="Print Label" />
@@ -114,6 +115,40 @@
                             success: function (data) {
                                 if (data.Result) {
                                     alert("Import Data Success");
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
+                                //debugger;
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+                    });
+
+                    $('#btnUpdateDSZ').click(function () {
+                        var link="@Html.Raw(Url.Action("UpdateDSZandSync", "JobItem"))"
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            dataType: "json",
+                            beforeSend: function () {
+                                $("#imgLoading").show();
+                            },
+                            complete: function () {
+                                $("#imgLoading").hide();
+                            },
+                            success: function (data) {
+                                if (data.Result) {
+                                    alert("Update DSZ Success");
                                 }
                                 else {
                                     //debugger;

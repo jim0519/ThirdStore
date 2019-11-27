@@ -1079,3 +1079,17 @@ update T_User
 set
 Description='E'
 where id in (18)
+
+
+
+
+insert into T_ScheduleTask
+select 
+'Update DSZ Data And Sync',
+43200,
+'ThirdStoreBusiness.ScheduleTask.UpdateDSDataAndSync, ThirdStoreBusiness',
+0,
+0,
+GETDATE(),
+GETDATE(),
+GETDATE()

@@ -545,11 +545,12 @@ namespace ThirdStoreBusiness.JobItem
                                 && epl.Qty == 0)
                             {
                                 var dszSKU = dszData.FirstOrDefault(d => d.SKU.ToLower().Equals(epl.SKU.ToLower()));
+                                var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
                                 if (dszSKU != null
-                                    && dszSKU.InventoryQty > 0
-                                    &&dszSKU.Price<=Convert.ToDecimal( ThirdStoreConfig.Instance.SyncDSPriceBelow))
+                                    && dszSKU.InventoryQty >= dsInventoryThredshold
+                                    && dszSKU.Price<=Convert.ToDecimal( ThirdStoreConfig.Instance.SyncDSPriceBelow))
                                 {
-                                    epl.Qty = 1;
+                                    epl.Qty = dsInventoryThredshold;
                                 }
                             }
                             tmpExportProductListing.Add(epl);

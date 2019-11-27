@@ -249,7 +249,8 @@ namespace ThirdStoreBusiness.Item
                     item.Cost = updateItem.Price;
                     item.Price = item.Cost * Convert.ToDecimal(1.3);
 
-                    UpdateItem(item);
+                    //UpdateItem(item);
+                    _itemRepository.Update(item,itm=> itm.Description,itm=>itm.Cost,itm=>itm.Price);
                 }
 
 
@@ -265,7 +266,8 @@ namespace ThirdStoreBusiness.Item
                     try
                     {
                         if (additem.SKU.Length > 23)
-                            throw new Exception($"SKU {additem.SKU} length is larger than 23.");
+                            LogManager.Instance.Info($"SKU {additem.SKU} length is larger than 23.");
+                            //throw new Exception($"SKU {additem.SKU} length is larger than 23.");
                         var newItem = new D_Item();
                         newItem.SKU = additem.SKU;
                         newItem.Name = additem.Title;
@@ -285,7 +287,7 @@ namespace ThirdStoreBusiness.Item
                         //newItem.Width = additem.Width;
                         //newItem.Height = additem.Height;
                         newItem.Ref3 = additem.EANCode.Trim();
-                        newItem.IsReadyForList = false;
+                        newItem.IsReadyForList =(additem.SKU.Length <= 23&&additem.Price<= Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow)? true :false) ;
                         newItem.IsActive = true;
                         newItem.CreateTime = createTime;
                         newItem.CreateBy = createBy;
@@ -329,60 +331,29 @@ namespace ThirdStoreBusiness.Item
                             imagesURL.Add(additem.Image15);
 
                         #region Download and Save Item Images
-                        //int i = 0;
-                        //using (var wc = new ThirdStoreWebClient())
-                        //{
-                        //    foreach (var imageURL in imagesURL)
-                        //    {
-                        //        try
-                        //        {
-                        //            var imgBytes = wc.DownloadData(imageURL);
-                        //            using (var stream = new MemoryStream(imgBytes))
-                        //            {
-                        //                var fileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
-                        //                var imgObj = _imageService.SaveImage(stream, fileName);
-                        //                newItem.ItemImages.Add(new M_ItemImage()
-                        //                {
-                        //                    Image = imgObj,
-                        //                    DisplayOrder = i,
-                        //                    StatusID = 0,//TODO Get item active status id
-                        //                    CreateTime = createTime,
-                        //                    CreateBy = createBy,
-                        //                    EditTime = createTime,
-                        //                    EditBy = createBy
-                        //                });
-                        //            }
-                        //        }
-                        //        catch (Exception ex)
-                        //        {
-                        //            LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
-                        //        }
-
-                        //        i++;
-                        //    }
-                        //}
-
-                        #endregion
-
-                        DirectoryInfo di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreImagesPath + "\\" + additem.SKU + "\\");
-                        #region Pre-Download and Save Images grouped by SKU
-
-                        if (!di.Exists)
-                        {
-                            di.Create();
-                        }
-
+                        int i = 0;
                         using (var wc = new ThirdStoreWebClient())
                         {
-                            int i = 1;
                             foreach (var imageURL in imagesURL)
                             {
                                 try
                                 {
-                                    var imageFileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
-                                    var saveImageFileFullName = Path.Combine(di.FullName, imageFileName);
-
-                                    wc.DownloadFile(imageURL, saveImageFileFullName);
+                                    var imgBytes = wc.DownloadData(imageURL);
+                                    using (var stream = new MemoryStream(imgBytes))
+                                    {
+                                        var fileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                                        var imgObj = _imageService.SaveImage(stream, fileName);
+                                        newItem.ItemImages.Add(new M_ItemImage()
+                                        {
+                                            Image = imgObj,
+                                            DisplayOrder = i,
+                                            StatusID = 0,//TODO Get item active status id
+                                            CreateTime = createTime,
+                                            CreateBy = createBy,
+                                            EditTime = createTime,
+                                            EditBy = createBy
+                                        });
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
@@ -392,6 +363,38 @@ namespace ThirdStoreBusiness.Item
                                 i++;
                             }
                         }
+
+                        #endregion
+
+                        //DirectoryInfo di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreImagesPath + "\\" + additem.SKU + "\\");
+                        //DirectoryInfo di = new DirectoryInfo(@"C:\Users\gdutj\Downloads\3rdStockSystem\DSZImages20191120\" + additem.SKU + "\\");
+                        #region Pre-Download and Save Images grouped by SKU
+
+                        //if (!di.Exists)
+                        //{
+                        //    di.Create();
+                        //}
+
+                        //using (var wc = new ThirdStoreWebClient())
+                        //{
+                        //    int i = 1;
+                        //    foreach (var imageURL in imagesURL)
+                        //    {
+                        //        try
+                        //        {
+                        //            var imageFileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                        //            var saveImageFileFullName = Path.Combine(di.FullName, imageFileName);
+
+                        //            wc.DownloadFile(imageURL, saveImageFileFullName);
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                        //        }
+
+                        //        i++;
+                        //    }
+                        //}
 
 
                         #endregion

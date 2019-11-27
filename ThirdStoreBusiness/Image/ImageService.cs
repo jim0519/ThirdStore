@@ -61,7 +61,8 @@ namespace ThirdStoreBusiness.Image
                     img = ResizeImage(img,new Size(img.Width, img.Height));
                 }
 
-                var entityImg = new D_Image() {  ImageName=fileName, ImageLocalPath=string.Empty, CreateBy= _workContext.CurrentUser.Name, CreateTime=DateTime.Now, EditBy= _workContext.CurrentUser.Name, EditTime= DateTime.Now };
+                var currentUser = (_workContext.CurrentUser != null ? _workContext.CurrentUser.Name : Constants.SystemUser);
+                var entityImg = new D_Image() {  ImageName=fileName, ImageLocalPath=string.Empty, CreateBy= currentUser, CreateTime=DateTime.Now, EditBy= currentUser, EditTime= DateTime.Now };
                 entityImg=this.InsertImage(entityImg);
                 string savefileName = string.Format("{0}.{1}", entityImg.ID.ToString("0000000"), "jpg");
                 if (!Directory.Exists(ThirdStoreConfig.Instance.ThirdStoreImagesPath))

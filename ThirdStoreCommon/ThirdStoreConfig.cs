@@ -96,6 +96,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string DSInventoryThreshold
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings["DSInventoryThreshold"];
+            }
+        }
+
 
     }
 

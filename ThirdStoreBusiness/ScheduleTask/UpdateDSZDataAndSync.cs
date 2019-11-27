@@ -51,6 +51,7 @@ namespace ThirdStoreBusiness.ScheduleTask
                     {
                         var top2DataFile = files.OrderByDescending(fi => fi.CreationTime).Take(2);
                         var syncDSPriceBelow = Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow);
+                        var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
                         if (top2DataFile.Count()==2)
                         {
                             var latestDataFile = top2DataFile.First();
@@ -67,13 +68,13 @@ namespace ThirdStoreBusiness.ScheduleTask
                             var leftJoinResult= from ld in latestData
                                                 join sld in secondLatestData on ld.SKU equals sld.SKU into leftJoin
                                                 from lj in leftJoin.DefaultIfEmpty()
-                                                where lj==null || ((ld.InventoryQty > 0 && lj.InventoryQty == 0) || (ld.InventoryQty == 0 && lj.InventoryQty > 0))
+                                                where lj==null || ((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty< dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
                                                 select ld.SKU;
 
                             var rightJoinResult = from sld in secondLatestData
                                                   join ld in latestData on sld.SKU equals ld.SKU into rightJoin
                                                   from rj in rightJoin.DefaultIfEmpty()
-                                                  where rj == null || ((sld.InventoryQty > 0 && rj.InventoryQty == 0) || (sld.InventoryQty == 0 && rj.InventoryQty > 0))
+                                                  where rj == null || ((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
                                                   select sld.SKU;
 
                             syncItemIDs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
