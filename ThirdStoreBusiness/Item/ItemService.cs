@@ -478,11 +478,10 @@ namespace ThirdStoreBusiness.Item
 
 
                 #region Persist DSZ Item Data
-                if (!Directory.Exists(ThirdStoreConfig.Instance.ThirdStoreDSZData))
-                    Directory.CreateDirectory(ThirdStoreConfig.Instance.ThirdStoreDSZData);
+                
 
-                var fullFileName = ThirdStoreConfig.Instance.ThirdStoreDSZData+"\\"+CommonFunc.ToCSVFileName("DSZData");
-                _csvContext.Write(skuList, fullFileName,_csvFileDescription);
+                //var fullFileName = ThirdStoreConfig.Instance.ThirdStoreDSZData+"\\"+CommonFunc.ToCSVFileName("DSZData");
+                //_csvContext.Write(skuList, fullFileName,_csvFileDescription);
 
                 //_dszItemRepository.Clear();
                 //var insertItems = new List<D_DSZItem>();
@@ -509,21 +508,27 @@ namespace ThirdStoreBusiness.Item
             IList<DSZSKUModel> skuList = null;
             using (var webClient = new ThirdStoreWebClient())
             {
-                var byCsv = webClient.DownloadData(Constants.DSZSKUListURL);
+                if (!Directory.Exists(ThirdStoreConfig.Instance.ThirdStoreDSZData))
+                    Directory.CreateDirectory(ThirdStoreConfig.Instance.ThirdStoreDSZData);
+                //var byCsv = webClient.DownloadData(Constants.DSZSKUListURL);
+                var fileName = ThirdStoreConfig.Instance.ThirdStoreDSZData + "\\" + CommonFunc.ToCSVFileName("DSZData");
+                webClient.DownloadFile(Constants.DSZSKUListURL, fileName);
+                skuList=_csvContext.Read<DSZSKUModel>(fileName, _csvFileDescription).ToList();
+                //using (var ms = new MemoryStream(byCsv))
+                //{
+                //    ms.Position = 0;
+                //    using (var sr = new StreamReader(ms))
+                //    {
+                //        //var csvFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default };
+                //        //var csvContext = new CsvContext();
+                //        skuList = _csvContext.Read<DSZSKUModel>(sr, _csvFileDescription).ToList();
 
-                using (var ms = new MemoryStream(byCsv))
-                {
-                    ms.Position = 0;
-                    using (var sr = new StreamReader(ms))
-                    {
-                        //var csvFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default };
-                        //var csvContext = new CsvContext();
-                        skuList = _csvContext.Read<DSZSKUModel>(sr, _csvFileDescription).ToList();
-
-                    }
-                }
+                //    }
+                //}
+                if(skuList!=null)
+                    skuList = skuList.Where(s => !s.SKU.Contains("*") && !Regex.IsMatch(s.SKU, @"^V\d+")).ToList();
             }
-            skuList = skuList.Where(s => !s.SKU.Contains("*")&&!Regex.IsMatch(s.SKU, @"^V\d+")).ToList();
+            
             return skuList;
         }
     }

@@ -66,10 +66,12 @@
 <table style="width:100%;">
     <tr>
         <td>
-            @Html.LabelFor(m => m.JobItemCreateTime)
+            @Html.LabelFor(m => m.Type)
+
         </td>
         <td>
-            @Html.EditorFor(model => model.JobItemCreateTime)
+            @Html.DropDownListFor(model => model.Type, Model.JobItemTypes)
+
         </td>
         <td>
             @Html.LabelFor(m => m.Reference)
@@ -80,12 +82,12 @@
     </tr>
     <tr>
         <td>
-            @Html.LabelFor(m => m.Type)
+            @Html.LabelFor(m => m.ConditionID)
 
         </td>
         <td>
-            @Html.DropDownListFor(model => model.Type, Model.JobItemTypes)
 
+            @Html.DropDownListFor(model => model.ConditionID, Model.JobItemConditions)
         </td>
         <td>
             @Html.LabelFor(m => m.ItemName)
@@ -98,13 +100,12 @@
     </tr>
     <tr>
         <td>
-            @Html.LabelFor(m => m.ConditionID)
-
+            @Html.LabelFor(m => m.Location)
         </td>
         <td>
-
-            @Html.DropDownListFor(model => model.ConditionID, Model.JobItemConditions)
+            @Html.EditorFor(model => model.Location)
         </td>
+        
         <td>
             @Html.LabelFor(m => m.ItemPrice)
         </td>
@@ -130,21 +131,6 @@
     </tr>
     <tr>
         <td>
-            @Html.LabelFor(m => m.Location)
-        </td>
-        <td>
-            @Html.EditorFor(model => model.Location)
-        </td>
-        <td>
-            @Html.LabelFor(m => m.StatusID)
-        </td>
-        <td>
-            @Html.DropDownListFor(model => model.StatusID, Model.JobItemStatuses)
-
-        </td>
-    </tr>
-    <tr>
-        <td>
             @Html.LabelFor(m => m.DesignatedSKU)
 
         </td>
@@ -153,11 +139,10 @@
             @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
         </td>
         <td>
-            @Html.LabelFor(m => m.ShipTime)
-
+            @Html.LabelFor(m => m.StatusID)
         </td>
         <td>
-            @Html.EditorFor(model => model.ShipTime)
+            @Html.DropDownListFor(model => model.StatusID, Model.JobItemStatuses)
 
         </td>
     </tr>
@@ -172,18 +157,26 @@
             @Html.EditorFor(model => model.Ref2, new { SelectList = Model.InspectorList })
         </td>
         <td>
-            @Html.LabelFor(m => m.TrackingNumber)
+            @Html.LabelFor(m => m.ShipTime)
+
         </td>
         <td>
-            @Html.EditorFor(model => model.TrackingNumber)
+            @Html.EditorFor(model => model.ShipTime)
+
         </td>
     </tr>
     <tr>
         <td>
             @Html.LabelFor(m => m.PricePercentage)
         </td>
-        <td colspan="3">
+        <td>
             @Html.EditorFor(model => model.PricePercentage)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.TrackingNumber)
+        </td>
+        <td>
+            @Html.EditorFor(model => model.TrackingNumber)
         </td>
     </tr>
 </table>
@@ -195,6 +188,7 @@
     <div id="jobItemLine-grid"></div>
     <script>
         $(document).ready(function () {
+
             $("#jobItemLine-grid").kendoGrid({
                 dataSource: {
                     type: "json",
@@ -313,7 +307,7 @@
                             dataType: 'json',
                             data: { sku: skuValue },
                             success: function (response) {
-                                debugger;
+                                //debugger;
                                 if (response.Result) {
                                     var lengthInput = e.container.find("[name='Length']");
                                     var lengthWidget = lengthInput.data("kendoNumericTextBox");
@@ -355,7 +349,7 @@
                         hidden: true
                 }, {
                         field: "SKU",
-                        template: "#=SKU#" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].SKU' value='#=SKU#' />",
+                        template: "<a href='@Url.Action("Edit","Item")?ItemID=#=ItemID#' target='_blank' > #=SKU#</a>" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].SKU' value='#=SKU#' />",
                         width:200
                 }, {
                         field: "Qty",

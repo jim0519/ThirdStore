@@ -114,7 +114,7 @@ namespace ThirdStore.Controllers
                 var viewModel = i.ToModel();
                 viewModel.Condition = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).FirstOrDefault(itm=>itm.ID.Equals(i.ConditionID)).Name;
                 if (i.JobItemLines.Count > 0)
-                    viewModel.SKUs = i.JobItemLines.Select(l => l.SKU + ":" + l.Qty).Aggregate((current, next) => current + "," + next);
+                    viewModel.SKUs = i.JobItemLines.Select(l => l.SKU+","+l.ItemID).Aggregate((current, next) => current + ";" + next);
                 viewModel.Reference = _jobItemService.GetJobItemReference(i);
                 return viewModel;
             } );

@@ -58,6 +58,16 @@
         } // main callback function
     });
 
+    var num = 300; //number of pixels before modifying styles
+
+    $(window).bind('scroll', function () {
+        if ($(window).scrollTop() > num) {
+            $('#divOperationBtn').addClass('fixed');
+        } else {
+            $('#divOperationBtn').removeClass('fixed');
+        }
+    });
+
 });
 
 $(document).on('keypress', function (e) {
