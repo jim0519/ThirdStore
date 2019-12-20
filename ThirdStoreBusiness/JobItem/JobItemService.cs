@@ -1311,7 +1311,7 @@ namespace ThirdStoreBusiness.JobItem
             }
         }
 
-        public ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs)
+        public ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs,string location)
         {
             var returnMessage = new ThirdStoreReturnMessage();
             try
@@ -1370,6 +1370,7 @@ namespace ThirdStoreBusiness.JobItem
                     foreach(var ji in jobItems)
                     {
                         ji.StocktakeTime = DateTime.Now;
+                        ji.Location = (!string.IsNullOrWhiteSpace(location) ? location.Trim() : ji.Location);
                         this.UpdateJobItem(ji);
                         returnMessage.Mesage += $"Job item { GetJobItemReference(ji)} confirmed, ";
                     }

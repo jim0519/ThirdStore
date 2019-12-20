@@ -60,7 +60,7 @@ namespace ThirdStoreBusiness.JobItem
 
         ThirdStoreReturnMessage ShipOut(string jobItemLineID,string jobItemLineRef, string trackingNumber);
 
-        ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs);
+        ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs,string location);
 
         void PrintJobItemLabel(IList<int> ids);
 

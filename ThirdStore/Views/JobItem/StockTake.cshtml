@@ -29,6 +29,14 @@
             </td>
         </tr>
         <tr>
+            <td>
+                @Html.LabelFor(model => model.Location):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Location)
+            </td>
+        </tr>
+        <tr>
             <td class="adminTitle" colspan="2">
                 <input type="submit" id="btnConfirmNext" class="k-button" value="Confirm and Next" />
                 <a href="@Html.Raw(Url.Action("List", "JobItem"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>

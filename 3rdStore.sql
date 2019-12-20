@@ -1106,3 +1106,7 @@ select
 GETDATE(),
 GETDATE(),
 GETDATE()
+
+
+select * from fn_GetAffectedItems('20191219','20191219') A
+inner join D_Item I on A.ID=I.ID

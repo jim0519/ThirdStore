@@ -333,11 +333,16 @@ namespace ThirdStore.Controllers
         }
 
 
-        public ActionResult StockTake()
+        public ActionResult StockTake(string location=null)
         {
             //var jobItemShipOutViewModel = new JobItemShipOutViewModel();
+            var jobItemStockTakeViewModel = new JobItemStockTakeViewModel();
+            if (!string.IsNullOrWhiteSpace(location))
+            {
+                jobItemStockTakeViewModel. Location = location.Trim();
+            }
 
-            return View();
+            return View(jobItemStockTakeViewModel);
         }
 
         [HttpPost]
@@ -348,7 +353,7 @@ namespace ThirdStore.Controllers
                 var jobItemLineIDs =(model.JobItemLineID!=null? model.JobItemLineID.ToEnumerable().ToList():null) ;
                 var jobItemLineRefs =(model.JobItemLineReference!=null? model.JobItemLineReference.ToEnumerable().ToList():null) ;
                 //var jobItemShipOutViewModel = new JobItemShipOutViewModel();
-                var returnMessage = _jobItemService.ConfirmStock(jobItemLineIDs, jobItemLineRefs);
+                var returnMessage = _jobItemService.ConfirmStock(jobItemLineIDs, jobItemLineRefs,model.Location);
                 if (returnMessage.IsSuccess)
                 {
                     SuccessNotification(returnMessage.Mesage);
@@ -357,7 +362,7 @@ namespace ThirdStore.Controllers
                 {
                     ErrorNotification(returnMessage.Mesage);
                 }
-                return RedirectToAction("StockTake");
+                return RedirectToAction("StockTake",new {Location= model.Location});
 
             }
             catch (Exception ex)

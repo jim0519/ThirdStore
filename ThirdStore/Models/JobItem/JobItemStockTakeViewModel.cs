@@ -10,5 +10,6 @@ namespace ThirdStore.Models.JobItem
     {
         public string JobItemLineID { get; set; }
         public string JobItemLineReference { get; set; }
+        public string Location { get; set; }
     }
 }
