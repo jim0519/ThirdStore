@@ -16,6 +16,7 @@ namespace ThirdStore.Models.JobItem
             this.Suppliers = new List<SelectListItem>();
             this.JobItemConditions = new List<SelectListItem>();
             this.JobItemStatuses = new List<SelectListItem>();
+            this.YesOrNo = new List<SelectListItem>();
         }
 
         [UIHint("DateNullable"), Display(Name = "Affect Time From")]
@@ -37,6 +38,7 @@ namespace ThirdStore.Models.JobItem
         public string SearchReference { get; set; }
         [UIHint("MultiSelectString")]
         public List<string> SearchInspector { get; set; }
+        public int HasStocktakeTime { get; set; }
         public bool ShowSyncInventory { get; set; }
 
         public IList<SelectListItem> Suppliers { get; set; }
@@ -44,6 +46,7 @@ namespace ThirdStore.Models.JobItem
         public IList<SelectListItem> JobItemConditions { get; set; }
         public IList<SelectListItem> JobItemStatuses { get; set; }
         public IList<SelectListItem> InspectorList { get; set; }
+        public IList<SelectListItem> YesOrNo { get; set; }
 
         public BulkUpdateJobItemModel BulkUpdate { get; set; }
         public class BulkUpdateJobItemModel

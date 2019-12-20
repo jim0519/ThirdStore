@@ -432,7 +432,7 @@ namespace ThirdStoreBusiness.Order
                 var jobItems= _jobItemService.GetJobItemsByIDs(lstTotalAllocatedJobItemID.Select(id=>Convert.ToInt32( id)).ToList());
                 foreach(var jobItem in jobItems)
                 {
-                    if (jobItem.StatusID != ThirdStoreJobItemStatus.SHIPPED.ToValue())
+                    if (jobItem.StatusID != ThirdStoreJobItemStatus.SHIPPED.ToValue()&&jobItem.StatusID!= ThirdStoreJobItemStatus.BOOKED.ToValue())
                     {
                         jobItem.StatusID = ThirdStoreJobItemStatus.ALLOCATED.ToValue();
                         _jobItemService.UpdateJobItem(jobItem);//TODO: Jobitem Edit time should not be changed if it is from logic action

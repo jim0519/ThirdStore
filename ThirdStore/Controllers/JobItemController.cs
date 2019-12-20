@@ -78,6 +78,10 @@ namespace ThirdStore.Controllers
             model.InspectorList = new MultiSelectList(_userService.GetAllUsers().Where(u => !string.IsNullOrWhiteSpace(u.Description)).Select(u => new { ID = u.Description, Name = u.Description }), "ID", "Name").ToList();
             model.InspectorList.Insert(0, new SelectListItem { Text = "All", Value = "" });
 
+            model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
+            model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
+            model.HasStocktakeTime = -1;
+
             var showSyncInvUsers = new int[] {1,4, 14,17 };
             if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
                 model.ShowSyncInventory = true;
@@ -107,6 +111,7 @@ namespace ThirdStore.Controllers
                 location:model.SearchLocation,
                 inspector: inspector,
                 trackingNumber:model.SearchTrackingNumber,
+                hasStocktakeTime:model.HasStocktakeTime,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
 
@@ -132,7 +137,7 @@ namespace ThirdStore.Controllers
             var newJobItemViewModel = new JobItemViewModel();
 
             FillDropDownDS(newJobItemViewModel);
-            newJobItemViewModel.JobItemCreateTime = DateTime.Now;
+            //newJobItemViewModel.JobItemCreateTime = DateTime.Now;
 
             return View(newJobItemViewModel);
         }
@@ -308,14 +313,14 @@ namespace ThirdStore.Controllers
             try
             {
                 //var jobItemShipOutViewModel = new JobItemShipOutViewModel();
-                var jobItem=_jobItemService.ShipOut(model.JobItemLineID, model.JobItemLineReference, model.TrackingNumber);
-                if(jobItem!=null)
+                var returnMessage = _jobItemService.ShipOut(model.JobItemLineID, model.JobItemLineReference, model.TrackingNumber);
+                if(returnMessage .IsSuccess)
                 {
-                    SuccessNotification($"Job item {jobItem.ID} has been shipped out.");
+                    SuccessNotification(returnMessage.Mesage);
                 }
                 else
                 {
-                    ErrorNotification("Cannot locate job item");
+                    ErrorNotification(returnMessage.Mesage);
                 }
                 return RedirectToAction("ShipOut");
 
@@ -327,7 +332,42 @@ namespace ThirdStore.Controllers
             }
         }
 
-        
+
+        public ActionResult StockTake()
+        {
+            //var jobItemShipOutViewModel = new JobItemShipOutViewModel();
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult StockTake(JobItemStockTakeViewModel model)
+        {
+            try
+            {
+                var jobItemLineIDs =(model.JobItemLineID!=null? model.JobItemLineID.ToEnumerable().ToList():null) ;
+                var jobItemLineRefs =(model.JobItemLineReference!=null? model.JobItemLineReference.ToEnumerable().ToList():null) ;
+                //var jobItemShipOutViewModel = new JobItemShipOutViewModel();
+                var returnMessage = _jobItemService.ConfirmStock(jobItemLineIDs, jobItemLineRefs);
+                if (returnMessage.IsSuccess)
+                {
+                    SuccessNotification(returnMessage.Mesage);
+                }
+                else
+                {
+                    ErrorNotification(returnMessage.Mesage);
+                }
+                return RedirectToAction("StockTake");
+
+            }
+            catch (Exception ex)
+            {
+                ErrorNotification("Job item confirm failed. " + ex.Message);
+                return RedirectToAction("StockTake");
+            }
+        }
+
+
 
         [HttpPost]
         public ActionResult ReadJobItemLines(DataSourceRequest command, int jobItemID)
@@ -439,6 +479,16 @@ namespace ThirdStore.Controllers
                 return Json(new { Result = false, Message = "Percentage only can be decimal and 2 decimal places." });
             }
 
+            if(model.Ref2==null||model.Ref2.Count==0)
+            {
+                return Json(new { Result = false, Message = "Please input as least one inspector." });
+            }
+
+            if (model.JobItemViewImages==null||model.JobItemViewImages.Count == 0)
+            {
+                return Json(new { Result = false, Message = "Please upload ast least one photo." });
+            }
+
             //if(model.JobItemViewLines.Any(l=>l.Qty>1))
             return Json(new { Result=true});
         }
@@ -484,7 +534,7 @@ namespace ThirdStore.Controllers
                 if (retMessage.IsSuccess)
                     return Json(new { Result = true });
                 else
-                    return Json(new { Result = false, Message = retMessage.ErrorMesage });
+                    return Json(new { Result = false, Message = retMessage.Mesage });
             }
             catch(Exception ex)
             {
@@ -507,7 +557,7 @@ namespace ThirdStore.Controllers
                 if (retMessage.IsSuccess)
                     return Json(new { Result = true });
                 else
-                    return Json(new { Result = false, Message = retMessage.ErrorMesage });
+                    return Json(new { Result = false, Message = retMessage.Mesage });
             }
             catch (Exception ex)
             {

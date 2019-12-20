@@ -281,7 +281,7 @@ namespace ThirdStoreBusiness.API.Neto
                     catch (Exception ex)
                     {
                         LogManager.Instance.Error(ex.Message);
-                        return new ThirdStoreReturnMessage() { IsSuccess = true, ErrorMesage = ex.Message };
+                        return new ThirdStoreReturnMessage() { IsSuccess = true, Mesage = ex.Message };
                     }
                 }
                 else
@@ -292,7 +292,7 @@ namespace ThirdStoreBusiness.API.Neto
             catch(Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                return new ThirdStoreReturnMessage() { IsSuccess = false, ErrorMesage = ex.Message };
+                return new ThirdStoreReturnMessage() { IsSuccess = false, Mesage = ex.Message };
             }
         }
 
@@ -329,7 +329,7 @@ namespace ThirdStoreBusiness.API.Neto
                     catch (Exception ex)
                     {
                         LogManager.Instance.Error(ex.Message);
-                        return new ThirdStoreReturnMessage() { IsSuccess = true,ErrorMesage=ex.Message };
+                        return new ThirdStoreReturnMessage() { IsSuccess = true,Mesage=ex.Message };
                     }
                 }
                 else
@@ -347,7 +347,7 @@ namespace ThirdStoreBusiness.API.Neto
             catch(Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                return new ThirdStoreReturnMessage() { IsSuccess=false, ErrorMesage=ex.Message };
+                return new ThirdStoreReturnMessage() { IsSuccess=false, Mesage=ex.Message };
             }
         }
 
@@ -384,7 +384,7 @@ namespace ThirdStoreBusiness.API.Neto
                     catch (Exception ex)
                     {
                         LogManager.Instance.Error(ex.Message);
-                        return new ThirdStoreReturnMessage() { IsSuccess = true, ErrorMesage = ex.Message };
+                        return new ThirdStoreReturnMessage() { IsSuccess = true, Mesage = ex.Message };
                     }
                 }
                 else
@@ -395,7 +395,7 @@ namespace ThirdStoreBusiness.API.Neto
             catch (Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                return new ThirdStoreReturnMessage() { IsSuccess = false, ErrorMesage = ex.Message };
+                return new ThirdStoreReturnMessage() { IsSuccess = false, Mesage = ex.Message };
             }
         }
 

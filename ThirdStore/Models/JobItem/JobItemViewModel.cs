@@ -19,8 +19,8 @@ namespace ThirdStore.Models.JobItem
             this.JobItemViewImages = new List<JobItemImageViewModel>();
         }
 
-        [UIHint("DateTimeNullable")]
-        public DateTime JobItemCreateTime { get; set; }
+        //[UIHint("DateTimeNullable")]
+        //public DateTime JobItemCreateTime { get; set; }
         public int Type { get; set; }
         public int StatusID { get; set; }
         public int ConditionID { get; set; }

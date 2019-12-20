@@ -21,5 +21,6 @@ namespace ThirdStore.Models.JobItem
         public string Location { get; set; }
         public string ItemDetail { get; set; }
         public string Ref2 { get; set; }
+        public DateTime? StocktakeTime { get; set; }
     }
 }

@@ -396,6 +396,14 @@
             </td>
         </tr>
         <tr>
+            <td>
+                @Html.LabelFor(model => model.HasStocktakeTime):
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.HasStocktakeTime, Model.YesOrNo)
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <input type="button" id="btnSearch" class="k-button" value="Search" />
                 <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
@@ -486,6 +494,11 @@
                                     type: "date",
                                     format: "{0:dd/MM/yyyy HH:mm:ss}"
                                 }, {
+                                    field: "StocktakeTime",
+                                    title: "Stocktake Time",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+                                }, {
                                     field: "TrackingNumber",
                                     title: "Tracking Number"
                                 },{
@@ -521,6 +534,7 @@
             $('#@Html.FieldIdFor(model => model.SearchLocation)').val("");
             //$('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
+            $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
             var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
             inspectorMultiselect.value("");
             inspectorMultiselect.trigger("change");
@@ -546,7 +560,8 @@
             SearchStatus: $('#@Html.FieldIdFor(model => model.SearchStatus)').val(),
             SearchLocation: $('#@Html.FieldIdFor(model => model.SearchLocation)').val(),
             SearchInspector: $('#@Html.FieldIdFor(model => model.SearchInspector)').val(),
-            SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val()
+            SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
+            HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val()
         };
     }
     </script>

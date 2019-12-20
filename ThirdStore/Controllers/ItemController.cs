@@ -457,7 +457,7 @@ namespace ThirdStore.Controllers
                 if (retMessage.IsSuccess)
                     return Json(new { Result = true });
                 else
-                    return Json(new { Result = false, Message = retMessage.ErrorMesage });
+                    return Json(new { Result = false, Message = retMessage.Mesage });
             }
             catch (Exception ex)
             {

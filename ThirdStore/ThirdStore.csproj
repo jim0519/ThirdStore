@@ -193,6 +193,7 @@
     <Compile Include="Models\Item\ItemGridViewModel.cs" />
     <Compile Include="Models\Item\ItemListViewModel.cs" />
     <Compile Include="Models\Item\ItemViewModel.cs" />
+    <Compile Include="Models\JobItem\JobItemStockTakeViewModel.cs" />
     <Compile Include="Models\JobItem\JobItemShipOutViewModel.cs" />
     <Compile Include="Models\JobItem\JobItemGridViewModel.cs" />
     <Compile Include="Models\JobItem\JobItemListViewModel.cs" />
@@ -395,6 +396,7 @@
     <Content Include="Views\Shared\FormPage.cshtml" />
     <Content Include="Views\Order\ScreenshoptDisplay.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\MultiSelectString.cshtml" />
+    <Content Include="Views\JobItem\StockTake.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

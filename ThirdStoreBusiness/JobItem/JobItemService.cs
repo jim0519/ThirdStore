@@ -81,6 +81,7 @@ namespace ThirdStoreBusiness.JobItem
             string location = null,
              List<string> inspector = null,
             string trackingNumber = null,
+            int hasStocktakeTime = -1,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -145,6 +146,19 @@ namespace ThirdStoreBusiness.JobItem
             if (trackingNumber != null)
                 query = query.Where(i => i.TrackingNumber.Contains(trackingNumber.ToLower()));
 
+            if(hasStocktakeTime!=-1)
+            {
+                var blHasStocktakeTime = Convert.ToBoolean(hasStocktakeTime);
+                if(blHasStocktakeTime)
+                {
+                    query = query.Where(i => i.StocktakeTime.HasValue);
+                }
+                else
+                {
+                    query = query.Where(i => !i.StocktakeTime.HasValue);
+                }
+            }
+
             if(reference!=null&&reference.Length>4)
             {
                 var datePart = reference.Substring(0, 4);
@@ -183,7 +197,9 @@ namespace ThirdStoreBusiness.JobItem
                 jobItem.Ref1 = GetJobItemSequenceNumber();
             jobItem.FillOutNull();
             jobItem.CreateBy = currentUser;
-            if(jobItem.CreateTime.Equals(DateTime.MinValue))
+            if (jobItem.JobItemCreateTime.Equals(DateTime.MinValue))
+                jobItem.JobItemCreateTime = currentTime;
+            if (jobItem.CreateTime.Equals(DateTime.MinValue))
                 jobItem.CreateTime =currentTime;
             jobItem.EditBy = currentUser;
             if (jobItem.EditTime.Equals(DateTime.MinValue))
@@ -297,11 +313,12 @@ namespace ThirdStoreBusiness.JobItem
 
                 var listingItems = qlistingItems.ToList();
 
-                var notInStatus = new int[] { ThirdStoreJobItemStatus.PENDING.ToValue(), ThirdStoreJobItemStatus.SHIPPED.ToValue() };
+                //var notInStatus = new int[] { ThirdStoreJobItemStatus.PENDING.ToValue(), ThirdStoreJobItemStatus.SHIPPED.ToValue() };
+                var inStatus = new int[] { ThirdStoreJobItemStatus.READY.ToValue(), ThirdStoreJobItemStatus.ALLOCATED.ToValue() };
                 var inType = new int[] { ThirdStoreJobItemType.SELFSTORED.ToValue() };
                 var inventory = from jobItem in _jobItemRepository.Table
                                 from jobItemLine in jobItem.JobItemLines
-                                where !notInStatus.Contains(jobItem.StatusID) && inType.Contains(jobItem.Type)
+                                where inStatus.Contains(jobItem.StatusID) && inType.Contains(jobItem.Type)
                                 orderby jobItem.JobItemCreateTime
                                 select new
                                 {
@@ -430,7 +447,7 @@ namespace ThirdStoreBusiness.JobItem
                                              where jobItmInv.ConditionID.Equals(itmInv.ConditionID)
                                              && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
                                                         && itemR.Qty % jobItmInv.RelationQty == 0
-                                                        && jobItmInv.StatusID != 3
+                                                        && jobItmInv.StatusID != ThirdStoreJobItemStatus.ALLOCATED.ToValue()
                                              select jobItmInv;
 
                             var invJobItemIDs = SortInvJobItemIDs(relatedInv.ToList(), parentItem.Select(i => i).ToList());
@@ -744,7 +761,7 @@ namespace ThirdStoreBusiness.JobItem
             catch (Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                return new ThirdStoreReturnMessage() { IsSuccess = false,ErrorMesage=ex.Message};
+                return new ThirdStoreReturnMessage() { IsSuccess = false,Mesage=ex.Message};
             }
         }
 
@@ -1065,8 +1082,9 @@ namespace ThirdStoreBusiness.JobItem
             _jobItemLineRepository.Delete(jobItemLine);
         }
 
-        public D_JobItem ShipOut(string jobItemLineID, string jobItemLineRef, string trackingNumber)
+        public ThirdStoreReturnMessage ShipOut(string jobItemLineID, string jobItemLineRef, string trackingNumber)
         {
+            var returnMessage = new ThirdStoreReturnMessage();
             try
             {
                 if (string.IsNullOrEmpty(jobItemLineID)&& string.IsNullOrEmpty(jobItemLineRef))
@@ -1075,26 +1093,43 @@ namespace ThirdStoreBusiness.JobItem
                 }
 
                 D_JobItem jobItem = null;
-                if(!string.IsNullOrEmpty(jobItemLineID))
+                var inStatus = new int[] { ThirdStoreJobItemStatus.READY.ToValue(), ThirdStoreJobItemStatus.ALLOCATED.ToValue(), ThirdStoreJobItemStatus.BOOKED.ToValue() };
+                if (!string.IsNullOrEmpty(jobItemLineID))
                 {
                     var intJobItemLineID = Convert.ToInt32(jobItemLineID);
-                    jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID)));
+                    jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID))&&inStatus.Contains( ji.StatusID));
                 }
                 else if(!string.IsNullOrEmpty(jobItemLineRef))
                 {
-                    jobItem = GetJobItemByReference(jobItemLineRef);
+                    var jobItemsByRef = GetJobItemByReference(jobItemLineRef);
+                    if(jobItemsByRef!=null&& jobItemsByRef.Count>0)
+                    {
+                        
+                        jobItemsByRef = jobItemsByRef.Where(ji =>inStatus.Contains(ji.StatusID)).ToList();
+                        if(jobItemsByRef.Count==1)
+                        {
+                            jobItem = jobItemsByRef.FirstOrDefault();
+                        }
+                    }
                 }
 
                 if(jobItem!=null)
                 {
-                    if(!string.IsNullOrEmpty(trackingNumber.Trim()))
+                    if(!string.IsNullOrWhiteSpace(trackingNumber))
                         jobItem.TrackingNumber =trackingNumber.Trim();
                     jobItem.StatusID = ThirdStoreJobItemStatus.SHIPPED.ToValue();
                     jobItem.ShipTime = DateTime.Now;
                     this.UpdateJobItem(jobItem);
+                    returnMessage.IsSuccess = true;
+                    returnMessage.Mesage += $"Job item { GetJobItemReference(jobItem)} has been shipped out.";
+                }
+                else
+                {
+                    returnMessage.IsSuccess = false;
+                    returnMessage.Mesage += $"Cannot locate job item.";
                 }
 
-                return jobItem;
+                return returnMessage;
 
                 //var jobItemLine = _jobItemLineRepository.Table.FirstOrDefault(l => l.ID.Equals(intJobItemLineID));
                 //if (jobItemLine != null)
@@ -1111,7 +1146,9 @@ namespace ThirdStoreBusiness.JobItem
             catch(Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                throw ex;
+                returnMessage.IsSuccess = false;
+                returnMessage.Mesage = ex.Message;
+                return returnMessage;
             }
         }
 
@@ -1121,10 +1158,10 @@ namespace ThirdStoreBusiness.JobItem
             return jobItems.ToList();
         }
 
-        protected D_JobItem GetJobItemByReference(string reference)
+        protected IList<D_JobItem> GetJobItemByReference(string reference)
         {
             if (string.IsNullOrEmpty(reference) || reference.Length < 5)
-                return default(D_JobItem);
+                return default(IList<D_JobItem>);
             var jobItemRef = "";
             if(reference.IndexOf("/")!=-1)
             {
@@ -1141,10 +1178,11 @@ namespace ThirdStoreBusiness.JobItem
             var jobItemQuery = _jobItemRepository.Table;
             //jobItemQuery = jobItemQuery.Where(ji => ji.CreateTime.ToString("ddMM").Equals(datePart) && ji.Ref1.Equals(numPart));
             jobItemQuery = jobItemQuery.Where(ji =>(DbFunctions.Right("000" + SqlFunctions.DatePart("dd", ji.CreateTime).Value, 2)+ DbFunctions.Right("000"+SqlFunctions.DatePart("mm", ji.CreateTime).Value, 2)).Equals(datePart) && ji.Ref1.Equals(numPart));
-            if (jobItemQuery.Count() == 1)
-                return jobItemQuery.FirstOrDefault();
-            else
-                return default(D_JobItem);
+            //if (jobItemQuery.Count() == 1)
+            //    return jobItemQuery.FirstOrDefault();
+            //else
+            //    return default(D_JobItem);
+            return jobItemQuery.ToList();
         }
 
         public string GetJobItemReference(DateTime jobItemCreateTime, string sequenceNum)
@@ -1239,7 +1277,7 @@ namespace ThirdStoreBusiness.JobItem
             catch(Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                return new ThirdStoreReturnMessage() { IsSuccess = false, ErrorMesage = ex.Message };
+                return new ThirdStoreReturnMessage() { IsSuccess = false, Mesage = ex.Message };
             }
         }
 
@@ -1269,7 +1307,87 @@ namespace ThirdStoreBusiness.JobItem
             catch (Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
-                return new ThirdStoreReturnMessage() { IsSuccess = false, ErrorMesage = ex.Message };
+                return new ThirdStoreReturnMessage() { IsSuccess = false, Mesage = ex.Message };
+            }
+        }
+
+        public ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs)
+        {
+            var returnMessage = new ThirdStoreReturnMessage();
+            try
+            {
+                if (jobItemLineIDs==null && jobItemLineRefs==null)
+                {
+                    throw new Exception("No job item line id or job item line reference was provided.");
+                }
+
+                var jobItems = new List<D_JobItem>() ;
+                if (jobItemLineIDs != null)
+                {
+                    var intJobItemLineIDs = jobItemLineIDs.Select(id => Convert.ToInt32(id));
+                    var notInStatus = new int[] { ThirdStoreJobItemStatus.SHIPPED.ToValue() };
+                    jobItems = (from ji in _jobItemRepository.Table
+                                   from line in ji.JobItemLines
+                                   where intJobItemLineIDs.Contains(line.ID)
+                                   && !notInStatus.Contains(ji.StatusID)
+                                    select ji).ToList();
+
+                    var notLocateLineIDs = from jilid in jobItemLineIDs.Select(lid=>Convert.ToInt32(lid))
+                                           where !jobItems.SelectMany(ji => ji.JobItemLines).Select(l => l.ID).Any(lid => lid.Equals(jilid))
+                                           select jilid;
+
+                    if(notLocateLineIDs.Count()>0)
+                    {
+                        foreach(var lid in notLocateLineIDs)
+                        {
+                            returnMessage.Mesage += $"Cannot locate job item line id {lid}, ";
+                        }
+                    }
+                       
+                }
+                else if(jobItemLineRefs!=null)
+                {
+                    foreach(var jir in jobItemLineRefs)
+                    {
+                        var jobItemsByRef = GetJobItemByReference(jir);
+                        if (jobItemsByRef != null && jobItemsByRef.Count > 0)
+                        {
+                            jobItemsByRef = jobItemsByRef.Where(ji => ji.StatusID != ThirdStoreJobItemStatus.SHIPPED.ToValue()).ToList();
+                            if (jobItemsByRef.Count == 1)
+                            {
+                                jobItems.Add(jobItemsByRef.FirstOrDefault());
+                            }
+                            else
+                            {
+                                returnMessage.Mesage += $"Cannot locate job item {jir}, ";
+                            }
+                        }
+                    }
+                }
+
+                if(jobItems.Count>0)
+                {
+                    foreach(var ji in jobItems)
+                    {
+                        ji.StocktakeTime = DateTime.Now;
+                        this.UpdateJobItem(ji);
+                        returnMessage.Mesage += $"Job item { GetJobItemReference(ji)} confirmed, ";
+                    }
+                    returnMessage.IsSuccess = true;
+                }
+                else
+                {
+                    returnMessage.IsSuccess = false;
+                }
+
+                return returnMessage;
+            }
+            catch(Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                returnMessage.IsSuccess = false;
+                returnMessage.Mesage = ex.Message;
+                return returnMessage;
             }
         }
 

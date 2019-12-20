@@ -681,6 +681,19 @@ IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_PricePerce
 GO
 
 
+--Add StocktakeTime
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_JobItem' AND C.Name='StocktakeTime')
+	ALTER TABLE dbo.D_JobItem ADD
+		StocktakeTime datetime null CONSTRAINT DF_D_JobItem_StocktakeTime DEFAULT null
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_StocktakeTime')
+	ALTER TABLE dbo.D_JobItem
+		DROP CONSTRAINT DF_D_JobItem_StocktakeTime
+GO
+
+
 
 --insert fake data
 

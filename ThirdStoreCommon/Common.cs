@@ -52,7 +52,8 @@ namespace ThirdStoreCommon
         PENDING=1,
         READY=2,
         ALLOCATED=3,
-        SHIPPED=4
+        SHIPPED=4,
+        BOOKED=5
     }
 
     public enum ThirdStoreJobItemType
@@ -105,6 +106,7 @@ namespace ThirdStoreCommon
     public class ThirdStoreReturnMessage
     {
         public bool IsSuccess { get; set; }
-        public string ErrorMesage { get; set; }
+        public string Mesage { get; set; }
+
     }
 }

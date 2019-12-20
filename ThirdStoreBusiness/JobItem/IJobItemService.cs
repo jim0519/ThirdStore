@@ -30,6 +30,7 @@ namespace ThirdStoreBusiness.JobItem
             string location = null,
             List<string> inspector = null,
             string trackingNumber=null,
+            int hasStocktakeTime=-1,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
@@ -57,7 +58,9 @@ namespace ThirdStoreBusiness.JobItem
 
         void DeleteJobItemLine(D_JobItemLine jobItemLine);
 
-        D_JobItem ShipOut(string jobItemLineID,string jobItemLineRef, string trackingNumber);
+        ThirdStoreReturnMessage ShipOut(string jobItemLineID,string jobItemLineRef, string trackingNumber);
+
+        ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs);
 
         void PrintJobItemLabel(IList<int> ids);
 
