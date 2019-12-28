@@ -27,6 +27,7 @@ namespace ThirdStoreBusiness.Item
              ThirdStoreItemType? itemType = null,
             string name = null,
             string aliasSKU = null,
+            string refSKU=null,
             ThirdStoreSupplier? supplier = null,
             int isReadyForList = -1,
             int pageIndex = 0,

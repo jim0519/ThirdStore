@@ -170,6 +170,14 @@
         </tr>
         <tr>
             <td>
+                @Html.LabelFor(model => model.SearchReferenceSKU):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchReferenceSKU)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.LabelFor(model => model.SearchSupplier):
             </td>
             <td>
@@ -296,6 +304,7 @@
             $('#@Html.FieldIdFor(model => model.SearchType)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchName)').val("");
             $('#@Html.FieldIdFor(model => model.SearchAliasSKU)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchReferenceSKU)').val("");
             $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val("-1");
 
@@ -313,6 +322,7 @@
             SearchType: $('#@Html.FieldIdFor(model => model.SearchType)').val(),
             SearchName: $('#@Html.FieldIdFor(model => model.SearchName)').val(),
             SearchAliasSKU: $('#@Html.FieldIdFor(model => model.SearchAliasSKU)').val(),
+            SearchReferenceSKU: $('#@Html.FieldIdFor(model => model.SearchReferenceSKU)').val(),
             SearchSupplier: $('#@Html.FieldIdFor(model => model.SearchSupplier)').val(),
             SearchReadyForList: $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val()
         };

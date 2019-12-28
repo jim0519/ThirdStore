@@ -372,6 +372,36 @@ namespace ThirdStore.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult StocktakeFind(DataSourceRequest command, JobItemStockTakeViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.JobItemLineID) && string.IsNullOrWhiteSpace(model.JobItemLineReference))
+                return new JsonResult { Data = new DataSourceResult() { Data = new List<JobItemGridViewModel>() , Total = 0 } };
+
+            var jobItemLineID = (!string.IsNullOrWhiteSpace(model.JobItemLineID) ? Convert.ToInt32(model.JobItemLineID) : 0);
+            var jobItems = _jobItemService.SearchJobItems(
+                jobItemLineID: jobItemLineID,
+                jobItemReference: model.JobItemLineReference,
+                pageIndex: command.Page - 1,
+                pageSize: command.PageSize);
+
+            var jobItemGridViewList = jobItems.Select(i => {
+                var viewModel = i.ToModel();
+                viewModel.Condition = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).FirstOrDefault(itm => itm.ID.Equals(i.ConditionID)).Name;
+                if (i.JobItemLines.Count > 0)
+                    viewModel.SKUs = i.JobItemLines.Select(l => l.SKU + "," + l.ItemID).Aggregate((current, next) => current + ";" + next);
+                viewModel.Reference = _jobItemService.GetJobItemReference(i);
+                return viewModel;
+            });
+
+            var gridModel = new DataSourceResult() { Data = jobItemGridViewList, Total = jobItems.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
 
 
         [HttpPost]

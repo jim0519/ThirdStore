@@ -60,6 +60,7 @@ namespace ThirdStoreBusiness.Item
             ThirdStoreItemType? itemType = null, 
             string name = null,
             string aliasSKU = null,
+            string refSKU = null,
             ThirdStoreSupplier? supplier = null,
             int isReadyForList = -1,
             int pageIndex = 0,
@@ -68,7 +69,10 @@ namespace ThirdStoreBusiness.Item
             var query = _itemRepository.Table;
 
             if (sku != null)
+            {
+                sku = GetRealSKU(sku);
                 query = query.Where(i => i.SKU.Contains(sku.ToLower()));
+            }
             if (itemType.HasValue)
             {
                 var itemTypeID = itemType.Value.ToValue();
@@ -79,12 +83,20 @@ namespace ThirdStoreBusiness.Item
 
             if(aliasSKU!=null)
             {
-                if(Regex.IsMatch( aliasSKU, "(_D){1}$"))
-                {
-                    aliasSKU = Regex.Replace(aliasSKU, "(_D){1}$", "");
-                    query = query.Where(i => i.Ref2.Contains(aliasSKU));
-                }
+                aliasSKU = GetRealSKU(aliasSKU);
+                query = query.Where(i => i.Ref2.Contains(aliasSKU));
+                //if (Regex.IsMatch( aliasSKU, "(_D){1}$"))
+                //{
+                //    aliasSKU = Regex.Replace(aliasSKU, "(_D){1}$", "");
+                //    query = query.Where(i => i.Ref2.Contains(aliasSKU));
+                //}
             }
+            if(refSKU!=null)
+            {
+                refSKU = GetRealSKU(refSKU);
+                query = query.Where(i => i.Ref1.Contains(refSKU));
+            }
+
             if (supplier.HasValue)
             {
                 var supplierID = supplier.Value.ToValue();
@@ -530,6 +542,15 @@ namespace ThirdStoreBusiness.Item
             }
             
             return skuList;
+        }
+
+        private string GetRealSKU(string sku)
+        {
+            if (Regex.IsMatch(sku, "(_D){1}$"))
+            {
+                sku = Regex.Replace(sku, "(_D){1}$", "");
+            }
+            return sku;
         }
     }
 }

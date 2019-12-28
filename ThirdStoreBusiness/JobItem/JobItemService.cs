@@ -177,6 +177,34 @@ namespace ThirdStoreBusiness.JobItem
         }
 
 
+        public IPagedList<D_JobItem> SearchJobItems(
+            int jobItemLineID = 0, 
+            string jobItemReference = null, 
+            int pageIndex = 0, 
+            int pageSize = int.MaxValue)
+        {
+            var query = _jobItemRepository.Table;
+
+            if (jobItemLineID != 0)
+            {
+                query = from ji in query
+                        from line in ji.JobItemLines
+                        where line.ID.Equals(jobItemLineID)
+                        select ji;
+            }
+
+            if(!string.IsNullOrWhiteSpace(jobItemReference))
+            {
+                query = GetJobItemByReference(jobItemReference, query);
+            }
+
+            query = query.OrderByDescending(i => i.JobItemCreateTime);
+
+            return new PagedList<D_JobItem>(query, pageIndex, pageSize);
+
+        }
+
+
         public D_JobItem GetJobItemByID(int id)
         {
             var item = _jobItemRepository.GetById(id);
@@ -1158,10 +1186,10 @@ namespace ThirdStoreBusiness.JobItem
             return jobItems.ToList();
         }
 
-        protected IList<D_JobItem> GetJobItemByReference(string reference)
+        protected IQueryable<D_JobItem> GetJobItemByReference(string reference,IQueryable<D_JobItem> query=null)
         {
             if (string.IsNullOrEmpty(reference) || reference.Length < 5)
-                return default(IList<D_JobItem>);
+                return query;
             var jobItemRef = "";
             if(reference.IndexOf("/")!=-1)
             {
@@ -1175,14 +1203,20 @@ namespace ThirdStoreBusiness.JobItem
             var datePart = jobItemRef.Substring(0, 4);
             var numPart = jobItemRef.Substring(datePart.Length, jobItemRef.Length - datePart.Length);
 
-            var jobItemQuery = _jobItemRepository.Table;
+            var jobItemQuery =(query?? _jobItemRepository.Table) ;
             //jobItemQuery = jobItemQuery.Where(ji => ji.CreateTime.ToString("ddMM").Equals(datePart) && ji.Ref1.Equals(numPart));
             jobItemQuery = jobItemQuery.Where(ji =>(DbFunctions.Right("000" + SqlFunctions.DatePart("dd", ji.CreateTime).Value, 2)+ DbFunctions.Right("000"+SqlFunctions.DatePart("mm", ji.CreateTime).Value, 2)).Equals(datePart) && ji.Ref1.Equals(numPart));
             //if (jobItemQuery.Count() == 1)
             //    return jobItemQuery.FirstOrDefault();
             //else
             //    return default(D_JobItem);
-            return jobItemQuery.ToList();
+            return jobItemQuery;
+        }
+
+        protected IList<D_JobItem> GetJobItemByReference(string reference)
+        {
+            var query = this.GetJobItemByReference(reference, null);
+            return query != null ? query.ToList() : null;
         }
 
         public string GetJobItemReference(DateTime jobItemCreateTime, string sequenceNum)
@@ -1391,6 +1425,8 @@ namespace ThirdStoreBusiness.JobItem
                 return returnMessage;
             }
         }
+
+        
 
         protected class JobItemInv
         {

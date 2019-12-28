@@ -34,6 +34,12 @@ namespace ThirdStoreBusiness.JobItem
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
+        IPagedList<D_JobItem> SearchJobItems(
+            int jobItemLineID = 0,
+            string jobItemReference = null,
+            int pageIndex = 0,
+            int pageSize = int.MaxValue);
+
         void InsertJobItem(D_JobItem jobItem);
 
         void UpdateJobItem(D_JobItem jobItem);

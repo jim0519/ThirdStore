@@ -3,6 +3,7 @@
 {
     <script src="@Url.Content("~/Scripts/jquery.scannerdetection.js")"></script>
     <script src="@Url.Content("~/Scripts/jquery.tabbable.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/listGridCommon.js")"></script>
 }
 @{
     ViewBag.Title = "Stock Take";
@@ -40,12 +41,127 @@
             <td class="adminTitle" colspan="2">
                 <input type="submit" id="btnConfirmNext" class="k-button" value="Confirm and Next" />
                 <a href="@Html.Raw(Url.Action("List", "JobItem"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
+                <input type="button" id="btnSearch" class="k-button" value="Search" />
             </td>
         </tr>
     </table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="jobItem-grid"></div>
+                <script>
+                    $(document).ready(function () {
+                        var skusTemplate = "#if(SKUs!=''&&SKUs!=null&&SKUs!=undefined ){var skuInfos=SKUs.split(';'); for(var i = 0; i < skuInfos.length; i = i+1){var skuInfo=skuInfos[i].split(','); var sku=skuInfo[0]; var itemId=skuInfo[1];  # <a href='@Url.Action("Edit","Item")?ItemID=#=itemId#' target='_blank'>#=sku#</a><br /> #} }#";
+                        $("#jobItem-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("StocktakeFind", "JobItem"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "100",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["100", "200", "500"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                },
+                                {
+                                    field: "ID",
+                                    template: "<a href='@Url.Action("Edit")?JobItemID=#=ID#' target='_blank' > #=ID#</a>",
+                                    title: "ID"
+                                }, {
+                                    field: "Status",
+                                    title: "Status"
+                                }, {
+                                    field: "Reference",
+                                    title: "Reference"
+                                }, {
+                                    field: "Location",
+                                    title: "Location"
+                                }, {
+                                    field: "Condition",
+                                    title: "Condition"
+                                }, {
+                                    field: "SKUs",
+                                    template: skusTemplate,
+                                    title: "SKU Details"
+                                }, {
+                                    field: "Ref2",
+                                    title: "Inspectors"
+                                }, {
+                                    field: "ItemPrice",
+                                    title: "Price"
+                                }, {
+                                    field: "ShipTime",
+                                    title: "Ship Time",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+                                }, {
+                                    field: "StocktakeTime",
+                                    title: "Stocktake Time",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+                                }, {
+                                    field: "TrackingNumber",
+                                    title: "Tracking Number"
+                                },{
+                                    field: "ItemDetail",
+                                    title: "Item Detail"
+                                }
+                            ]
+                        });
+                    });
+
+
+                </script>
+
+            </td>
+        </tr>
+    </table>
+
     <script>
+        var selectedIds = [];
         $(document).ready(function () {
             $('#@Html.FieldIdFor(model => model.JobItemLineReference)').focus();
+            @*$('#@Html.FieldIdFor(model => model.JobItemLineReference)').blur(function () {
+                RefreshGrid(false);
+            });
+            $('#@Html.FieldIdFor(model => model.JobItemLineID)').blur(function () {
+                RefreshGrid(false);
+            });*@
 
             $(this).scannerDetection({
                 timeBeforeScanTest: 200, // wait for the next character for upto 200ms
@@ -57,11 +173,45 @@
                     //$(document).trigger(e);
                     //debugger;
                     //jQuery.event.trigger({ type: 'keypress', which: character.charCodeAt(9) });
+                    RefreshGrid(false);
                     $.tabNext();
                     //alert(barcode);
                 } // main callback function
             });
 
+            //clear all button
+            @*$('#btnClearAll').click(function () {
+                $('#@Html.FieldIdFor(model => model.SearchID)').val("");
+                $('#@Html.FieldIdFor(model => model.SearchSKU)').val("");
+                $('#@Html.FieldIdFor(model => model.SearchReference)').val("");
+                $('#@Html.FieldIdFor(model => model.CreateTimeFrom)').val("");
+                $('#@Html.FieldIdFor(model => model.CreateTimeTo)').val("");
+                $('#@Html.FieldIdFor(model => model.SearchType)').val("0");
+                $('#@Html.FieldIdFor(model => model.SearchCondition)').val("0");
+                $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
+                $('#@Html.FieldIdFor(model => model.SearchStatus)').val("0");
+                $('#@Html.FieldIdFor(model => model.SearchLocation)').val("");
+                //$('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
+                $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
+                $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
+                var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
+                inspectorMultiselect.value("");
+                inspectorMultiselect.trigger("change");
+
+                selectedIds = [];
+
+                RefreshGrid(false);
+
+                return false;
+            });*@
+
         });
+
+        function additionalData() {
+                return {
+                    JobItemLineID: $('#@Html.FieldIdFor(model => model.JobItemLineID)').val(),
+                    JobItemLineReference: $('#@Html.FieldIdFor(model => model.JobItemLineReference)').val()
+                };
+            }
     </script>
 }

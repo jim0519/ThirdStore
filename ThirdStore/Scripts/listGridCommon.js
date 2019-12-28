@@ -71,8 +71,12 @@
 });
 
 $(document).on('keypress', function (e) {
-    if (e.which == 13 && $("#btnSearch").length) {
-        $("#btnSearch").click();
+    //debugger;
+    if (e.which == 13 ) {
+        if ($("#btnSearch").length)
+            $("#btnSearch").click();
+        else if (typeof RefreshGrid === "function")
+            RefreshGrid(false);
     }
 });
 
