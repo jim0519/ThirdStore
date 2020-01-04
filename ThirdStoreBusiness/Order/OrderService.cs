@@ -11,6 +11,8 @@ using ThirdStoreBusiness.API.eBay;
 using System.Web;
 using HtmlAgilityPack;
 using ThirdStoreBusiness.JobItem;
+using ThirdStoreBusiness.Item;
+using ThirdStoreCommon.Models.Item;
 
 namespace ThirdStoreBusiness.Order
 {
@@ -21,18 +23,21 @@ namespace ThirdStoreBusiness.Order
         private readonly IeBayAPICallManager _eBayAPICallManager;
         private readonly IWorkContext _workContext;
         private readonly IJobItemService _jobItemService;
+        private readonly IItemService _itemService;
 
         public OrderService(IRepository<D_Order_Header> orderRepository,
             INetoAPICallManager netoAPICallManager,
             IeBayAPICallManager eBayAPICallManager,
             IWorkContext workContext,
-            IJobItemService jobItemService)
+            IJobItemService jobItemService,
+            IItemService itemService)
         {
             _orderRepository = orderRepository;
             _netoAPICallManager = netoAPICallManager;
             _eBayAPICallManager = eBayAPICallManager;
             _workContext = workContext;
             _jobItemService = jobItemService;
+            _itemService = itemService;
         }
 
         public void DeleteOrder(D_Order_Header order)
@@ -331,6 +336,7 @@ namespace ThirdStoreBusiness.Order
                 var updateOrderObj = new UpdateOrder();
                 var updateOrderOrders = new List<UpdateOrderOrder>();
                 var lstTotalAllocatedJobItemID = new List<string>();
+                var lstOrderAffectedSKU = new List<string>();
                 foreach (var order in orders)
                 {
                     //var eBayOrderLineItemIDs = order.OrderLines.Select(l => new {LineID=l.ID,OrderLineItemID=l.Ref2 });
@@ -338,6 +344,8 @@ namespace ThirdStoreBusiness.Order
                     var lstAllocateInvJobItemIDs = new List<string>();
                     foreach (var orderLine in order.OrderLines)
                     {
+                        if(!lstOrderAffectedSKU.Contains(orderLine.SKU))
+                            lstOrderAffectedSKU.Add(orderLine.SKU);
                         var soldItemSnapshot = _eBayAPICallManager.GetSoldItemSnapshot(orderLine.Ref2);
                         if (soldItemSnapshot != null)
                         {
@@ -439,7 +447,15 @@ namespace ThirdStoreBusiness.Order
                     }
                 }
 
-                _jobItemService.SyncInventory(jobItems.Select(ji=>ji.ID).ToArray());
+                var orderAffectedItems = _itemService.GetItemsBySKUs(lstOrderAffectedSKU);
+                var affectedItemIDs = (from jiItemID in _jobItemService.GetAffectedItemIDsByJobItemIDs(jobItems.Select(ji => ji.ID).ToList())
+                                       select jiItemID)
+                                       .Union(from item in orderAffectedItems ?? new List<D_Item>()
+                                              select item.ID
+                    );
+
+                _jobItemService.SyncInventory(affectedItemIDs.ToList());
+                //_jobItemService.SyncInventory(jobItems.Select(ji => ji.ID).ToArray());
 
                 //var eBayOrderLineItemIDs = from o in orders
                 //                           from line in o.OrderLines

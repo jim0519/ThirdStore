@@ -188,7 +188,10 @@ namespace ThirdStoreBusiness.Item
 
         public IList<D_Item> GetItemsBySKUs(IList<string> skus)
         {
-            skus = skus.Select(s => s.ToLower()).ToList();
+            if (skus == null || skus.Count == 0)
+                return default(IList<D_Item>);
+
+            skus = skus.Select(s =>GetRealSKU( s).ToLower()).ToList();
             var items = _itemRepository.Table.Where(i => skus.Contains(i.SKU.ToLower()) && i.IsActive);
             return items.ToList();
         }

@@ -52,6 +52,8 @@ namespace ThirdStoreBusiness.JobItem
 
         ThirdStoreReturnMessage SyncInventory(DateTime? fromTime, DateTime? toTime);
 
+        IList<int> GetAffectedItemIDsByJobItemIDs(IList<int> jobItemIDs);
+
         D_JobItemLine GetJobItemLineByID(int jobItemLineID);
 
         string GetJobItemReference(DateTime jobItemCreateTime,string sequenceNum);

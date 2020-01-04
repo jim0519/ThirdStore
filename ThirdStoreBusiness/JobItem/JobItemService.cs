@@ -1319,21 +1319,7 @@ namespace ThirdStoreBusiness.JobItem
         {
             try
             {
-                if(jobItemIDs==null||jobItemIDs.Count()==0)
-                {
-                    return new ThirdStoreReturnMessage() { IsSuccess = true };
-                }
-
-                var strJobItemIDs = jobItemIDs.Select(id=>id.ToString()).Aggregate((current, next) => current + "," + next);
-                var sqlStr = new StringBuilder();
-                sqlStr.Append("select * from fn_GetAffectedItemsByJobItems(@JobItemIDs)");
-
-                var paraJobItemIDs = new SqlParameter();
-                paraJobItemIDs.ParameterName = "JobItemIDs";
-                paraJobItemIDs.DbType = DbType.String;
-                paraJobItemIDs.Value = strJobItemIDs;
-
-                var query = _dbContext.SqlQuery<int>(sqlStr.ToString(), paraJobItemIDs).ToList();
+                var query=GetAffectedItemIDsByJobItemIDs(jobItemIDs.ToList());
 
                 return this.SyncInventory(query);
 
@@ -1343,6 +1329,26 @@ namespace ThirdStoreBusiness.JobItem
                 LogManager.Instance.Error(ex.Message);
                 return new ThirdStoreReturnMessage() { IsSuccess = false, Mesage = ex.Message };
             }
+        }
+
+        public IList<int> GetAffectedItemIDsByJobItemIDs(IList<int> jobItemIDs)
+        {
+            if (jobItemIDs == null || jobItemIDs.Count() == 0)
+            {
+                return new List<int>();
+            }
+
+            var strJobItemIDs = jobItemIDs.Select(id => id.ToString()).Aggregate((current, next) => current + "," + next);
+            var sqlStr = new StringBuilder();
+            sqlStr.Append("select * from fn_GetAffectedItemsByJobItems(@JobItemIDs)");
+
+            var paraJobItemIDs = new SqlParameter();
+            paraJobItemIDs.ParameterName = "JobItemIDs";
+            paraJobItemIDs.DbType = DbType.String;
+            paraJobItemIDs.Value = strJobItemIDs;
+
+            var query = _dbContext.SqlQuery<int>(sqlStr.ToString(), paraJobItemIDs).ToList();
+            return query;
         }
 
         public ThirdStoreReturnMessage ConfirmStock(IList<string> jobItemLineIDs, IList<string> jobItemLineRefs,string location)
