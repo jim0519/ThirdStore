@@ -35,7 +35,7 @@ namespace ThirdStore.Controllers
 
         public ActionResult List()
         {
-            var allowOrderDownloadUserIDs = new int[] { 1,4,14,17 };
+            var allowOrderDownloadUserIDs = new int[] { 1,4,10,14,16,17 };
             if (!allowOrderDownloadUserIDs.Contains(_workContext.CurrentUser.ID))
             {
                 ErrorNotification("You do not have permission to process this page.");
