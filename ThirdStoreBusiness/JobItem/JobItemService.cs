@@ -328,6 +328,10 @@ namespace ThirdStoreBusiness.JobItem
         {
             try
             {
+                //itemids==null means sync all eligible items, itenids!=null && itemids.count==0 means sync nothing.
+                if(itemids!=null&&itemids.Count==0)
+                    return new ThirdStoreReturnMessage() { IsSuccess = true };
+
                 #region Calculate Product Inventory
                 //var itemRelationship = _itemService.GetAllItemsWithRelationship();
                 var notInItemType = new int[] { ThirdStoreItemType.PART.ToValue() };

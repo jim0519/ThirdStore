@@ -453,8 +453,12 @@ namespace ThirdStoreBusiness.Order
                                        .Union(from item in orderAffectedItems ?? new List<D_Item>()
                                               select item.ID
                     );
-
-                _jobItemService.SyncInventory(affectedItemIDs.ToList());
+                if(affectedItemIDs.Count()>0)
+                    _jobItemService.SyncInventory(affectedItemIDs.ToList());
+                if (affectedItemIDs.Count() > 0)
+                    LogManager.Instance.Info("Sync affected item ids for download order: "+affectedItemIDs.Select(id=>id.ToString()).Aggregate((current, next) => current + "," + next));
+                
+                
                 //_jobItemService.SyncInventory(jobItems.Select(ji => ji.ID).ToArray());
 
                 //var eBayOrderLineItemIDs = from o in orders

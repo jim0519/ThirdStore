@@ -119,6 +119,8 @@
     <Compile Include="Models\JobItem\D_JobItem.cs" />
     <Compile Include="Models\Order\D_Order_Header.cs" />
     <Compile Include="Models\Order\D_Order_Line.cs" />
+    <Compile Include="Models\ScheduleTask\T_ScheduleRuleLine.cs" />
+    <Compile Include="Models\ScheduleTask\T_ScheduleRule.cs" />
     <Compile Include="Models\ScheduleTask\T_ScheduleTask.cs" />
     <Compile Include="ThirdStoreConfig.cs" />
     <Compile Include="PageList.cs" />

@@ -695,6 +695,69 @@ GO
 
 
 
+--Schedule Rule
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[T_ScheduleRule]') AND type in (N'U'))
+DROP TABLE [dbo].[T_ScheduleRule]
+GO
+CREATE TABLE [dbo].[T_ScheduleRule](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](500) NOT NULL,
+	[Description] [varchar](4000) NOT NULL,
+	[IntervalDay] [int] NOT NULL,
+	[LastSuccessTime] datetime not null,
+	[IsActive] bit not null,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_T_ScheduleRule] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[T_ScheduleRuleLine]') AND type in (N'U'))
+DROP TABLE [dbo].[T_ScheduleRuleLine]
+GO
+CREATE TABLE [dbo].[T_ScheduleRuleLine](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ScheduleRuleID] [int] NOT NULL,
+	[TimeRangeFrom] datetime NOT NULL,
+	[TimeRangeTo] datetime NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_T_ScheduleRuleLine] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+insert into T_ScheduleTask
+select 
+'Sync Inventory For Last Day',
+300,
+'ThirdStoreBusiness.ScheduleTask.SyncInventoryForLastDayTask, ThirdStoreBusiness',
+0,
+0,
+GETDATE(),
+GETDATE(),
+GETDATE()
+
+insert into T_ScheduleRule
+select 'SyncInventoryForLastDayTask','SyncInventoryForLastDayTask',1,GETDATE(),1,getdate(),'System',GETDATE(),'System'
+
+
+insert into T_ScheduleRuleLine
+select 1,'2016-02-01 00:00:30.000','2016-02-01 23:59:59.000',getdate(),'System',GETDATE(),'System'
+
+
 --insert fake data
 
 

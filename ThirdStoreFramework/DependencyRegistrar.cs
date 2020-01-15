@@ -99,6 +99,9 @@ namespace ThirdStoreFramework
 
             //Schedule Task
             builder.RegisterType<ScheduleTaskService>().As<IScheduleTaskService>().InstancePerLifetimeScope();
+
+            //Schedule Rule
+            builder.RegisterType<ScheduleRuleService>().As<IScheduleRuleService>().InstancePerLifetimeScope();
         }
 
         public int Order
