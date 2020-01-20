@@ -132,9 +132,23 @@ namespace ThirdStore.Controllers
             };
         }
 
-        public ActionResult Create()
+        public ActionResult Create(int fromJobItemID = 0)
         {
             var newJobItemViewModel = new JobItemViewModel();
+
+            if(fromJobItemID!=0)
+            {
+                var jobItem = _jobItemService.GetJobItemByID(fromJobItemID);
+                if(jobItem!=null)
+                {
+                    newJobItemViewModel = jobItem.ToCreateNewModel();
+
+                    newJobItemViewModel.Reference = string.Empty;
+                    newJobItemViewModel.ShipTime = null;
+                    newJobItemViewModel.TrackingNumber = string.Empty;
+                    newJobItemViewModel.StatusID = ThirdStoreJobItemStatus.PENDING.ToValue();
+                }
+            }
 
             FillDropDownDS(newJobItemViewModel);
             //newJobItemViewModel.JobItemCreateTime = DateTime.Now;

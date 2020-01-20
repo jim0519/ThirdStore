@@ -94,6 +94,7 @@
                 <input type="button" id="btnSyncByJobItem" class="k-button" value="Sync Inventory" />
             }
             <input type="button" id="btnPrintLabel" class="k-button" value="Print Label" />
+            <input type="button" id="btnDuplicate" class="k-button" value="Duplicate" />
             <input type="button" id="btnEdit" class="k-button" value="Edit" />
             <input type="button" id="btnCreateNew" class="k-button" value="Create New Item" />
             <script>
@@ -212,6 +213,18 @@
                         }
 
                         return false;
+                    });
+
+                    $('#btnDuplicate').click(function () {
+
+                        if (selectedIds.length != 1) {
+                            alert("Please select one job item to duplicate.");
+                            return false;
+                        }
+
+                        var selectedJobItemID = selectedIds[0];
+                        var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromJobItemID = "_selectedJobItemID_" }))'.replace('_selectedJobItemID_', selectedJobItemID);
+                        location.href = link;
                     });
 
                     $('#btnCreateNew').click(function () {
