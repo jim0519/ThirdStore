@@ -146,7 +146,7 @@ namespace ThirdStoreBusiness.API.Neto
 
         private bool shippingDiscountFieldSpecified;
 
-        private System.DateTime dateRequiredField;
+        private System.DateTime? dateRequiredField;
 
         private bool dateRequiredFieldSpecified;
 
@@ -158,11 +158,11 @@ namespace ThirdStoreBusiness.API.Neto
 
         private bool datePaidFieldSpecified;
 
-        private System.DateTime datePlacedField;
+        private System.DateTime? datePlacedField;
 
         private bool datePlacedFieldSpecified;
 
-        private System.DateTime dateUpdatedField;
+        private System.DateTime? dateUpdatedField;
 
         private bool dateUpdatedFieldSpecified;
 
@@ -596,7 +596,7 @@ namespace ThirdStoreBusiness.API.Neto
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public System.DateTime DateRequired
+        public System.DateTime? DateRequired
         {
             get
             {
@@ -680,7 +680,7 @@ namespace ThirdStoreBusiness.API.Neto
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public System.DateTime DatePlaced
+        public System.DateTime? DatePlaced
         {
             get
             {
@@ -708,7 +708,7 @@ namespace ThirdStoreBusiness.API.Neto
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public System.DateTime DateUpdated
+        public System.DateTime? DateUpdated
         {
             get
             {
