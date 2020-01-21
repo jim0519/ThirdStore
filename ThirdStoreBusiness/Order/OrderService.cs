@@ -156,7 +156,7 @@ namespace ThirdStoreBusiness.Order
             newOrder.SubTotal = Convert.ToDecimal(netoOrder.GrandTotal);
             newOrder.TotalAmount = Convert.ToDecimal(netoOrder.GrandTotal);
             newOrder.Postage = netoOrder.ShippingTotal;
-            newOrder.OrderTime = netoOrder.DatePlaced.ToLocalTime();
+            newOrder.OrderTime = netoOrder.DatePlaced.HasValue? netoOrder.DatePlaced.Value.ToLocalTime():DateTime.Now;
             newOrder.CustomerID = netoOrder.Username;
             if (netoOrder.OrderPayment != null&&netoOrder.OrderPayment.Count()>0)
             {
