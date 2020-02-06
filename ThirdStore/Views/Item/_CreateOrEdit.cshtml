@@ -57,7 +57,7 @@
             @Html.LabelFor(m => m.Name)
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.Name)
+            @Html.TextAreaFor(model => model.Name, 4, 30, null)
         </td>
         <td class="adminTitle">
             @Html.LabelFor(m => m.Description)
