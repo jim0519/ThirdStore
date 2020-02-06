@@ -382,6 +382,8 @@
             </td>
             <td>
                 @Html.DropDownListFor(model => model.SearchStatus, Model.JobItemStatuses)
+                @Html.LabelFor(model => model.IsExcludeStatus)
+                @Html.EditorFor(model => model.IsExcludeStatus)
             </td>
         </tr>
         <tr>
@@ -548,6 +550,7 @@
             //$('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
             $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
+            $('#@Html.FieldIdFor(model => model.IsExcludeStatus)').prop('checked', false);
             var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
             inspectorMultiselect.value("");
             inspectorMultiselect.trigger("change");
@@ -574,7 +577,8 @@
             SearchLocation: $('#@Html.FieldIdFor(model => model.SearchLocation)').val(),
             SearchInspector: $('#@Html.FieldIdFor(model => model.SearchInspector)').val(),
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
-            HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val()
+            HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val(),
+            IsExcludeStatus: $('#@Html.FieldIdFor(model => model.IsExcludeStatus)').is(':checked')
         };
     }
     </script>

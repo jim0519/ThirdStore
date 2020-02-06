@@ -82,6 +82,7 @@ namespace ThirdStoreBusiness.JobItem
              List<string> inspector = null,
             string trackingNumber = null,
             int hasStocktakeTime = -1,
+            bool isExcludeStatus=false,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -112,7 +113,10 @@ namespace ThirdStoreBusiness.JobItem
             if (jobItemStatus.HasValue)
             {
                 var itemStatusID = jobItemStatus.Value.ToValue();
-                query = query.Where(i => i.StatusID.Equals(itemStatusID));
+                if(isExcludeStatus)
+                    query = query.Where(i => !i.StatusID.Equals(itemStatusID));
+                else
+                    query = query.Where(i => i.StatusID.Equals(itemStatusID));
             }
 
             if (jobItemCondition.HasValue)

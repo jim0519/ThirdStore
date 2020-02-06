@@ -33,6 +33,8 @@ namespace ThirdStore.Models.JobItem
         public int SearchCondition { get; set; }
         public int SearchSupplier { get; set; }
         public int SearchStatus { get; set; }
+        [Display(Name = "Exclude")]
+        public bool IsExcludeStatus { get; set; }
         public string SearchLocation { get; set; }
         public string SearchTrackingNumber { get; set; }
         public string SearchReference { get; set; }

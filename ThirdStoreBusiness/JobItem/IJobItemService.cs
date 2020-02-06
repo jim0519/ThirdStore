@@ -18,19 +18,20 @@ namespace ThirdStoreBusiness.JobItem
         IList<D_JobItem> GetJobItemsByIDs(IList<int> ids);
 
         IPagedList<D_JobItem> SearchJobItems(
-            string id =null,
-            string reference=null,
-            string sku=null,
+            string id = null,
+            string reference = null,
+            string sku = null,
             DateTime? jobItemCreateTimeFrom = null,
             DateTime? jobItemCreateTimeTo = null,
-            ThirdStoreJobItemType? jobItemType=null,
+            ThirdStoreJobItemType? jobItemType = null,
             ThirdStoreJobItemStatus? jobItemStatus = null,
             ThirdStoreJobItemCondition? jobItemCondition = null,
             ThirdStoreSupplier? jobItemSupplier = null,
             string location = null,
             List<string> inspector = null,
-            string trackingNumber=null,
-            int hasStocktakeTime=-1,
+            string trackingNumber = null,
+            int hasStocktakeTime = -1,
+            bool isExcludeStatus = false,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 

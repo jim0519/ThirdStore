@@ -350,7 +350,11 @@ namespace ThirdStore.Controllers
             var item = _itemService.GetItemBySKU(inputSKU);
             if (item == null)
             {
-                return Json(new { Result = false });
+                return Json(new { Result = false, ErrMessage = "SKU Not Exists" });
+            }
+            else if (item.ChildItems.Count > 1)
+            {
+                return Json(new { Result = false, ErrMessage = "SKU cannot contain more than 1 sub SKU." });
             }
             return Json(new { Result = true });
         }

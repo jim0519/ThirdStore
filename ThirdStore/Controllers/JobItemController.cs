@@ -112,6 +112,7 @@ namespace ThirdStore.Controllers
                 inspector: inspector,
                 trackingNumber:model.SearchTrackingNumber,
                 hasStocktakeTime:model.HasStocktakeTime,
+                isExcludeStatus:model.IsExcludeStatus,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
 
