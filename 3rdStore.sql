@@ -1173,3 +1173,18 @@ GETDATE()
 
 select * from fn_GetAffectedItems('20191219','20191219') A
 inner join D_Item I on A.ID=I.ID
+
+
+--connect row into string with comma
+
+declare @tmp varchar(max)
+SET @tmp = ''
+select @tmp = @tmp + ID + ',' from 
+(select CONVERT(varchar, ID) ID from D_Item
+where Cost>50 and Cost<=100
+and SupplierID=1
+and IsActive=1
+and Name<>'' and Description<>''
+and Type<>1) I
+
+select SUBSTRING(@tmp, 0, LEN(@tmp))

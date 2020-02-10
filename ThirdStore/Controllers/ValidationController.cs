@@ -6,11 +6,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using ThirdStoreBusiness.Item;
+using ThirdStoreFramework.Controllers;
 
 namespace ThirdStore.Controllers
 {
     [RoutePrefix("api/validation")]
-    public class ValidationController : ApiController
+    public class ValidationController : BaseApiController
     {
         private readonly IItemService _itemService;
 

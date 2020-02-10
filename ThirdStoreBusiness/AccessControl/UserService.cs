@@ -72,21 +72,25 @@ namespace ThirdStoreBusiness.AccessControl
 
         public bool ValidateUser(string email, string password)
         {
-            throw new NotImplementedException();
-        }
-
-
-        public bool SignIn(string email, string password)
-        {
             var user = GetUserByEmail(email);
             if (user == null || user.StatusID != 1)//TODO: get user active status ID in status list
-                return false ;
+                return false;
 
             var pwd = _encryptionService.CreatePasswordHash(password, user.PasswordSalt);
 
             if (pwd != user.Password)
                 return false;
 
+            return true;
+        }
+
+
+        public bool SignIn(string email, string password)
+        {
+            if (!ValidateUser(email, password))
+                return false;
+
+            var user = GetUserByEmail(email);
 
             var now = DateTime.UtcNow.ToLocalTime();
 

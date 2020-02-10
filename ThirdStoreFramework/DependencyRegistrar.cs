@@ -23,6 +23,7 @@ using ThirdStoreBusiness.API.eBay;
 using ThirdStoreBusiness.Order;
 using ThirdStoreBusiness.ReportPrint;
 using LINQtoCSV;
+using ThirdStoreFramework.Controllers;
 
 namespace ThirdStoreFramework
 {
@@ -96,6 +97,7 @@ namespace ThirdStoreFramework
             builder.RegisterType<EncryptionService>().As<IEncryptionService>().InstancePerLifetimeScope();
             builder.RegisterType<PermissionService>().As<IPermissionService>().InstancePerLifetimeScope();
             builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
+            builder.RegisterType<AuthorizationHelper>().As<IAuthorizationHelper>().InstancePerLifetimeScope();
 
             //Schedule Task
             builder.RegisterType<ScheduleTaskService>().As<IScheduleTaskService>().InstancePerLifetimeScope();
