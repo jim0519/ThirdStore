@@ -1185,6 +1185,9 @@ where Cost>50 and Cost<=100
 and SupplierID=1
 and IsActive=1
 and Name<>'' and Description<>''
-and Type<>1) I
+and Type<>1
+and ((LEN(sku)<=23) or
+(LEN(sku)>23 and Ref2<>''))
+) I
 
 select SUBSTRING(@tmp, 0, LEN(@tmp))
