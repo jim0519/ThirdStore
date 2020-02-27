@@ -112,6 +112,7 @@
     <Compile Include="Models\Image\D_Image.cs" />
     <Compile Include="Models\Image\M_JobItemImage.cs" />
     <Compile Include="Models\Image\M_ItemImage.cs" />
+    <Compile Include="Models\Item\NetoProducts.cs" />
     <Compile Include="Models\Item\D_Item.cs" />
     <Compile Include="Models\Item\D_Item_Relationship.cs" />
     <Compile Include="Models\Item\V_ItemRelationship.cs" />

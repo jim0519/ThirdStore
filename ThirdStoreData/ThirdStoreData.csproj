@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="IDbContext.cs" />
     <Compile Include="IRepository.cs" />
+    <Compile Include="Mapping\NetoProductsMap.cs" />
     <Compile Include="Mapping\T_ScheduleRuleLineMap.cs" />
     <Compile Include="Mapping\T_ScheduleRuleMap.cs" />
     <Compile Include="Mapping\D_Order_HeaderMap.cs" />

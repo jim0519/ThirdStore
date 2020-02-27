@@ -758,6 +758,19 @@ insert into T_ScheduleRuleLine
 select 1,'2016-02-01 00:00:30.000','2016-02-01 23:59:59.000',getdate(),'System',GETDATE(),'System'
 
 
+--fetch neto products
+EXEC sp_rename 'NetoProducts.ID', 'NetoProductID', 'COLUMN';
+
+ALTER TABLE NetoProducts ADD ID int identity(1,1) not null
+GO
+ALTER TABLE NetoProducts
+add CONSTRAINT pk_NetoProducts_ID primary key(ID)
+GO
+
+ALTER TABLE dbo.NetoProducts ADD Qty varchar(50) NULL DEFAULT '0'
+
+
+
 --insert fake data
 
 
@@ -1191,3 +1204,33 @@ and ((LEN(sku)<=23) or
 ) I
 
 select SUBSTRING(@tmp, 0, LEN(@tmp))
+
+
+
+
+
+--neto上的active listing但是没有我们系统上job item，也不是ds的
+
+select * from ThirdStore.dbo.NetoProducts
+where SKU not in 
+(
+	select 
+	distinct
+	case when H.DesignatedSKU<>'' then H.DesignatedSKU else L.SKU end HSKU
+	from D_JobItem H
+	inner join D_JobItemLine L on H.ID=L.HeaderID
+	where StatusID in (1,2,3) and Type=1
+)
+and sku not in
+(
+	select SKU from D_Item
+	where Cost<=100
+	and SupplierID=1
+	and IsActive=1
+	and Name<>'' and Description<>''
+	and Type<>1
+	and ((LEN(sku)<=23) or
+	(LEN(sku)>23 and Ref2<>''))
+)
+and SKU not like '%_D'
+and convert(int,Qty)>0

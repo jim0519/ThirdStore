@@ -12,6 +12,7 @@ using System.IO;
 using LINQtoCSV;
 using ThirdStoreBusiness.Image;
 using ThirdStoreCommon.Models.Image;
+using ThirdStoreBusiness.API.Neto;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -19,17 +20,21 @@ namespace ThirdStoreBusiness.Item
     {
         private readonly IRepository<D_Item> _itemRepository;
         private readonly IRepository<D_Item_Relationship> _itemRelationshipRepository;
+        private readonly IRepository<NetoProducts> _netoProductsRepository;
         private readonly IDbContext _dbContext;
         private readonly IWorkContext _workContext;
         private readonly IImageService _imageService;
+        private readonly INetoAPICallManager _netoAPIManager;
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
 
         public ItemService(IRepository<D_Item> itemRepository,
             IRepository<D_Item_Relationship> itemRelationshipRepository,
+            IRepository<NetoProducts> netoProductsRepository,
             IWorkContext workContext,
             IDbContext dbContext,
             IImageService imageService,
+            INetoAPICallManager netoAPIManager,
             CsvContext csvContext,
             CsvFileDescription csvFileDescription)
         {
@@ -38,6 +43,8 @@ namespace ThirdStoreBusiness.Item
             _dbContext = dbContext;
             _workContext = workContext;
             _imageService = imageService;
+            _netoAPIManager = netoAPIManager;
+            _netoProductsRepository = netoProductsRepository;
             _csvContext = csvContext;
             _csvFileDescription = csvFileDescription;
         }
@@ -262,8 +269,19 @@ namespace ThirdStoreBusiness.Item
                     if(!string.IsNullOrWhiteSpace(updateItem.Description))
                         item.Description = updateItem.Description;
                     item.Cost = updateItem.Price;
-                    item.Price = item.Cost * Convert.ToDecimal(1.3);
+                    
+                    var postage = new List<decimal>() {
+                        updateItem.VIC.IsNumeric()? Convert.ToDecimal(updateItem.VIC):0,
+                        updateItem.NSW.IsNumeric()? Convert.ToDecimal(updateItem.NSW):0,
+                        updateItem.SA.IsNumeric()? Convert.ToDecimal(updateItem.SA):0,
+                        updateItem.QLD.IsNumeric()? Convert.ToDecimal(updateItem.QLD):0,
+                        updateItem.TAS.IsNumeric()? Convert.ToDecimal(updateItem.TAS):0,
+                        updateItem.WA.IsNumeric()? Convert.ToDecimal(updateItem.WA):0,
+                        updateItem.NT.IsNumeric()? Convert.ToDecimal(updateItem.NT):0
+                        }.Max();
 
+
+                    item.Price = (item.Cost+ postage) * Convert.ToDecimal(1.3);
                     //UpdateItem(item);
                     _itemRepository.Update(item,itm=> itm.Description,itm=>itm.Cost,itm=>itm.Price);
                 }
@@ -554,6 +572,66 @@ namespace ThirdStoreBusiness.Item
                 sku = Regex.Replace(sku, "(_D){1}$", "");
             }
             return sku;
+        }
+
+        public void FetchNetoProducts()
+        {
+            try
+            {
+                _netoProductsRepository.Clear();
+                var netoProducts = _netoAPIManager.GetNetoProducts(false);
+                
+                foreach(var p in netoProducts)
+                {
+                    var newProduct = new NetoProducts();
+                    newProduct.NetoProductID = p.ID;
+                    newProduct.SKU = p.SKU;
+                    if (p.WarehouseQuantity != null)
+                        newProduct.Qty = p.WarehouseQuantity.Quantity;
+                    else
+                        newProduct.Qty = "0";
+                    newProduct.DefaultPrice = p.DefaultPrice.ToString();
+                    newProduct.Name = p.Name;
+                    newProduct.PrimarySupplier = p.PrimarySupplier;
+                    if(p.Images.Count()>=1)
+                        newProduct.Image1 = p.Images[0].URL;
+                    if (p.Images.Count() >= 2)
+                        newProduct.Image2 = p.Images[1].URL;
+                    if (p.Images.Count() >= 3)
+                        newProduct.Image3 = p.Images[2].URL;
+                    if (p.Images.Count() >= 4)
+                        newProduct.Image4 = p.Images[3].URL;
+                    if (p.Images.Count() >= 5)
+                        newProduct.Image5 = p.Images[4].URL;
+                    if (p.Images.Count() >= 6)
+                        newProduct.Image6 = p.Images[5].URL;
+                    if (p.Images.Count() >= 7)
+                        newProduct.Image7 = p.Images[6].URL;
+                    if (p.Images.Count() >= 8)
+                        newProduct.Image8 = p.Images[7].URL;
+                    if (p.Images.Count() >= 9)
+                        newProduct.Image9 = p.Images[8].URL;
+                    if (p.Images.Count() >= 10)
+                        newProduct.Image10 = p.Images[9].URL;
+                    if (p.Images.Count() >= 11)
+                        newProduct.Image11 = p.Images[10].URL;
+                    if (p.Images.Count() >= 12)
+                        newProduct.Image12 = p.Images[11].URL;
+                    newProduct.ShippingHeight = p.ShippingHeight.ToString();
+                    newProduct.ShippingLength = p.ShippingLength.ToString();
+                    newProduct.ShippingWeight = p.ShippingWeight.ToString();
+                    newProduct.ShippingWidth = p.ShippingWidth.ToString();
+
+                    newProduct.FillOutNull();
+                    _netoProductsRepository.Insert(newProduct);
+                }
+
+            }
+            catch(Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                throw ex;
+            }
         }
     }
 }

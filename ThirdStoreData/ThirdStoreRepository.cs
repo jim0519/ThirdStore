@@ -242,6 +242,7 @@ namespace ThirdStoreData
         {
             var dbSet = this.Entities as DbSet<T>;
             dbSet.RemoveRange(dbSet);
+            _context.SaveChanges();
         }
 
         private IDbSet<T> Entities

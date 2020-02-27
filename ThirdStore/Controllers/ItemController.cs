@@ -449,6 +449,20 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
+        public ActionResult FetchNetoProducts()
+        {
+            try
+            {
+                _itemService.FetchNetoProducts();
+                return Json(new { Result = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = false, ErrMsg = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public ActionResult SyncInventory(string selectedIDs)
         {
             try

@@ -79,5 +79,14 @@ namespace ThirdStore.Extensions
 
             return MvcHtmlString.Create(result);
         }
+
+        public static bool IsDebug(this HtmlHelper htmlHelper)
+        {
+            #if DEBUG
+                  return true;
+            #else
+                  return false;
+            #endif
+        }
     }
 }

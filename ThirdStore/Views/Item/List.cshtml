@@ -12,6 +12,10 @@
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
             <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+            @if (Html.IsDebug())
+            {
+                <input type="button" id="btnFetchNetoProducts" class="k-button" value="Fetch Neto Products" />
+            }
             @if (Model.ShowSyncInventory)
             {
                 <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
@@ -21,6 +25,34 @@
             <input type="button" id="btnCreateNew" class="k-button" value="Create New SKU" />
             <script>
                 $(document).ready(function () {
+
+                    $('#btnFetchNetoProducts').click(function () {
+                        var link="@Html.Raw(Url.Action("FetchNetoProducts", "Item"))"
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            dataType: "json",
+                            success: function (data) {
+                                if (data.Result) {
+                                    alert("Fetch Neto Products Success");
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
+                                debugger;
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+                    });
 
                     $('#btnImportData').click(function () {
                         var link="@Html.Raw(Url.Action("ImportSelloData", "Item"))"

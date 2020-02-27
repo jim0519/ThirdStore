@@ -722,6 +722,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public static bool IsNumeric(this string s)
+        {
+            //if (string.IsNullOrWhiteSpace(s))
+            //    return false;
+            float output;
+            return float.TryParse(s, out output);
+        }
+
         //public static
 
         public static IEnumerable<TSource> TakeWhileAggregate<TSource, TAccumulate>(
