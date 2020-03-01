@@ -133,7 +133,7 @@ namespace ThirdStoreBusiness.JobItem
 
             if (location != null)
             {
-                query = query.Where(i => i.Location.Contains(location));
+                query = query.Where(i => i.Location.ToLower().Equals(location.ToLower()));
             }
 
             if(inspector!=null)
