@@ -131,9 +131,12 @@ namespace ThirdStoreBusiness.JobItem
                 query = query.Where(i => i.JobItemLines.Any(l=>l.Item.SupplierID.Equals(itemSupplierID)));
             }
 
-            if (location != null)
+            if (!string.IsNullOrWhiteSpace(location))
             {
-                query = query.Where(i => i.Location.ToLower().Equals(location.ToLower()));
+                if(location.ToLower().Equals(Constants.BlankConst))
+                    query = query.Where(i =>string.IsNullOrEmpty(i.Location));
+                else
+                    query = query.Where(i => i.Location.ToLower().Equals(location.ToLower()));
             }
 
             if(inspector!=null)

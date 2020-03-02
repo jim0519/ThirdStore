@@ -25,6 +25,7 @@ namespace ThirdStoreCommon
 
         //public const string DSZSKUListURL = "https://www.dropshipzone.com.au/rsdropship/download/downloadSkuList/";
         public const string DSZSKUListURL = "http://dropshipzone.com.au/sample/Standard/sku_list.csv";
+        public const string BlankConst = "blank";
     }
 
 
