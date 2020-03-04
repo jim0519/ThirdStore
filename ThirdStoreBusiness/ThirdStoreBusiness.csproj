@@ -120,6 +120,7 @@
     <Compile Include="Item\ItemService.cs" />
     <Compile Include="JobItem\IJobItemService.cs" />
     <Compile Include="JobItem\JobItemService.cs" />
+    <Compile Include="Order\DSZImportLine.cs" />
     <Compile Include="Order\IOrderService.cs" />
     <Compile Include="Order\OrderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -74,6 +74,21 @@
                             });
                             return false;
                         });
+
+                        $("#btnExportDSZFile").click(function (e) {
+                            //debugger;
+                            e.preventDefault();
+                            if (selectedIds.length == 0) {
+                                alert("Please select more than one order to export.");
+
+                            } else {
+                                var ids = selectedIds.join(",");
+                                $('#export-dszfile-form #orderIds').val(ids);
+                                $('#export-dszfile-form').submit();
+                            }
+                            return false;
+                        });
+
                     });
 
                 </script>
@@ -84,7 +99,7 @@
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
-            
+            <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
         </div>
     </div>
 
@@ -211,21 +226,25 @@
                                     format: "{0:dd/MM/yyyy HH:mm:ss}"
 
                                 }, {
+                                    field: "SKUs",
+                                    title: "SKU Details",
+                                    width: 130
+                                }, {
                                     field: "Ref1",
                                     title: "Status",
-                                    width: 110
+                                    width: 80
                                 }, {
                                     field: "BuyerNote",
                                     title: "Custom Delivery Instructions",
-                                    width: 200
+                                    width: 250
                                 }, {
                                     field: "CustomerID",
                                     title: "Customer ID",
-                                    width: 250
+                                    width: 100
                                 }, {
                                     field: "ConsigneeName",
                                     title: "Consignee Name",
-                                    width: 150
+                                    width: 100
                                 }
                             ]
                         });
@@ -266,5 +285,11 @@
     }
     </script>
 
+}
+
+
+@using (Html.BeginForm("ExportDSZFile", "Order", FormMethod.Post, new { id = "export-dszfile-form" }))
+{
+    <input type="hidden" id="orderIds" name="orderIds" value="" />
 }
 

@@ -13,6 +13,7 @@ using HtmlAgilityPack;
 using ThirdStoreBusiness.JobItem;
 using ThirdStoreBusiness.Item;
 using ThirdStoreCommon.Models.Item;
+using LINQtoCSV;
 
 namespace ThirdStoreBusiness.Order
 {
@@ -24,13 +25,17 @@ namespace ThirdStoreBusiness.Order
         private readonly IWorkContext _workContext;
         private readonly IJobItemService _jobItemService;
         private readonly IItemService _itemService;
+        private readonly CsvContext _csvContext;
+        private readonly CsvFileDescription _csvFileDesc;
 
         public OrderService(IRepository<D_Order_Header> orderRepository,
             INetoAPICallManager netoAPICallManager,
             IeBayAPICallManager eBayAPICallManager,
             IWorkContext workContext,
             IJobItemService jobItemService,
-            IItemService itemService)
+            IItemService itemService,
+            CsvContext csvContext,
+            CsvFileDescription csvFileDesc)
         {
             _orderRepository = orderRepository;
             _netoAPICallManager = netoAPICallManager;
@@ -38,6 +43,8 @@ namespace ThirdStoreBusiness.Order
             _workContext = workContext;
             _jobItemService = jobItemService;
             _itemService = itemService;
+            _csvContext = csvContext;
+            _csvFileDesc = csvFileDesc;
         }
 
         public void DeleteOrder(D_Order_Header order)
@@ -540,6 +547,57 @@ namespace ThirdStoreBusiness.Order
         {
             var item = _eBayAPICallManager.GetSoldItemSnapshot(orderTran);
             return item?.Description;
+        }
+
+        public Stream ExportDSZImportFile(IList<int> orderids)
+        {
+            Stream retStream = new MemoryStream();
+            var listDSZImportLine = new List<DSZImportLine>();
+
+            var orders = GetOrdersByIDs(orderids);
+            foreach(var o in orders)
+            {
+                foreach(var line in o.OrderLines)
+                {
+                    if (string.IsNullOrWhiteSpace(line.Ref5))//item has been allocated and not local stock item
+                    {
+                        var importLine = new DSZImportLine();
+                        importLine.serial_number = line.Ref1;
+                        var firstName = o.ConsigneeName.Substring(0, o.ConsigneeName.IndexOf(" "));
+                        var lastName = o.ConsigneeName.Substring(o.ConsigneeName.IndexOf(" ") + 1);
+                        importLine.first_name = firstName;
+                        importLine.last_name = lastName;
+
+                        importLine.address1 = o.ShippingAddress1;
+                        importLine.address2 = o.ShippingAddress2;
+                        importLine.suburb = o.ShippingSuburb;
+                        importLine.state = o.ShippingState;
+                        importLine.country = o.ShippingCountry;
+                        importLine.postcode = o.ShippingPostcode;
+                        importLine.telephone = o.ConsigneePhoneNo;
+                        importLine.sku = line.SKU;
+                        importLine.price = 10;
+                        importLine.postage = 0;
+                        importLine.qty = line.Qty;
+                        importLine.comment = o.BuyerNote;
+
+                        listDSZImportLine.Add(importLine);
+                    }
+                }
+            }
+
+            var stWriter = new StreamWriter(retStream);
+            _csvContext.Write(listDSZImportLine, stWriter, _csvFileDesc);
+            stWriter.Flush();
+            retStream.Position = 0;
+
+            return retStream;
+        }
+
+        public IList<D_Order_Header> GetOrdersByIDs(IList<int> orderids)
+        {
+            var query = _orderRepository.Table.Where(o => orderids.Contains(o.ID));
+            return query.ToList();
         }
     }
 }

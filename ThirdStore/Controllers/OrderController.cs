@@ -11,6 +11,7 @@ using ThirdStoreFramework.Controllers;
 using ThirdStoreCommon;
 using ThirdStoreFramework.MVC;
 using ThirdStoreCommon.Infrastructure;
+using System.IO;
 
 namespace ThirdStore.Controllers
 {
@@ -62,7 +63,10 @@ namespace ThirdStore.Controllers
             var orderGridViewList = orders.Select(i => {
                 var viewModel = i.ToModel();
                 if (i.OrderLines.Count > 0)
+                { 
                     viewModel.OrderTransactions = i.OrderLines.Select(l => l.Ref2.ToString()).Aggregate((current, next) => current + ";" + next);
+                    viewModel.SKUs=i.OrderLines.Select(l=>l.SKU+":"+l.Qty+(!string.IsNullOrWhiteSpace(l.Ref5)?"("+l.Ref5+")":string.Empty)).Aggregate((current, next) => current + ";" + next);
+                }
                 return viewModel;
             });
 
@@ -85,6 +89,35 @@ namespace ThirdStore.Controllers
             catch(Exception ex)
             {
                 return Json(new { Result = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ExportDSZFile(string orderIds)
+        {
+            try
+            {
+                byte[] bytes = null;
+                if (orderIds != null)
+                {
+                    var ids = orderIds
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => Convert.ToInt32(x))
+                        .ToList();
+
+                    using (var stream = _orderService.ExportDSZImportFile(ids) as MemoryStream)
+                    {
+                        bytes = stream.ToArray();
+                    }
+                }
+
+                return File(bytes, "text/csv", CommonFunc.ToCSVFileName("DSZOrderFile"));
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                ErrorNotification("Export file failed." + ex.Message);
+                return RedirectToAction("List");
             }
         }
 

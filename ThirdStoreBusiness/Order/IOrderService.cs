@@ -31,6 +31,8 @@ namespace ThirdStoreBusiness.Order
 
         D_Order_Header GetOrderByID(int id);
 
+        IList<D_Order_Header> GetOrdersByIDs(IList<int> orderids);
+
         D_Order_Header InsertOrder(D_Order_Header order);
 
         D_Order_Header UpdateOrder(D_Order_Header order);
@@ -38,5 +40,9 @@ namespace ThirdStoreBusiness.Order
         void DeleteOrder(D_Order_Header order);
 
         string GetOrderScreenshot(string orderTran);
+
+        Stream ExportDSZImportFile(IList<int> orderids);
+
+        
     }
 }
