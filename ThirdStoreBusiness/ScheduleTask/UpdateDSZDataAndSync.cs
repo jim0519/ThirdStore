@@ -68,13 +68,17 @@ namespace ThirdStoreBusiness.ScheduleTask
                             var leftJoinResult= from ld in latestData
                                                 join sld in secondLatestData on ld.SKU equals sld.SKU into leftJoin
                                                 from lj in leftJoin.DefaultIfEmpty()
-                                                where lj==null || ((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty< dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
+                                                where lj==null 
+                                                || ((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty< dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
+                                                ||ld.Price!=lj.Price
                                                 select ld.SKU;
 
                             var rightJoinResult = from sld in secondLatestData
                                                   join ld in latestData on sld.SKU equals ld.SKU into rightJoin
                                                   from rj in rightJoin.DefaultIfEmpty()
-                                                  where rj == null || ((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
+                                                  where rj == null 
+                                                  || ((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
+                                                  ||sld.Price!=rj.Price
                                                   select sld.SKU;
 
                             syncItemIDs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
