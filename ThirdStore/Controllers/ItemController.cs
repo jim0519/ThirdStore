@@ -177,6 +177,15 @@ namespace ThirdStore.Controllers
 
             return RedirectToAction("Edit", new { itemID = newEntityModel.ID });
         }
+        //[ActionName("Delete")]
+        public ActionResult EditBySKU(string sku)
+        {
+            var item = _itemService.GetItemBySKU(sku);
+            if(item==null)
+                return RedirectToAction("List");
+
+            return RedirectToAction("Edit", new { itemID = item.ID });
+        }
 
         public ActionResult Edit(int itemID)
         {

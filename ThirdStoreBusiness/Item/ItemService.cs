@@ -57,6 +57,8 @@ namespace ThirdStoreBusiness.Item
 
         public D_Item GetItemBySKU(string sku)
         {
+            if (string.IsNullOrWhiteSpace(sku))
+                return default(D_Item);
             var item = _itemRepository.Table.Where(i => i.SKU.ToLower().Equals(sku.ToLower())&&i.IsActive).FirstOrDefault();
             return item;
 

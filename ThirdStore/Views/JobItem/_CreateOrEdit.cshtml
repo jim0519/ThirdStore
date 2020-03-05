@@ -349,7 +349,7 @@
                         hidden: true
                 }, {
                         field: "SKU",
-                        template: "<a href='@Url.Action("Edit","Item")?ItemID=#=ItemID#' target='_blank' > #=SKU#</a>" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].SKU' value='#=SKU#' />",
+                        template: "<a href='@Url.Action("EditBySKU", "Item")?SKU=#=SKU#' target='_blank' > #=SKU#</a>" + "<input type='hidden' name='JobItemViewLines[#= index(data)#].SKU' value='#=SKU#' />",
                         width:200
                 }, {
                         field: "Qty",
