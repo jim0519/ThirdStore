@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThirdStoreFramework", "Thir
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThirdStoreBusiness", "ThirdStoreBusiness\ThirdStoreBusiness.csproj", "{68981AEA-0E9F-4C4C-9C6F-7622974BF3FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThirdStoreTest", "ThirdStoreTest\ThirdStoreTest.csproj", "{3C1643E2-572A-4495-924D-82AC51F8515E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{68981AEA-0E9F-4C4C-9C6F-7622974BF3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68981AEA-0E9F-4C4C-9C6F-7622974BF3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68981AEA-0E9F-4C4C-9C6F-7622974BF3FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C1643E2-572A-4495-924D-82AC51F8515E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C1643E2-572A-4495-924D-82AC51F8515E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C1643E2-572A-4495-924D-82AC51F8515E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C1643E2-572A-4495-924D-82AC51F8515E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
