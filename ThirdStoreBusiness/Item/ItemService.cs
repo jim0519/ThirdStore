@@ -80,7 +80,7 @@ namespace ThirdStoreBusiness.Item
             if (sku != null)
             {
                 sku = GetRealSKU(sku);
-                query = query.Where(i => i.SKU.Contains(sku.ToLower()));
+                query = query.Where(i => i.SKU.Contains(sku.ToLower())||i.ChildItems.Any(ir=>ir.ChildItem.SKU.Contains(sku)));
             }
             if (itemType.HasValue)
             {
