@@ -1132,7 +1132,8 @@ namespace ThirdStoreBusiness.JobItem
                 }
 
                 D_JobItem jobItem = null;
-                var inStatus = new int[] { ThirdStoreJobItemStatus.READY.ToValue(), ThirdStoreJobItemStatus.ALLOCATED.ToValue(), ThirdStoreJobItemStatus.BOOKED.ToValue() };
+                var cannotLocateItemReason = string.Empty;
+                var inStatus = new int[] {  ThirdStoreJobItemStatus.BOOKED.ToValue() };
                 if (!string.IsNullOrEmpty(jobItemLineID))
                 {
                     var intJobItemLineID = Convert.ToInt32(jobItemLineID);
@@ -1141,15 +1142,19 @@ namespace ThirdStoreBusiness.JobItem
                 else if(!string.IsNullOrEmpty(jobItemLineRef))
                 {
                     var jobItemsByRef = GetJobItemByReference(jobItemLineRef);
-                    if(jobItemsByRef!=null&& jobItemsByRef.Count>0)
+                    if (jobItemsByRef != null && jobItemsByRef.Count > 0)
                     {
-                        
-                        jobItemsByRef = jobItemsByRef.Where(ji =>inStatus.Contains(ji.StatusID)).ToList();
-                        if(jobItemsByRef.Count==1)
+
+                        jobItemsByRef = jobItemsByRef.Where(ji => inStatus.Contains(ji.StatusID)).ToList();
+                        if (jobItemsByRef.Count == 1)
                         {
                             jobItem = jobItemsByRef.FirstOrDefault();
                         }
+                        else
+                            cannotLocateItemReason = $"No corresponding job item is in {ThirdStoreJobItemStatus.BOOKED.ToName()} status.";
                     }
+                    else
+                        cannotLocateItemReason = "Cannot locate job item.";
                 }
 
                 if(jobItem!=null)
@@ -1165,7 +1170,7 @@ namespace ThirdStoreBusiness.JobItem
                 else
                 {
                     returnMessage.IsSuccess = false;
-                    returnMessage.Mesage += $"Cannot locate job item.";
+                    returnMessage.Mesage += cannotLocateItemReason;
                 }
 
                 return returnMessage;
