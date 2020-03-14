@@ -79,6 +79,24 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
+        public ActionResult GridDataUpdate(OrderGridViewModel model)
+        {
+            if (model != null)
+            {
+                var order = _orderService.GetOrderByID(model.ID);
+                if(order!=null)
+                {
+                    order.Ref2 = model.Ref2;
+                    order.Ref3 = model.Ref3;
+                    order.Ref4 = model.Ref4;
+                    _orderService.UpdateOrder(order);
+                }
+            }
+
+            return new NullJsonResult();
+        }
+
+        [HttpPost]
         public ActionResult UpdateOrderDeliveryInstruction(DateTime updateOrderFrom, DateTime updateOrderTo)
         {
             try

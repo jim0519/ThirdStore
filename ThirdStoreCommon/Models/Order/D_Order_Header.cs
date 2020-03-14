@@ -45,9 +45,9 @@ namespace ThirdStoreCommon.Models.Order
         public string OrderNote { get; set; }
         public Nullable<System.DateTime> ShipmentTime { get; set; }
         public string Ref1 { get; set; }//netoOrderStatus
-        public string Ref2 { get; set; }
-        public string Ref3 { get; set; }
-        public string Ref4 { get; set; }
+        public string Ref2 { get; set; }//Issue
+        public string Ref3 { get; set; }//Action
+        public string Ref4 { get; set; }//Note
         public string Ref5 { get; set; }
         public System.DateTime CreateTime { get; set; }
         public string CreateBy { get; set; }

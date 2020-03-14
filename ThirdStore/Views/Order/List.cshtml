@@ -103,6 +103,7 @@
             {
                 <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
             }
+            <input type="button" id="btnUpdate" class="k-button" value="Save All" />
         </div>
     </div>
 
@@ -162,7 +163,7 @@
 
                 <script>
                     $(document).ready(function () {
-                        var OrderTransactionsColumnTemplate = "#if(OrderTransactions!='' ){var orderTrans=OrderTransactions.split(';'); for(var i = 0; i < orderTrans.length; i = i+1){# <a href='@Url.Action("ScreenshotDisplay","Order")?orderTran=#=orderTrans[i]#' target='_blank'>#=orderTrans[i]#</a> #} }# ";
+                        var OrderTransactionsColumnTemplate = "#if(OrderTransactions!='' ){var orderTrans=OrderTransactions.split(';'); for(var i = 0; i < orderTrans.length; i = i+1){# <a href='@Url.Action("ScreenshotDisplay", "Order")?orderTran=#=orderTrans[i]#' target='_blank'>#=orderTrans[i]#</a> #} }# ";
                         $("#order-grid").kendoGrid({
                             dataSource: {
                                 type: "json",
@@ -172,12 +173,36 @@
                                         type: "POST",
                                         dataType: "json",
                                         data: additionalData
+                                    },
+                                    update: {
+                                        url: "@Html.Raw(Url.Action("GridDataUpdate", "Order"))",
+                                        type: "POST",
+                                        dataType: "json"
+                                        //data: gridUpdateData
                                     }
                                 },
                                 schema: {
                                     data: "Data",
                                     total: "Total",
-                                    errors: "Errors"
+                                    errors: "Errors",
+                                    model: {
+                                        id: "ID",
+                                        fields: {
+                                            ID: { editable: false, type: "number" },
+                                            ChannelOrderID: { editable: false, type: "string" },
+                                            OrderTransactions: { editable: false, type: "string" },
+                                            Ref2: { editable: true, type: "string" },
+                                            Ref3: { editable: true, type: "string" },
+                                            Ref4: { editable: true, type: "string" },
+                                            OrderTime: { editable: false, type: "date" },
+                                            PaidTime: { editable: false, type: "date" },
+                                            SKUs: { editable: false, type: "string" },
+                                            Ref1: { editable: false, type: "string" },
+                                            BuyerNote: { editable: false, type: "string" },
+                                            CustomerID: { editable: false, type: "string" },
+                                            ConsigneeName: { editable: false, type: "string" }
+                                        }
+                                    }
                                 },
                                 error: function (e) {
                                     display_kendoui_grid_error(e);
@@ -193,9 +218,20 @@
                                 refresh: true,
                                 pageSizes: ["100", "300", "1000"]
                             },
-                            editable: {
-                                confirmation: false,
-                                mode: "inline"
+                            //editable: {
+                            //    confirmation: false,
+                            //    mode: "inline"
+                            //},
+                            editable: true,
+                            toolbar: ["save"],
+                            edit: function (e) {
+                                $(document).unbind("keypress");
+                                //$("[name='Ref2']", e.container).keypress(function (event) {
+                                //    if (event.keyCode == 13) {
+                                //        debugger;
+                                //        event.preventDefault();
+                                //    }
+                                //});
                             },
                             scrollable: false,
                             dataBound: onDataBound,
@@ -210,11 +246,28 @@
                                 }, {
                                     field: "ChannelOrderID",
                                     @*template: "<a href='@Url.Action("Edit")?ItemID=#=ID#' target='_blank' > #=SKU#</a>",*@
-                                    title: "Order ID"
+                                    title: "Order ID",
+                                    width: 80
                                 }, {
                                     field: "OrderTransactions",
                                     template: OrderTransactionsColumnTemplate,
-                                    title: "Order Transactions"
+                                    title: "Order Transactions",
+                                    width: 120
+                                }, {
+                                    field: "Ref2",
+                                    title: "Issue",
+                                    width: 100,
+                                    editor: customRichEditor
+                                }, {
+                                    field: "Ref3",
+                                    title: "Action",
+                                    width: 100,
+                                    editor: customRichEditor
+                                }, {
+                                    field: "Ref4",
+                                    title: "Notes",
+                                    width: 100,
+                                    editor: customRichEditor
                                 }, {
                                     field: "OrderTime",
                                     title: "Order Time",
@@ -275,6 +328,14 @@
 
             return false;
         });
+
+        //$('textarea').keypress(function (event) {
+            
+        //    if (event.keyCode == 13) {
+        //        debugger;
+        //        event.preventDefault();
+        //    }
+        //});
     });
 
     function additionalData() {
@@ -285,7 +346,23 @@
             SearchCustomerID: $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val(),
             SearchJobItemID: $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val()
         };
-    }
+        }
+
+    //    function gridUpdateData() {
+    //        debugger;
+    //        var grid = $('#order-grid').data('kendoGrid');
+    //        var data = grid.dataSource.data();
+    //        var dirty = $.grep(data, function (item) {
+    //            return item.dirty
+    //        });
+    //        return JSON.stringify({
+    //            orders: dirty
+    //    });
+
+    //}
+        function customRichEditor(container, options) {
+            $('<textarea cols="50" name="' + options.field + '" rows="3" class="k-input k-textbox" data-bind="value:' + options.field+'"></textarea>').appendTo(container);
+        }
     </script>
 
 }
