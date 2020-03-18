@@ -70,7 +70,7 @@ namespace ThirdStoreBusiness.ScheduleTask
                                                 from lj in leftJoin.DefaultIfEmpty()
                                                 where lj==null 
                                                 || ((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty< dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
-                                                ||ld.Price!=lj.Price
+                                                ||(ld.Price!=lj.Price&&(ld.Price <= syncDSPriceBelow||lj.Price <= syncDSPriceBelow))
                                                 select ld.SKU;
 
                             var rightJoinResult = from sld in secondLatestData
@@ -78,12 +78,11 @@ namespace ThirdStoreBusiness.ScheduleTask
                                                   from rj in rightJoin.DefaultIfEmpty()
                                                   where rj == null 
                                                   || ((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
-                                                  ||sld.Price!=rj.Price
+                                                  ||(sld.Price!=rj.Price&&(sld.Price <= syncDSPriceBelow||rj.Price <= syncDSPriceBelow))
                                                   select sld.SKU;
 
                             syncItemIDs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
                                               join itm in _itemService.GetAllItems() on sku.ToLower() equals itm.SKU.ToLower()
-                                           where itm.Cost<= syncDSPriceBelow
                                            select itm.ID).ToList();
 
                         }
@@ -94,7 +93,7 @@ namespace ThirdStoreBusiness.ScheduleTask
 
                             syncItemIDs = (from ld in latestData
                                            join itm in _itemService.GetAllItems() on ld.SKU.ToLower() equals itm.SKU.ToLower()
-                                           where ld.InventoryQty > 0 && itm.Cost <= syncDSPriceBelow
+                                           where itm.Cost <= syncDSPriceBelow
                                            select itm.ID).ToList();
                         }
                     }

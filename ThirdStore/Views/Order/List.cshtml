@@ -4,7 +4,8 @@
     Layout = "~/Views/Shared/CommonList.cshtml";
 }
 
-
+@*<script src="http://cdn.kendostatic.com/2011.3.1129/js/kendo.all.min.js"></script>
+<link href="http://cdn.kendostatic.com/2011.3.1129/styles/kendo.common.min.css" rel="stylesheet">*@
 
 @using (Html.BeginForm())
 {
@@ -99,11 +100,7 @@
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
-            @if (Html.IsDebug())
-            {
                 <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
-            }
-            <input type="button" id="btnUpdate" class="k-button" value="Save All" />
         </div>
     </div>
 
