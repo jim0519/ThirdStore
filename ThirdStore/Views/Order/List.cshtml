@@ -197,7 +197,8 @@
                                             Ref1: { editable: false, type: "string" },
                                             BuyerNote: { editable: false, type: "string" },
                                             CustomerID: { editable: false, type: "string" },
-                                            ConsigneeName: { editable: false, type: "string" }
+                                            ConsigneeName: { editable: false, type: "string" },
+                                            TotalAmount: { editable: false, type: "number" }
                                         }
                                     }
                                 },
@@ -223,6 +224,17 @@
                             toolbar: ["save"],
                             edit: function (e) {
                                 $(document).unbind("keypress");
+                                var input = e.container.find(".k-input");
+                                input.blur(function () {
+                                    $(document).on('keypress', function (ev) {
+                                        if (ev.which == 13) {
+                                            if ($("#btnSearch").length)
+                                                $("#btnSearch").click();
+                                            else if (typeof RefreshGrid === "function")
+                                                RefreshGrid(false);
+                                        }
+                                    });
+                                });
                                 //$("[name='Ref2']", e.container).keypress(function (event) {
                                 //    if (event.keyCode == 13) {
                                 //        debugger;
@@ -250,22 +262,24 @@
                                     template: OrderTransactionsColumnTemplate,
                                     title: "Order Transactions",
                                     width: 120
-                                }, {
+                                },
+                                {
                                     field: "Ref2",
-                                    title: "Issue",
-                                    width: 100,
+                                    title: "OrderIssue(Problem)",
+                                    width: 150,
                                     editor: customRichEditor
                                 }, {
                                     field: "Ref3",
-                                    title: "Action",
+                                    title: "StaffActionTaken",
                                     width: 100,
                                     editor: customRichEditor
                                 }, {
                                     field: "Ref4",
-                                    title: "Notes",
+                                    title: "CustomerServiceNotes",
                                     width: 100,
                                     editor: customRichEditor
-                                }, {
+                                },
+                                {
                                     field: "OrderTime",
                                     title: "Order Time",
                                     width: 100,
@@ -279,21 +293,25 @@
                                     format: "{0:dd/MM/yyyy HH:mm:ss}"
 
                                 }, {
-                                    field: "SKUs",
-                                    title: "SKU Details",
-                                    width: 130
-                                }, {
-                                    field: "Ref1",
-                                    title: "Status",
-                                    width: 80
-                                }, {
                                     field: "BuyerNote",
                                     title: "Custom Delivery Instructions",
                                     width: 250
                                 }, {
+                                    field: "TotalAmount",
+                                    title: "Total Amount",
+                                    width: 100
+                                }, {
+                                    field: "SKUs",
+                                    title: "SKU Details",
+                                    width: 130
+                                }, {
                                     field: "CustomerID",
                                     title: "Customer ID",
                                     width: 100
+                                }, {
+                                    field: "Ref1",
+                                    title: "Status",
+                                    width: 80
                                 }, {
                                     field: "ConsigneeName",
                                     title: "Consignee Name",
