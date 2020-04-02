@@ -432,7 +432,7 @@
                 <div id="jobItem-grid"></div>
                 <script>
                     $(document).ready(function () {
-                        var skusTemplate = "#if(SKUs!=''&&SKUs!=null&&SKUs!=undefined ){var skuInfos=SKUs.split(';'); for(var i = 0; i < skuInfos.length; i = i+1){var skuInfo=skuInfos[i].split(','); var sku=skuInfo[0]; var itemId=skuInfo[1];  # <a href='@Url.Action("Edit","Item")?ItemID=#=itemId#' target='_blank'>#=sku#</a><br /> #} }#";
+                        var skusTemplate = "#if(SKUs!=''&&SKUs!=null&&SKUs!=undefined ){var skuInfos=SKUs.split(';'); for(var i = 0; i < skuInfos.length; i = i+1){var skuInfo=skuInfos[i].split(','); var sku=skuInfo[0]; var itemId=skuInfo[1];  # <a href='@Url.Action("EditBySKU", "Item")?SKU=#=sku#' target='_blank'>#=sku#</a><br /> #} }#";
                         $("#jobItem-grid").kendoGrid({
                             dataSource: {
                                 type: "json",

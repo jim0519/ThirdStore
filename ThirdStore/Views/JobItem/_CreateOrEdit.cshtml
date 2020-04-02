@@ -136,6 +136,10 @@
         </td>
         <td>
             @Html.EditorFor(model => model.DesignatedSKU)
+            @if (!string.IsNullOrWhiteSpace(Model.DesignatedSKU))
+            {
+                <a href='@Url.Action("EditBySKU", "Item")?SKU=@Model.DesignatedSKU' target='_blank' >View</a>
+            }
             @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
         </td>
         <td>

@@ -120,7 +120,7 @@ namespace ThirdStore.Controllers
                 var viewModel = i.ToModel();
                 viewModel.Condition = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).FirstOrDefault(itm=>itm.ID.Equals(i.ConditionID)).Name;
                 if (i.JobItemLines.Count > 0)
-                    viewModel.SKUs = i.JobItemLines.Select(l => l.SKU+","+l.ItemID).Aggregate((current, next) => current + ";" + next);
+                    viewModel.SKUs = GetSKUsDetails(i);
                 viewModel.Reference = _jobItemService.GetJobItemReference(i);
                 return viewModel;
             } );
@@ -404,7 +404,7 @@ namespace ThirdStore.Controllers
                 var viewModel = i.ToModel();
                 viewModel.Condition = _cacheManager.Get<IList<SelectOptionEntity>>(ThirdStoreCacheKey.ThirdStoreJobItemConditionListCache).FirstOrDefault(itm => itm.ID.Equals(i.ConditionID)).Name;
                 if (i.JobItemLines.Count > 0)
-                    viewModel.SKUs = i.JobItemLines.Select(l => l.SKU + "," + l.ItemID).Aggregate((current, next) => current + ";" + next);
+                    viewModel.SKUs = GetSKUsDetails(i);
                 viewModel.Reference = _jobItemService.GetJobItemReference(i);
                 return viewModel;
             });
@@ -769,6 +769,8 @@ namespace ThirdStore.Controllers
             }
         }
 
+        #region Private Methods
+
         private void FillDropDownDS(JobItemViewModel model)
         {
             model.JobItemTypes = ThirdStoreJobItemType.SELFSTORED.ToSelectList(false).ToList();
@@ -782,6 +784,14 @@ namespace ThirdStore.Controllers
             //var result = jobItemsInspectors.Where(ins=>!userList.Contains(ins));
         }
 
+        private string GetSKUsDetails(D_JobItem jobItem)
+        {
+            if (jobItem == null)
+                return string.Empty;
+            return (!string.IsNullOrWhiteSpace(jobItem.DesignatedSKU) ? jobItem.DesignatedSKU + ",0" : jobItem.JobItemLines.Select(l => l.SKU + "," + l.ItemID).Aggregate((current, next) => current + ";" + next));
+        }
+
+        #endregion
 
         #region Import Temp
         [HttpPost]
