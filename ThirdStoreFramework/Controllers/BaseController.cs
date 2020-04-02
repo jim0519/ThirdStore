@@ -10,7 +10,7 @@ namespace ThirdStoreFramework.Controllers
     /// <summary>
     /// Base controller
     /// </summary>
-    [Authorize]
+    //[Authorize]
     public abstract class BaseController : Controller
     {
         //private readonly IWorkContext _workContext;
