@@ -20,6 +20,7 @@ namespace ThirdStoreBusiness.Item
     {
         private readonly IRepository<D_Item> _itemRepository;
         private readonly IRepository<D_Item_Relationship> _itemRelationshipRepository;
+        private readonly IRepository<M_ItemImage> _itemImageRepository;
         private readonly IRepository<NetoProducts> _netoProductsRepository;
         private readonly IDbContext _dbContext;
         private readonly IWorkContext _workContext;
@@ -30,6 +31,7 @@ namespace ThirdStoreBusiness.Item
 
         public ItemService(IRepository<D_Item> itemRepository,
             IRepository<D_Item_Relationship> itemRelationshipRepository,
+            IRepository<M_ItemImage> itemImageRepository,
             IRepository<NetoProducts> netoProductsRepository,
             IWorkContext workContext,
             IDbContext dbContext,
@@ -40,6 +42,7 @@ namespace ThirdStoreBusiness.Item
         {
             _itemRepository = itemRepository;
             _itemRelationshipRepository = itemRelationshipRepository;
+            _itemImageRepository = itemImageRepository;
             _dbContext = dbContext;
             _workContext = workContext;
             _imageService = imageService;
@@ -331,73 +334,73 @@ namespace ThirdStoreBusiness.Item
                         newItem.FillOutNull();
 
 
-                       
+                        DownloadItemImages(additem, newItem);
+                        #region Download and Save Item Images (Already moved to DownloadItemImages)
+                        //var imagesURL = new List<string>();
+                        //if (!string.IsNullOrEmpty(additem.Image1))
+                        //    imagesURL.Add(additem.Image1);
+                        //if (!string.IsNullOrEmpty(additem.Image2))
+                        //    imagesURL.Add(additem.Image2);
+                        //if (!string.IsNullOrEmpty(additem.Image3))
+                        //    imagesURL.Add(additem.Image3);
+                        //if (!string.IsNullOrEmpty(additem.Image4))
+                        //    imagesURL.Add(additem.Image4);
+                        //if (!string.IsNullOrEmpty(additem.Image5))
+                        //    imagesURL.Add(additem.Image5);
+                        //if (!string.IsNullOrEmpty(additem.Image6))
+                        //    imagesURL.Add(additem.Image6);
+                        //if (!string.IsNullOrEmpty(additem.Image7))
+                        //    imagesURL.Add(additem.Image7);
+                        //if (!string.IsNullOrEmpty(additem.Image8))
+                        //    imagesURL.Add(additem.Image8);
+                        //if (!string.IsNullOrEmpty(additem.Image9))
+                        //    imagesURL.Add(additem.Image9);
+                        //if (!string.IsNullOrEmpty(additem.Image10))
+                        //    imagesURL.Add(additem.Image10);
+                        //if (!string.IsNullOrEmpty(additem.Image11))
+                        //    imagesURL.Add(additem.Image11);
+                        //if (!string.IsNullOrEmpty(additem.Image12))
+                        //    imagesURL.Add(additem.Image12);
+                        //if (!string.IsNullOrEmpty(additem.Image13))
+                        //    imagesURL.Add(additem.Image13);
+                        //if (!string.IsNullOrEmpty(additem.Image14))
+                        //    imagesURL.Add(additem.Image14);
+                        //if (!string.IsNullOrEmpty(additem.Image15))
+                        //    imagesURL.Add(additem.Image15);
 
-                        var imagesURL = new List<string>();
-                        if (!string.IsNullOrEmpty(additem.Image1))
-                            imagesURL.Add(additem.Image1);
-                        if (!string.IsNullOrEmpty(additem.Image2))
-                            imagesURL.Add(additem.Image2);
-                        if (!string.IsNullOrEmpty(additem.Image3))
-                            imagesURL.Add(additem.Image3);
-                        if (!string.IsNullOrEmpty(additem.Image4))
-                            imagesURL.Add(additem.Image4);
-                        if (!string.IsNullOrEmpty(additem.Image5))
-                            imagesURL.Add(additem.Image5);
-                        if (!string.IsNullOrEmpty(additem.Image6))
-                            imagesURL.Add(additem.Image6);
-                        if (!string.IsNullOrEmpty(additem.Image7))
-                            imagesURL.Add(additem.Image7);
-                        if (!string.IsNullOrEmpty(additem.Image8))
-                            imagesURL.Add(additem.Image8);
-                        if (!string.IsNullOrEmpty(additem.Image9))
-                            imagesURL.Add(additem.Image9);
-                        if (!string.IsNullOrEmpty(additem.Image10))
-                            imagesURL.Add(additem.Image10);
-                        if (!string.IsNullOrEmpty(additem.Image11))
-                            imagesURL.Add(additem.Image11);
-                        if (!string.IsNullOrEmpty(additem.Image12))
-                            imagesURL.Add(additem.Image12);
-                        if (!string.IsNullOrEmpty(additem.Image13))
-                            imagesURL.Add(additem.Image13);
-                        if (!string.IsNullOrEmpty(additem.Image14))
-                            imagesURL.Add(additem.Image14);
-                        if (!string.IsNullOrEmpty(additem.Image15))
-                            imagesURL.Add(additem.Image15);
+                        //
+                        //int i = 0;
+                        //using (var wc = new ThirdStoreWebClient())
+                        //{
+                        //    foreach (var imageURL in imagesURL)
+                        //    {
+                        //        try
+                        //        {
+                        //            var imgBytes = wc.DownloadData(imageURL);
+                        //            using (var stream = new MemoryStream(imgBytes))
+                        //            {
+                        //                var fileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                        //                var imgObj = _imageService.SaveImage(stream, fileName);
+                        //                newItem.ItemImages.Add(new M_ItemImage()
+                        //                {
+                        //                    Image = imgObj,
+                        //                    DisplayOrder = i,
+                        //                    StatusID = 0,//TODO Get item active status id
+                        //                    CreateTime = createTime,
+                        //                    CreateBy = createBy,
+                        //                    EditTime = createTime,
+                        //                    EditBy = createBy
+                        //                });
+                        //            }
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //            LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                        //        }
 
-                        #region Download and Save Item Images
-                        int i = 0;
-                        using (var wc = new ThirdStoreWebClient())
-                        {
-                            foreach (var imageURL in imagesURL)
-                            {
-                                try
-                                {
-                                    var imgBytes = wc.DownloadData(imageURL);
-                                    using (var stream = new MemoryStream(imgBytes))
-                                    {
-                                        var fileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
-                                        var imgObj = _imageService.SaveImage(stream, fileName);
-                                        newItem.ItemImages.Add(new M_ItemImage()
-                                        {
-                                            Image = imgObj,
-                                            DisplayOrder = i,
-                                            StatusID = 0,//TODO Get item active status id
-                                            CreateTime = createTime,
-                                            CreateBy = createBy,
-                                            EditTime = createTime,
-                                            EditBy = createBy
-                                        });
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
-                                }
-
-                                i++;
-                            }
-                        }
+                        //        i++;
+                        //    }
+                        //}
 
                         #endregion
 
@@ -538,6 +541,84 @@ namespace ThirdStoreBusiness.Item
         }
 
 
+        private void DownloadItemImages(DSZSKUModel dszData,D_Item item)
+        {
+            var createTime = DateTime.Now;
+            var createBy= (_workContext.CurrentUser != null ? _workContext.CurrentUser.Name : Constants.SystemUser);
+            if(item.ItemImages.Count>0)
+            {
+                var itemImages = GetItemImagesByItemID(item.ID);
+                foreach (var existPic in itemImages)
+                    DeleteItemImage(existPic);
+            }
+
+            var imagesURL = new List<string>();
+            if (!string.IsNullOrEmpty(dszData.Image1))
+                imagesURL.Add(dszData.Image1);
+            if (!string.IsNullOrEmpty(dszData.Image2))
+                imagesURL.Add(dszData.Image2);
+            if (!string.IsNullOrEmpty(dszData.Image3))
+                imagesURL.Add(dszData.Image3);
+            if (!string.IsNullOrEmpty(dszData.Image4))
+                imagesURL.Add(dszData.Image4);
+            if (!string.IsNullOrEmpty(dszData.Image5))
+                imagesURL.Add(dszData.Image5);
+            if (!string.IsNullOrEmpty(dszData.Image6))
+                imagesURL.Add(dszData.Image6);
+            if (!string.IsNullOrEmpty(dszData.Image7))
+                imagesURL.Add(dszData.Image7);
+            if (!string.IsNullOrEmpty(dszData.Image8))
+                imagesURL.Add(dszData.Image8);
+            if (!string.IsNullOrEmpty(dszData.Image9))
+                imagesURL.Add(dszData.Image9);
+            if (!string.IsNullOrEmpty(dszData.Image10))
+                imagesURL.Add(dszData.Image10);
+            if (!string.IsNullOrEmpty(dszData.Image11))
+                imagesURL.Add(dszData.Image11);
+            if (!string.IsNullOrEmpty(dszData.Image12))
+                imagesURL.Add(dszData.Image12);
+            if (!string.IsNullOrEmpty(dszData.Image13))
+                imagesURL.Add(dszData.Image13);
+            if (!string.IsNullOrEmpty(dszData.Image14))
+                imagesURL.Add(dszData.Image14);
+            if (!string.IsNullOrEmpty(dszData.Image15))
+                imagesURL.Add(dszData.Image15);
+
+            int i = 0;
+            using (var wc = new ThirdStoreWebClient())
+            {
+                foreach (var imageURL in imagesURL)
+                {
+                    try
+                    {
+                        var imgBytes = wc.DownloadData(imageURL);
+                        using (var stream = new MemoryStream(imgBytes))
+                        {
+                            var fileName = dszData.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                            var imgObj = _imageService.SaveImage(stream, fileName);
+                            item.ItemImages.Add(new M_ItemImage()
+                            {
+                                Image = imgObj,
+                                DisplayOrder = i,
+                                StatusID = 0,//TODO Get item active status id
+                                CreateTime = createTime,
+                                CreateBy = createBy,
+                                EditTime = createTime,
+                                EditBy = createBy
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                    }
+
+                    i++;
+                }
+            }
+        }
+
+
         private IList<DSZSKUModel> GetSupplierSKUList()
         {
             IList<DSZSKUModel> skuList = null;
@@ -634,6 +715,61 @@ namespace ThirdStoreBusiness.Item
                 LogManager.Instance.Error(ex.Message);
                 throw ex;
             }
+        }
+
+        public void RedownloadImage(IList<int> ids)
+        {
+            try
+            {
+                var di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreDSZData);
+                if (di.Exists)
+                {
+                    FileInfo[] files = di.GetFiles().ToArray();
+                    if (files.Count() > 0)
+                    {
+                        var topDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                        var dszDatas = _csvContext.Read<DSZSKUModel>(topDataFile.FullName, _csvFileDescription);
+                        var items = this.GetItemsByIDs(ids);
+
+                        foreach(var item in items)
+                        {
+                            var dszData = dszDatas.FirstOrDefault(d=>d.SKU.ToLower().Equals(item.SKU.ToLower()));
+                            if(dszData!=null)
+                            {
+                                DownloadItemImages(dszData,item);
+                            }
+
+                            UpdateItem(item);
+                        }
+
+                    }
+                }
+
+
+
+            }
+            catch(Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                throw ex;
+            }
+        }
+
+        private IList<M_ItemImage> GetItemImagesByItemID(int itemID)
+        {
+            var query = from ii in _itemImageRepository.Table
+                        where ii.ItemID.Equals(itemID)
+                        orderby ii.DisplayOrder, ii.ID
+                        select ii;
+            return query.ToList();
+        }
+
+        private void DeleteItemImage(M_ItemImage itemImage)
+        {
+            if (itemImage == null)
+                throw new ArgumentNullException("item Image");
+
+            _itemImageRepository.Delete(itemImage);
         }
     }
 }

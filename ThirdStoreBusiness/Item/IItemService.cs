@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ThirdStoreCommon.Models.Item;
 using ThirdStoreCommon;
-
+using ThirdStoreCommon.Models.Image;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -48,5 +48,7 @@ namespace ThirdStoreBusiness.Item
         void UpdateChannelData();
 
         void FetchNetoProducts();
+
+        void RedownloadImage(IList<int> ids);
     }
 }

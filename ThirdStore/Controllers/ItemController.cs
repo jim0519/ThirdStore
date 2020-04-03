@@ -494,6 +494,25 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
+        public ActionResult RedownloadImage(string selectedIDs)
+        {
+            try
+            {
+                var ids = selectedIDs
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => Convert.ToInt32(x))
+                    .ToList();
+
+                 _itemService.RedownloadImage(ids);
+                return Json(new { Result = true });
+            }
+            catch(Exception ex)
+            {
+                return Json(new { Result = false, ErrMsg = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public ActionResult ImportData()
         {
             try

@@ -15,6 +15,7 @@
             @if (Html.IsDebug())
             {
                 <input type="button" id="btnFetchNetoProducts" class="k-button" value="Fetch Neto Products" />
+                <input type="button" id="btnRedownloadImage" class="k-button" value="Redownload Images" />
             }
             @if (Model.ShowSyncInventory)
             {
@@ -47,6 +48,50 @@
                             },
                             error: function (data) {
                                 debugger;
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+                    });
+
+                    $('#btnRedownloadImage').click(function (e) {                        
+                        if (selectedIds.length == 0) {
+                            alert("Please select more than one item to edit");
+                            return false;
+                        }
+                        e.preventDefault();
+
+                        var link="@Html.Raw(Url.Action("RedownloadImage", "Item"))"
+                        var ids = selectedIds.join(",");
+                        var postData = {
+                            selectedIDs: ids
+                        };
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            data: postData,
+                            dataType: "json",
+                            beforeSend: function () {
+                                $("#imgLoading").show();
+                            },
+                            complete: function () {
+                                $("#imgLoading").hide();
+                            },
+                            success: function (data) {
+                                if (data.Result) {
+                                    alert("Redownload Images Success");
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
 
                                 alert("error");
                             }
