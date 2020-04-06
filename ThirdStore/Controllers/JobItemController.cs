@@ -82,7 +82,7 @@ namespace ThirdStore.Controllers
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
             model.HasStocktakeTime = -1;
 
-            var showSyncInvUsers = new int[] {1,4, 14,17 };
+            var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
             if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
                 model.ShowSyncInventory = true;
 

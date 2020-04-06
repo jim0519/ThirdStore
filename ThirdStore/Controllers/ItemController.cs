@@ -69,7 +69,7 @@ namespace ThirdStore.Controllers
             model.BulkUpdate.IsReadyForList = -1;
             model.BulkUpdate.IsActive = -1;
 
-            var showSyncInvUsers = new int[] { 1,4 , 14,17 };
+            var showSyncInvUsers = new int[] { 1,4 ,10, 14,16,17 };
             if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
                 model.ShowSyncInventory = true;
 
