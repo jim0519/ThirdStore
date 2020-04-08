@@ -5,11 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Security;
+using ThirdStoreCommon;
 
 namespace ThirdStoreBusiness.AccessControl
 {
     public interface IUserService
     {
+        IPagedList<T_User> SearchUsers(
+            string name = null,
+            string email = null,
+            string description = null,
+            int status = -1,
+            int pageIndex = 0,
+            int pageSize = int.MaxValue);
+
         void InsertUser(T_User user);
 
         void UpdateUser(T_User user);

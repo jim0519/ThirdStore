@@ -179,5 +179,25 @@ namespace ThirdStoreBusiness.AccessControl
             var query = _userRepository.Table.Where(u => u.StatusID == 1);
             return query.ToList();
         }
+
+        public IPagedList<T_User> SearchUsers(
+            string name = null, 
+            string email = null, 
+            string description = null, 
+            int status = -1, 
+            int pageIndex = 0, 
+            int pageSize = int.MaxValue)
+        {
+            var query = _userRepository.Table;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(u=>u.Name.Contains(name));
+
+
+
+            query = query.OrderBy(i => i.Email);
+
+            return new PagedList<T_User>(query, pageIndex, pageSize);
+        }
     }
 }

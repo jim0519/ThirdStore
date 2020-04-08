@@ -398,6 +398,7 @@
     <Content Include="Views\Order\ScreenshoptDisplay.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\MultiSelectString.cshtml" />
     <Content Include="Views\JobItem\StockTake.cshtml" />
+    <Content Include="Views\AccessControl\UserList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
