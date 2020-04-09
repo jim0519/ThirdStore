@@ -9,7 +9,7 @@ namespace ThirdStore.Models.Order
     public class OrderGridViewModel : BaseEntityViewModel
     {
         public string TypeID { get; set; }
-        public string StatusID { get; set; }
+        public int StatusID { get; set; }
         public System.DateTime OrderTime { get; set; }
         public string ChannelOrderID { get; set; }
         public string CustomerID { get; set; }

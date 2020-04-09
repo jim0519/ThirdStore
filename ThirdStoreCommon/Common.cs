@@ -92,6 +92,13 @@ namespace ThirdStoreCommon
         O = 5
     }
 
+    public enum ThirdStoreOrderStatus
+    {
+        AllGood = 1,
+        Investigating = 2,
+        Solved = 3
+    }
+
     public enum NotifyType
     {
         Success,

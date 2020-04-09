@@ -24,6 +24,7 @@ namespace ThirdStoreBusiness.Order
             string channelOrderID = null,
             string jobItemID = null,
             string customerID=null,
+            int statusID=0,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 

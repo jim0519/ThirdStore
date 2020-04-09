@@ -146,6 +146,14 @@
             </td>
         </tr>
         <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchStatusID):
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.SearchStatusID, Model.OrderStatuses)
+            </td>
+        </tr>
+        <tr>
             <td class="adminTitle" colspan="2">
                 <input type="button" id="btnSearch" class="k-button" value="Search" />
                 <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
@@ -178,6 +186,10 @@
                                         //data: gridUpdateData
                                     }
                                 },
+                                requestEnd: function (e) {
+                                    if (e.type == "update")
+                                        RefreshGrid(false);
+                                },
                                 schema: {
                                     data: "Data",
                                     total: "Total",
@@ -198,7 +210,10 @@
                                             BuyerNote: { editable: false, type: "string" },
                                             CustomerID: { editable: false, type: "string" },
                                             ConsigneeName: { editable: false, type: "string" },
-                                            TotalAmount: { editable: false, type: "number" }
+                                            TotalAmount: { editable: false, type: "number" },
+                                            //StatusText: { editable: true, type: "string" },
+                                            StatusID:{ editable: true, type: "number" }
+                                            
                                         }
                                     }
                                 },
@@ -241,6 +256,15 @@
                                 //        event.preventDefault();
                                 //    }
                                 //});
+                                if (e.model.isNew()) {
+                                    //little hack here
+                                    //pre-select the first value of kendoui dropdownlist datasource
+                                    //for some reasons (maybe, bug) it always sends 0
+                                    //if no value has been selected (changed) in the dropdownlist
+                                    if (allOrderStatuses.length > 0) {
+                                        e.model.StatusID = allOrderStatuses[0].StatusID;
+                                    }
+                                }
                             },
                             scrollable: false,
                             dataBound: onDataBound,
@@ -293,9 +317,11 @@
                                     editor: customRichEditor,
                                     template: "<span style='white-space:pre;'>#=Ref4#</span>"
                                 }, {
-                                    field: "Ref1",
+                                    field: "StatusID",
                                     title: "Status",
-                                    width: 80
+                                    editor: statusDropDownEditor,
+                                    width: 80,
+                                    template: getStatusText
                                 }, {
                                     field: "BuyerNote",
                                     title: "Custom Delivery Instructions",
@@ -337,6 +363,7 @@
             $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val("");
             $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val("");
             $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchStatusID)').val("0");
 
             selectedIds = [];
 
@@ -346,7 +373,7 @@
         });
 
         //$('textarea').keypress(function (event) {
-            
+
         //    if (event.keyCode == 13) {
         //        debugger;
         //        event.preventDefault();
@@ -360,7 +387,8 @@
             OrderTimeTo: $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val(),
             SearchChannelOrderID: $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val(),
             SearchCustomerID: $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val(),
-            SearchJobItemID: $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val()
+            SearchJobItemID: $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val(),
+            SearchStatusID: $('#@Html.FieldIdFor(model => model.SearchStatusID)').val(),
         };
         }
 
@@ -376,9 +404,45 @@
     //    });
 
     //}
+
+        //local datasource
+            var allOrderStatuses = [
+                @foreach(var status in Html.EnumToList<ThirdStoreOrderStatus>())
+                {
+                    <text>
+                        {
+                            StatusID: @status.ToValue(),
+                            StatusText: "@status.ToName()"
+                        },
+                    </text>
+                }
+            ];
         function customRichEditor(container, options) {
             $('<textarea cols="50" name="' + options.field + '" rows="3" class="k-input k-textbox" data-bind="value:' + options.field+'"></textarea>').appendTo(container);
         }
+
+        function statusDropDownEditor(container, options) {
+            //$('<input required name="' + options.field + '" />')
+            $('<input data-text-field="StatusText" data-value-field="StatusID" data-bind="value:' + options.field + '"/>')
+                .appendTo(container)
+                .kendoDropDownList({
+                    autoBind: false,
+                    dataSource: allOrderStatuses,
+                    dataTextField: "StatusText",
+                    dataValueField: "StatusID"
+                });
+        };
+
+        function getStatusText(dataItem) {
+            //var statusID = dataItem.StatusID;
+            //var text = $.grep(allOrderStatuses, function (n, i) {
+            //    return n.StatusID == statusID;
+            //});
+            //return text[0].StatusText ? text[0].StatusText : "No Status found";
+            return allOrderStatuses.find(s => s.StatusID == dataItem.StatusID).StatusText;
+        }
+
+        
     </script>
 
 }

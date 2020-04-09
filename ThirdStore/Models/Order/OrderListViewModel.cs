@@ -12,7 +12,7 @@ namespace ThirdStore.Models.Order
     {
         public OrderListViewModel()
         {
-
+            this.OrderStatuses = new List<SelectListItem>();
         }
 
         [UIHint("DateTimeNullable"), Display(Name = "Update Time From")]
@@ -32,5 +32,13 @@ namespace ThirdStore.Models.Order
         public DateTime? OrderTimeTo { get; set; }
 
         public string SearchCustomerID { get; set; }
+
+        public int SearchStatusID { get; set; }
+
+
+
+        public IList<SelectListItem> OrderStatuses { get; set; }
+
+
     }
 }

@@ -44,7 +44,10 @@ namespace ThirdStore.Controllers
             }
 
             var model = new OrderListViewModel();
-            
+
+            model.OrderStatuses = ThirdStoreOrderStatus.AllGood.ToSelectList(false).ToList();
+            model.OrderStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0", Selected = true });
+
             return View(model);
         }
 
@@ -57,6 +60,7 @@ namespace ThirdStore.Controllers
                 channelOrderID:model.SearchChannelOrderID,
                 jobItemID:model.SearchJobItemID,
                 customerID:model.SearchCustomerID,
+                statusID:model.SearchStatusID,
                 pageIndex: command.Page - 1,
                 pageSize:command.PageSize);
 
@@ -86,6 +90,7 @@ namespace ThirdStore.Controllers
                 var order = _orderService.GetOrderByID(model.ID);
                 if(order!=null)
                 {
+                    order.StatusID = model.StatusID;
                     order.Ref2 = model.Ref2;
                     order.Ref3 = model.Ref3;
                     order.Ref4 = model.Ref4;

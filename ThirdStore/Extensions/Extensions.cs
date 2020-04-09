@@ -88,5 +88,11 @@ namespace ThirdStore.Extensions
                   return false;
             #endif
         }
+
+        public static IEnumerable<TEnum> EnumToList<TEnum>(this HtmlHelper htmlHelper) where TEnum : struct
+        {
+            return (TEnum[])Enum.GetValues(typeof(TEnum));
+        } 
+
     }
 }

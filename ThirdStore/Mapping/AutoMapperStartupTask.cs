@@ -65,6 +65,7 @@ namespace ThirdStore.Infrastructure
 
             //Order
             Mapper.CreateMap<D_Order_Header, OrderGridViewModel>();
+                //.ForMember(dest => dest.StatusText, mce => mce.MapFrom(s => s.StatusID.ToEnumName<ThirdStoreOrderStatus>()));
 
 
 

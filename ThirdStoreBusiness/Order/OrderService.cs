@@ -261,6 +261,10 @@ namespace ThirdStoreBusiness.Order
             if (order == null)
                 throw new ArgumentNullException("order");
 
+            //Order Status Automatically Update
+            if (!string.IsNullOrWhiteSpace(order.Ref2) && order.StatusID.Equals(ThirdStoreOrderStatus.AllGood.ToValue()))
+                order.StatusID = ThirdStoreOrderStatus.Investigating.ToValue();
+
             var currentTime = DateTime.Now;
             var currentUser = Constants.SystemUser;
             if (_workContext.CurrentUser != null)
@@ -515,10 +519,14 @@ namespace ThirdStoreBusiness.Order
             string channelOrderID = null, 
             string jobItemID = null, 
             string customerID=null,
+            int statusID=0,
             int pageIndex = 0, 
             int pageSize = int.MaxValue)
         {
             var query = _orderRepository.Table;
+
+            if (statusID != 0)
+                query = query.Where(o=>o.StatusID.Equals(statusID));
 
             if (orderTimeFrom != null)
                 query = query.Where(o => o.OrderTime >= orderTimeFrom);
