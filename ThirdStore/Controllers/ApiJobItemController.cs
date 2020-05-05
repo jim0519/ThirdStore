@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using ThirdStoreBusiness.Item;
 using ThirdStoreBusiness.JobItem;
+using ThirdStoreCommon.Infrastructure;
 using ThirdStoreFramework.Controllers;
 
 namespace ThirdStore.Controllers
@@ -51,6 +52,22 @@ namespace ThirdStore.Controllers
             return Ok(result);
         }
 
+        [Route("updatedsz")]
+        [HttpPost]
+        public IHttpActionResult UpdateDSZData()
+        {
+            var type2 = System.Type.GetType("ThirdStoreBusiness.ScheduleTask.UpdateDSDataAndSync, ThirdStoreBusiness");
+            object instance;
+            if (!ThirdStoreWebContext.Instance.TryResolve(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope(), out instance))
+            {
+                //not resolved
+                instance = ThirdStoreWebContext.Instance.ResolveUnregistered(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope());
+            }
+            ThirdStoreBusiness.ScheduleTask.ITask task = instance as ThirdStoreBusiness.ScheduleTask.ITask;
+            task.Execute();
+
+            return Ok();
+        }
 
     }
 }

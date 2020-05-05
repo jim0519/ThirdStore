@@ -222,6 +222,8 @@
                             return false;
                         }
 
+                        if (!confirm("Are you sure to duplicate the job item?")) { return; }
+
                         var selectedJobItemID = selectedIds[0];
                         var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromJobItemID = "_selectedJobItemID_" }))'.replace('_selectedJobItemID_', selectedJobItemID);
                         location.href = link;
@@ -357,7 +359,7 @@
                 @Html.LabelFor(model => model.SearchLocation):
             </td>
             <td>
-                @Html.EditorFor(model => model.SearchLocation)
+                @Html.EditorFor(model => model.SearchLocation, new { htmlAttributes = new { @style = "text-transform:uppercase" } })
             </td>
         </tr>
         <tr>
@@ -382,8 +384,8 @@
             </td>
             <td>
                 @Html.DropDownListFor(model => model.SearchStatus, Model.JobItemStatuses)
-                @Html.LabelFor(model => model.IsExcludeStatus)
-                @Html.EditorFor(model => model.IsExcludeStatus)
+                @Html.LabelFor(model => model.IsExcludeShippedStatus)
+                @Html.EditorFor(model => model.IsExcludeShippedStatus)
             </td>
         </tr>
         <tr>
@@ -550,7 +552,7 @@
             //$('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
             $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
-            $('#@Html.FieldIdFor(model => model.IsExcludeStatus)').prop('checked', false);
+            $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').prop('checked', false);
             var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
             inspectorMultiselect.value("");
             inspectorMultiselect.trigger("change");
@@ -578,7 +580,7 @@
             SearchInspector: $('#@Html.FieldIdFor(model => model.SearchInspector)').val(),
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
             HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val(),
-            IsExcludeStatus: $('#@Html.FieldIdFor(model => model.IsExcludeStatus)').is(':checked')
+            IsExcludeShippedStatus: $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').is(':checked')
         };
     }
     </script>

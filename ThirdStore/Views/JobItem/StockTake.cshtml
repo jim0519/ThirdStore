@@ -38,6 +38,22 @@
             </td>
         </tr>
         <tr>
+            <td>
+                @Html.LabelFor(model => model.StocktakeTimeFrom):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.StocktakeTimeFrom)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.StocktakeTimeTo):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.StocktakeTimeTo)
+            </td>
+        </tr>
+        <tr>
             <td class="adminTitle" colspan="2">
                 <input type="submit" id="btnConfirmNext" class="k-button" value="Confirm and Next" />
                 <a href="@Html.Raw(Url.Action("List", "JobItem"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
@@ -209,6 +225,8 @@
 
         function additionalData() {
                 return {
+                    StocktakeTimeFrom: $('#@Html.FieldIdFor(model => model.StocktakeTimeFrom)').val(),
+                    StocktakeTimeTo: $('#@Html.FieldIdFor(model => model.StocktakeTimeTo)').val(),
                     JobItemLineID: $('#@Html.FieldIdFor(model => model.JobItemLineID)').val(),
                     JobItemLineReference: $('#@Html.FieldIdFor(model => model.JobItemLineReference)').val()
                 };

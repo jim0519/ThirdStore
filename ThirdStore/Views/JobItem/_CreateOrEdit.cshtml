@@ -103,7 +103,7 @@
             @Html.LabelFor(m => m.Location)
         </td>
         <td>
-            @Html.EditorFor(model => model.Location)
+            @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @style = "text-transform:uppercase" } })
         </td>
         
         <td>

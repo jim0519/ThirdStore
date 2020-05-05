@@ -112,7 +112,7 @@ namespace ThirdStore.Controllers
                 inspector: inspector,
                 trackingNumber:model.SearchTrackingNumber,
                 hasStocktakeTime:model.HasStocktakeTime,
-                isExcludeStatus:model.IsExcludeStatus,
+                isExcludeShippedStatus:model.IsExcludeShippedStatus,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
 
@@ -390,13 +390,18 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult StocktakeFind(DataSourceRequest command, JobItemStockTakeViewModel model)
         {
-            if (string.IsNullOrWhiteSpace(model.JobItemLineID) && string.IsNullOrWhiteSpace(model.JobItemLineReference))
-                return new JsonResult { Data = new DataSourceResult() { Data = new List<JobItemGridViewModel>() , Total = 0 } };
+            if (string.IsNullOrWhiteSpace(model.JobItemLineID) 
+                && string.IsNullOrWhiteSpace(model.JobItemLineReference)
+                &&!model.StocktakeTimeFrom.HasValue
+                &&!model.StocktakeTimeTo.HasValue)
+                return new JsonResult { Data = new DataSourceResult() { Data = new List<JobItemGridViewModel>(), Total = 0 } };
 
             var jobItemLineID = (!string.IsNullOrWhiteSpace(model.JobItemLineID) ? Convert.ToInt32(model.JobItemLineID) : 0);
             var jobItems = _jobItemService.SearchJobItems(
                 jobItemLineID: jobItemLineID,
                 jobItemReference: model.JobItemLineReference,
+                stocktakeTimeFrom: model.StocktakeTimeFrom,
+                stocktakeTimeTo: model.StocktakeTimeTo,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
 

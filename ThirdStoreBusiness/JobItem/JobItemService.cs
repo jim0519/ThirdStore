@@ -82,7 +82,7 @@ namespace ThirdStoreBusiness.JobItem
              List<string> inspector = null,
             string trackingNumber = null,
             int hasStocktakeTime = -1,
-            bool isExcludeStatus=false,
+            bool isExcludeShippedStatus=false,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -113,10 +113,13 @@ namespace ThirdStoreBusiness.JobItem
             if (jobItemStatus.HasValue)
             {
                 var itemStatusID = jobItemStatus.Value.ToValue();
-                if(isExcludeStatus)
-                    query = query.Where(i => !i.StatusID.Equals(itemStatusID));
-                else
-                    query = query.Where(i => i.StatusID.Equals(itemStatusID));
+                query = query.Where(i => i.StatusID.Equals(itemStatusID));
+            }
+
+            if (isExcludeShippedStatus)
+            {
+                var shippedStatusID = ThirdStoreJobItemStatus.SHIPPED.ToValue();
+                query = query.Where(i => !i.StatusID.Equals(shippedStatusID));
             }
 
             if (jobItemCondition.HasValue)
@@ -186,7 +189,9 @@ namespace ThirdStoreBusiness.JobItem
 
         public IPagedList<D_JobItem> SearchJobItems(
             int jobItemLineID = 0, 
-            string jobItemReference = null, 
+            string jobItemReference = null,
+            DateTime? stocktakeTimeFrom = null,
+            DateTime? stocktakeTimeTo = null,
             int pageIndex = 0, 
             int pageSize = int.MaxValue)
         {
@@ -203,6 +208,15 @@ namespace ThirdStoreBusiness.JobItem
             if(!string.IsNullOrWhiteSpace(jobItemReference))
             {
                 query = GetJobItemByReference(jobItemReference, query);
+            }
+
+            if (stocktakeTimeFrom != null)
+                query = query.Where(o => o.StocktakeTime >= stocktakeTimeFrom);
+
+            if (stocktakeTimeTo != null)
+            {
+                stocktakeTimeTo = stocktakeTimeTo.Value.AddDays(1);
+                query = query.Where(o => o.StocktakeTime < stocktakeTimeTo);
             }
 
             query = query.OrderByDescending(i => i.JobItemCreateTime);

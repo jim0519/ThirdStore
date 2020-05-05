@@ -31,13 +31,15 @@ namespace ThirdStoreBusiness.JobItem
             List<string> inspector = null,
             string trackingNumber = null,
             int hasStocktakeTime = -1,
-            bool isExcludeStatus = false,
+            bool isExcludeShippedStatus = false,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
         IPagedList<D_JobItem> SearchJobItems(
             int jobItemLineID = 0,
             string jobItemReference = null,
+            DateTime? stocktakeTimeFrom = null,
+            DateTime? stocktakeTimeTo = null,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 

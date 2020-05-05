@@ -69,16 +69,18 @@ namespace ThirdStoreBusiness.ScheduleTask
                                                 join sld in secondLatestData on ld.SKU equals sld.SKU into leftJoin
                                                 from lj in leftJoin.DefaultIfEmpty()
                                                 where lj==null 
-                                                || ((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty< dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
-                                                ||(ld.Price!=lj.Price&&(ld.Price <= syncDSPriceBelow||lj.Price <= syncDSPriceBelow))
+                                                || 
+                                                ((((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty< dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
+                                                ||(ld.Price!=lj.Price))&& (ld.Price <= syncDSPriceBelow || lj.Price <= syncDSPriceBelow))
                                                 select ld.SKU;
 
                             var rightJoinResult = from sld in secondLatestData
                                                   join ld in latestData on sld.SKU equals ld.SKU into rightJoin
                                                   from rj in rightJoin.DefaultIfEmpty()
                                                   where rj == null 
-                                                  || ((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
-                                                  ||(sld.Price!=rj.Price&&(sld.Price <= syncDSPriceBelow||rj.Price <= syncDSPriceBelow))
+                                                  || 
+                                                  ((((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
+                                                  ||(sld.Price!=rj.Price)) && (sld.Price <= syncDSPriceBelow || rj.Price <= syncDSPriceBelow))
                                                   select sld.SKU;
 
                             syncItemIDs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
@@ -100,6 +102,8 @@ namespace ThirdStoreBusiness.ScheduleTask
                 }
 
                 //sync online inventory for the specific item ids
+                if (syncItemIDs.Count > 0)
+                    LogManager.Instance.Info("Sync affected item ids for update DSZ data: " + syncItemIDs.Select(id => id.ToString()).Aggregate((current, next) => current + "," + next));
                 _jobItemService.SyncInventory(syncItemIDs);
 
             }
