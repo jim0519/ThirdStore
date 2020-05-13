@@ -37,6 +37,7 @@ namespace ThirdStore.Controllers
         public ActionResult List()
         {
             var allowOrderDownloadUserIDs = new int[] { 1,4,6,10,14,16,17 };
+            
             if (!allowOrderDownloadUserIDs.Contains(_workContext.CurrentUser.ID))
             {
                 ErrorNotification("You do not have permission to process this page.");
@@ -47,6 +48,9 @@ namespace ThirdStore.Controllers
 
             model.OrderStatuses = ThirdStoreOrderStatus.AllGood.ToSelectList(false).ToList();
             model.OrderStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0", Selected = true });
+
+            var canEditOrder = new int[] { 1, 4, 10, 14, 16, 17 };
+            model.CanEditOrder = canEditOrder.Contains(_workContext.CurrentUser.ID);
 
             return View(model);
         }

@@ -39,10 +39,7 @@ namespace ThirdStore.Models.Order
 
         public IList<SelectListItem> OrderStatuses { get; set; }
 
-        public class Permission
-        {
-            
-        }
+        public bool CanEditOrder { get; set; }
 
 
     }

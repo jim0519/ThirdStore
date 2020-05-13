@@ -200,9 +200,16 @@
                                             ID: { editable: false, type: "number" },
                                             ChannelOrderID: { editable: false, type: "string" },
                                             OrderTransactions: { editable: false, type: "string" },
-                                            Ref2: { editable: true, type: "string" },
-                                            Ref3: { editable: true, type: "string" },
-                                            Ref4: { editable: true, type: "string" },
+                                            Ref2: { editable:@if (Model.CanEditOrder)
+                                            {<text>true </text> }
+                                            else { <text> false </text>}
+                                                , type: "string" },
+                                            Ref3: { editable: @if (Model.CanEditOrder)
+                                            {<text>true </text> }
+                                            else { <text> false </text>}, type: "string" },
+                                            Ref4: { editable: @if (Model.CanEditOrder)
+                                            {<text>true </text> }
+                                            else { <text> false </text>}, type: "string" },
                                             OrderTime: { editable: false, type: "date" },
                                             PaidTime: { editable: false, type: "date" },
                                             SKUs: { editable: false, type: "string" },
@@ -212,7 +219,9 @@
                                             ConsigneeName: { editable: false, type: "string" },
                                             TotalAmount: { editable: false, type: "number" },
                                             //StatusText: { editable: true, type: "string" },
-                                            StatusID:{ editable: true, type: "number" }
+                                            StatusID:{ editable: @if (Model.CanEditOrder)
+                                            {<text>true </text> }
+                                            else { <text> false </text>}, type: "number" }
                                             
                                         }
                                     }

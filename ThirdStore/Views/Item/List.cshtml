@@ -15,13 +15,14 @@
             @if (Html.IsDebug())
             {
                 <input type="button" id="btnFetchNetoProducts" class="k-button" value="Fetch Neto Products" />
-                <input type="button" id="btnRedownloadImage" class="k-button" value="Redownload Images" />
+
             }
             @if (Model.ShowSyncInventory)
             {
                 <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
                 @*<input type="button" id="btnImportData" class="k-button" value="Import Data" />*@
             }
+            <input type="button" id="btnRedownloadImage" class="k-button" value="Redownload Images" />
             <input type="button" id="btnEdit" class="k-button" value="Edit" />
             <input type="button" id="btnCreateNew" class="k-button" value="Create New SKU" />
             <script>
@@ -55,7 +56,7 @@
                         return false;
                     });
 
-                    $('#btnRedownloadImage').click(function (e) {                        
+                    $('#btnRedownloadImage').click(function (e) {
                         if (selectedIds.length == 0) {
                             alert("Please select more than one item to edit");
                             return false;
