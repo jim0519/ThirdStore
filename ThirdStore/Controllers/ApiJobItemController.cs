@@ -4,9 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using ThirdStore.Extensions;
+using ThirdStore.Models.JobItem;
 using ThirdStoreBusiness.Item;
 using ThirdStoreBusiness.JobItem;
 using ThirdStoreCommon.Infrastructure;
+using ThirdStoreCommon.Models.JobItem;
 using ThirdStoreFramework.Controllers;
 
 namespace ThirdStore.Controllers
@@ -67,6 +70,24 @@ namespace ThirdStore.Controllers
             task.Execute();
 
             return Ok();
+        }
+
+        [Route("{jobItemID?}")]
+        [HttpGet]
+        public IHttpActionResult Get(int jobItemID=0,int page=0,int pagesize=10)
+        {
+            var jobItemList = new List<JobItemViewModel>();
+            if(jobItemID!=0)
+            {
+                var jobItem = _jobItemService.GetJobItemByID(jobItemID);
+                jobItemList.Add(jobItem.ToCreateNewModel());
+            }
+            else
+            {
+                jobItemList.AddRange(_jobItemService.SearchJobItems( isExcludeShippedStatus:false, pageIndex:page,pageSize:pagesize).Select(ji=>ji.ToCreateNewModel()));
+            }
+
+            return Ok(jobItemList);
         }
 
     }

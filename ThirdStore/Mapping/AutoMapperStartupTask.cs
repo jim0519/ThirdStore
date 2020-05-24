@@ -25,8 +25,10 @@ namespace ThirdStore.Infrastructure
         public void Execute()
         {
             //Access Control
-            Mapper.CreateMap<T_User, CreateUserViewModel>();
-            Mapper.CreateMap<CreateUserViewModel, T_User>();
+            Mapper.CreateMap<T_User, UserGridViewModel>();
+
+            Mapper.CreateMap<T_User, UserViewModel>();
+            Mapper.CreateMap<UserViewModel, T_User>();
 
             //Item
             Mapper.CreateMap<D_Item, ItemGridViewModel>()

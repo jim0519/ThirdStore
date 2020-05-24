@@ -28,24 +28,24 @@ namespace ThirdStore.Extensions
         }
 
         #region AccessControl
-        public static CreateUserViewModel ToModel(this T_User entity)
+        public static UserGridViewModel ToModel(this T_User entity)
         {
-            return entity.MapTo<T_User, CreateUserViewModel>();
+            return entity.MapTo<T_User, UserGridViewModel>();
         }
 
-        public static CreateUserViewModel ToCreateNewModel(this T_User entity)
+        public static UserViewModel ToCreateNewModel(this T_User entity)
         {
-            return entity.MapTo<T_User, CreateUserViewModel>();
+            return entity.MapTo<T_User, UserViewModel>();
         }
 
-        public static T_User ToCreateNewEntity(this CreateUserViewModel model)
+        public static T_User ToCreateNewEntity(this UserViewModel model)
         {
-            return model.MapTo<CreateUserViewModel, T_User>();
+            return model.MapTo<UserViewModel, T_User>();
         }
 
-        public static T_User ToCreateNewEntity(this CreateUserViewModel model, T_User destination)
+        public static T_User ToCreateNewEntity(this UserViewModel model, T_User destination)
         {
-            return model.MapTo<CreateUserViewModel, T_User>(destination);
+            return model.MapTo<UserViewModel, T_User>(destination);
         }
 
         #endregion

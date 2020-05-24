@@ -189,7 +189,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Mapping\AutoMapperStartupTask.cs" />
-    <Compile Include="Models\AccessControl\CreateUserViewModel.cs" />
+    <Compile Include="Models\AccessControl\UserViewModel.cs" />
+    <Compile Include="Models\AccessControl\UserGridViewModel.cs" />
+    <Compile Include="Models\AccessControl\UserListViewModel.cs" />
     <Compile Include="Models\AccessControl\LoginViewModel.cs" />
     <Compile Include="Models\Item\ItemGridViewModel.cs" />
     <Compile Include="Models\Item\ItemListViewModel.cs" />
@@ -399,6 +401,7 @@
     <Content Include="Views\Shared\EditorTemplates\MultiSelectString.cshtml" />
     <Content Include="Views\JobItem\StockTake.cshtml" />
     <Content Include="Views\AccessControl\UserList.cshtml" />
+    <Content Include="Views\AccessControl\_CreateOrEditUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

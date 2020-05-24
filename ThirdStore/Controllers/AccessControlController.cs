@@ -9,6 +9,7 @@ using ThirdStoreBusiness.AccessControl;
 using ThirdStore.Extensions;
 using ThirdStoreCommon;
 using ThirdStoreCommon.Infrastructure;
+using ThirdStoreFramework.Kendoui;
 
 namespace ThirdStore.Controllers
 {
@@ -22,6 +23,46 @@ namespace ThirdStore.Controllers
         {
             _userService = userService;
             _workContext = workContext;
+        }
+
+        public ActionResult UserList()
+        {
+
+            var model = new UserListViewModel();
+
+            model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
+            model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
+            model.SearchStatus = -1;
+
+            var allowAccessUserList = new int[] { 1 };
+            if (!allowAccessUserList.Contains(_workContext.CurrentUser.ID))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/"); ;
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult UserList(DataSourceRequest command, UserListViewModel model)
+        {
+            var users = _userService.SearchUsers(
+                name:model.SearchName,
+                description:model.SearchDescription,
+                email:model.SearchEmail,
+                status:model.SearchStatus,
+                pageIndex: command.Page - 1,
+                pageSize: command.PageSize);
+
+            var userGridViewList = users.Select(i => i.ToModel());
+
+            var gridModel = new DataSourceResult() { Data = userGridViewList, Total = users.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
         }
 
         //
@@ -64,7 +105,12 @@ namespace ThirdStore.Controllers
                 ErrorNotification("You do not have permission to process this page.");
                 return Redirect("~/"); ;
             }
-            return View();
+
+            var newItemViewModel = new UserViewModel() { StatusID = 1 };
+
+            FillDropDownDS(newItemViewModel);
+
+            return View(newItemViewModel);
         }
 
         //
@@ -72,7 +118,7 @@ namespace ThirdStore.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateUser(CreateUserViewModel model)
+        public ActionResult CreateUser(UserViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -99,6 +145,12 @@ namespace ThirdStore.Controllers
             _userService.SignOut();
 
             return RedirectToAction("Login", "AccessControl");
+        }
+
+
+        private void FillDropDownDS(UserViewModel model)
+        {
+            model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
         }
     }
 }

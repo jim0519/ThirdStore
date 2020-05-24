@@ -193,7 +193,16 @@ namespace ThirdStoreBusiness.AccessControl
             if (!string.IsNullOrWhiteSpace(name))
                 query = query.Where(u=>u.Name.Contains(name));
 
+            if (!string.IsNullOrWhiteSpace(email))
+                query = query.Where(u => u.Email.Contains(email));
 
+            if (!string.IsNullOrWhiteSpace(description))
+                query = query.Where(u => u.Description.Contains(description));
+
+            if (status != -1)
+            {
+                query = query.Where(l => l.StatusID.Equals(status));
+            }
 
             query = query.OrderBy(i => i.Email);
 

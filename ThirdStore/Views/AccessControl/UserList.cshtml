@@ -1,4 +1,4 @@
-﻿@model ItemListViewModel
+﻿@model UserListViewModel
 @{
     ViewBag.Title = "User List";
     Layout = "~/Views/Shared/CommonList.cshtml";
@@ -12,200 +12,15 @@
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
             <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
-            @if (Html.IsDebug())
-            {
-                <input type="button" id="btnFetchNetoProducts" class="k-button" value="Fetch Neto Products" />
-                <input type="button" id="btnRedownloadImage" class="k-button" value="Redownload Images" />
-            }
-            @if (Model.ShowSyncInventory)
-            {
-                <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
-                @*<input type="button" id="btnImportData" class="k-button" value="Import Data" />*@
-            }
-            <input type="button" id="btnEdit" class="k-button" value="Edit" />
             <input type="button" id="btnCreateNew" class="k-button" value="Create New SKU" />
             <script>
                 $(document).ready(function () {
 
-                    $('#btnFetchNetoProducts').click(function () {
-                        var link="@Html.Raw(Url.Action("FetchNetoProducts", "Item"))"
-
-                        $.ajax({
-                            url: link,
-                            type: "POST",
-                            dataType: "json",
-                            success: function (data) {
-                                if (data.Result) {
-                                    alert("Fetch Neto Products Success");
-                                }
-                                else {
-                                    //debugger;
-                                    if (data.Message != "")
-                                        alert(data.Message);
-                                    else
-                                        alert("Unknown error occurred.");
-                                }
-                            },
-                            error: function (data) {
-                                debugger;
-
-                                alert("error");
-                            }
-                        });
-                        return false;
-                    });
-
-                    $('#btnRedownloadImage').click(function (e) {                        
-                        if (selectedIds.length == 0) {
-                            alert("Please select more than one item to edit");
-                            return false;
-                        }
-                        e.preventDefault();
-
-                        var link="@Html.Raw(Url.Action("RedownloadImage", "Item"))"
-                        var ids = selectedIds.join(",");
-                        var postData = {
-                            selectedIDs: ids
-                        };
-
-                        $.ajax({
-                            url: link,
-                            type: "POST",
-                            data: postData,
-                            dataType: "json",
-                            beforeSend: function () {
-                                $("#imgLoading").show();
-                            },
-                            complete: function () {
-                                $("#imgLoading").hide();
-                            },
-                            success: function (data) {
-                                if (data.Result) {
-                                    alert("Redownload Images Success");
-                                }
-                                else {
-                                    //debugger;
-                                    if (data.Message != "")
-                                        alert(data.Message);
-                                    else
-                                        alert("Unknown error occurred.");
-                                }
-                            },
-                            error: function (data) {
-
-                                alert("error");
-                            }
-                        });
-                        return false;
-                    });
-
-                    $('#btnImportData').click(function () {
-                        var link="@Html.Raw(Url.Action("ImportSelloData", "Item"))"
-
-                        $.ajax({
-                            url: link,
-                            type: "POST",
-                            dataType: "json",
-                            success: function (data) {
-                                if (data.Result) {
-                                    alert("Import Data Success");
-                                }
-                                else {
-                                    //debugger;
-                                    if (data.Message != "")
-                                        alert(data.Message);
-                                    else
-                                        alert("Unknown error occurred.");
-                                }
-                            },
-                            error: function (data) {
-                                //debugger;
-
-                                alert("error");
-                            }
-                        });
-                        return false;
-                    });
-
                     $('#btnCreateNew').click(function () {
-
-                        //var link = '@Url.Action("Create", new {FromItemID="_selectedItemID_" })'.replace('_selectedItemID_', selectedItemID);
-                        var link="@Html.Raw(Url.Action("Create", "Item"))"
+                        var link="@Html.Raw(Url.Action("CreateUser", "AccessControl"))"
                         location.href = link;
                     });
 
-                    $('#btnEdit').click(function (e) {
-                        //debugger;
-
-                        if (selectedIds.length == 0) {
-                            alert("Please select more than one item to edit");
-                            return false;
-                        }
-
-                        e.preventDefault();
-                        var ids = selectedIds.join(",");
-                        //debugger;
-                        $('#bulk-update-item-form #itemIdsBulkUpdate').val(ids);
-                        var window = $("#bulkUpdateItem-window");
-                        if (!window.data("kendoWindow")) {
-                            window.kendoWindow({
-                                modal: true,
-                                width: "500px",
-                                title: "Bulk Update Item",
-                                actions: ["Close"]
-                            });
-                        }
-                        window.data('kendoWindow').center().open();
-                        return;
-                    });
-
-                    //Update Selected button
-                    $('#btnSyncInventory').click(function () {
-                        //debugger;
-                        if (selectedIds.length == 0) {
-                            alert("Please select more than one sku to sync");
-                            return false;
-                        }
-
-                        if (selectedIds.length > 0) {
-                            //e.preventDefault();
-                            var ids = selectedIds.join(",");
-                            var postData = {
-                                selectedIDs: ids
-                            };
-                            var link = '@Url.Action("SyncInventory", "Item")';
-                            $.ajax({
-                                url: link,
-                                type: "POST",
-                                //contentType: "application/json; charset=utf-8",
-                                data: postData,
-                                dataType: "json",
-                                beforeSend: function () {
-                                    $("#imgLoading").show();
-                                },
-                                complete: function () {
-                                    $("#imgLoading").hide();
-                                },
-                                success: function (data) {
-                                    if (data.Result) {
-                                        alert("Sync Inventory Finished");
-                                    }
-                                    else {
-                                        if (data.Message != "")
-                                            alert(data.Message);
-                                        else
-                                            alert("Unknown error occurred.");
-                                    }
-                                },
-                                error: function (data) {
-                                    //debugger;
-                                    alert("error");
-                                }
-                            });
-                        }
-
-                        return false;
-                    });
 
                 });
             </script>
@@ -213,22 +28,6 @@
     </div>
 
     <table width="100%">
-        <tr>
-            <td>
-                @Html.LabelFor(model => model.SearchSKU):
-            </td>
-            <td>
-                @Html.EditorFor(model => model.SearchSKU)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(model => model.SearchType):
-            </td>
-            <td>
-                @Html.DropDownListFor(model => model.SearchType, Model.SearchTypes)
-            </td>
-        </tr>
         <tr>
             <td>
                 @Html.LabelFor(model => model.SearchName):
@@ -239,34 +38,27 @@
         </tr>
         <tr>
             <td>
-                @Html.LabelFor(model => model.SearchAliasSKU):
+                @Html.LabelFor(model => model.SearchDescription):
             </td>
             <td>
-                @Html.EditorFor(model => model.SearchAliasSKU)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                @Html.LabelFor(model => model.SearchReferenceSKU):
-            </td>
-            <td>
-                @Html.EditorFor(model => model.SearchReferenceSKU)
+                @Html.EditorFor(model => model.SearchDescription)
             </td>
         </tr>
         <tr>
             <td>
-                @Html.LabelFor(model => model.SearchSupplier):
+                @Html.LabelFor(model => model.SearchEmail):
             </td>
             <td>
-                @Html.DropDownListFor(model => model.SearchSupplier, Model.Suppliers)
+                @Html.EditorFor(model => model.SearchEmail)
             </td>
         </tr>
+        
         <tr>
             <td>
-                @Html.LabelFor(model => model.SearchReadyForList):
+                @Html.LabelFor(model => model.SearchStatus):
             </td>
             <td>
-                @Html.DropDownListFor(model => model.SearchReadyForList, Model.YesOrNo)
+                @Html.DropDownListFor(model => model.SearchStatus, Model.YesOrNo)
             </td>
         </tr>
         <tr>
@@ -280,16 +72,16 @@
     <table class="adminContent">
         <tr>
             <td>
-                <div id="item-grid"></div>
+                <div id="user-grid"></div>
 
                 <script>
                     $(document).ready(function () {
-                        $("#item-grid").kendoGrid({
+                        $("#user-grid").kendoGrid({
                             dataSource: {
                                 type: "json",
                                 transport: {
                                     read: {
-                                        url: "@Html.Raw(Url.Action("List", "Item"))",
+                                        url: "@Html.Raw(Url.Action("UserList", "AccessControl"))",
                                         type: "POST",
                                         dataType: "json",
                                         data: additionalData
@@ -319,11 +111,6 @@
                                 mode: "inline"
                             },
                             scrollable: false,
-                            toolbar: ["excel"],
-                            excel: {
-                                allPages: true,
-                                fileName: "Item.xlsx"
-                            },
                             dataBound: onDataBound,
                             columns: [
                                 {
@@ -334,33 +121,19 @@
                                     template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
                                     width: 50
                                 }, {
-                                    field: "SKU",
-                                    template: "<a href='@Url.Action("Edit")?ItemID=#=ID#' target='_blank' > #=SKU#</a>",
-                                    title: "SKU"
-                                }, {
-                                    field: "Type",
-                                    title: "Item Type"
-                                }, {
                                     field: "Name",
+                                    template: "<a href='@Url.Action("Edit")?UserID=#=ID#' target='_blank' > #=Name#</a>",
                                     title: "Name"
                                 }, {
-                                    field: "Supplier",
-                                    title: "Supplier"
+                                    field: "Description",
+                                    title: "Description"
                                 }, {
-                                    field: "IsReadyForList",
-                                    title: "Is Ready For List",
-                                    template: "#= !!IsReadyForList#"
+                                    field: "Email",
+                                    title: "Email"
                                 }, {
-                                    field: "Price",
-                                    title: "Price"
-                                }, {
-                                    field: "EditTime",
-                                    type: "date",
-                                    format: "{0:dd/MM/yyyy HH:mm:ss}",
-                                    title: "Last Edit Time"
-                                }, {
-                                    field: "EditBy",
-                                    title: "Last Edit By"
+                                    field: "StatusID",
+                                    title: "Is Active",
+                                    template: "#= !!StatusID#"
                                 }
                             ]
                         });
@@ -377,13 +150,10 @@
         //clear all button
         $('#btnClearAll').click(function () {
 
-            $('#@Html.FieldIdFor(model => model.SearchSKU)').val("");
-            $('#@Html.FieldIdFor(model => model.SearchType)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchName)').val("");
-            $('#@Html.FieldIdFor(model => model.SearchAliasSKU)').val("");
-            $('#@Html.FieldIdFor(model => model.SearchReferenceSKU)').val("");
-            $('#@Html.FieldIdFor(model => model.SearchSupplier)').val("0");
-            $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val("-1");
+            $('#@Html.FieldIdFor(model => model.SearchDescription)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchEmail)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchStatus)').val("0");
 
             selectedIds = [];
 
@@ -395,44 +165,12 @@
     });
     function additionalData() {
         return {
-            SearchSKU: $('#@Html.FieldIdFor(model => model.SearchSKU)').val(),
-            SearchType: $('#@Html.FieldIdFor(model => model.SearchType)').val(),
             SearchName: $('#@Html.FieldIdFor(model => model.SearchName)').val(),
-            SearchAliasSKU: $('#@Html.FieldIdFor(model => model.SearchAliasSKU)').val(),
-            SearchReferenceSKU: $('#@Html.FieldIdFor(model => model.SearchReferenceSKU)').val(),
-            SearchSupplier: $('#@Html.FieldIdFor(model => model.SearchSupplier)').val(),
-            SearchReadyForList: $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val()
+            SearchDescription: $('#@Html.FieldIdFor(model => model.SearchDescription)').val(),
+            SearchEmail: $('#@Html.FieldIdFor(model => model.SearchEmail)').val(),
+            SearchStatus: $('#@Html.FieldIdFor(model => model.SearchStatus)').val()
         };
     }
     </script>
 
 }
-
-    <div id="bulkUpdateItem-window" style="display:none;">
-        @using (Html.BeginForm("BulkUpdateItem", "Item", FormMethod.Post, new { id = "bulk-update-item-form" }))
-        {
-            <input type="hidden" id="itemIdsBulkUpdate" name="itemIdsBulkUpdate" value="" />
-            <table style="text-align:left;">
-                <tr>
-                    <td>
-                        @Html.LabelFor(model => model.BulkUpdate.IsActive):
-                    </td>
-                    <td>
-                        @Html.DropDownListFor(model => model.BulkUpdate.IsActive, Model.YesOrNo)
-                    </td>
-                    <td>
-                        @Html.LabelFor(model => model.BulkUpdate.IsReadyForList):
-                    </td>
-                    <td>
-                        @Html.DropDownListFor(model => model.BulkUpdate.IsReadyForList, Model.YesOrNo)
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <input type="submit" class="k-button" value="Submit" />
-                    </td>
-                </tr>
-            </table>
-        }
-    </div>

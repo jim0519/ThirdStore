@@ -1,14 +1,17 @@
 ﻿using ThirdStoreFramework.MVC;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace ThirdStore.Models.AccessControl
 {
-    public class CreateUserViewModel : BaseViewModel
+    public class UserViewModel : BaseEntityViewModel
     {
         [Required]
         [Display(Name = "User Name")]
         public string Name { get; set; }
+
+        public string Description { get; set; }
 
         [Required]
         [EmailAddress]
@@ -23,8 +26,13 @@ namespace ThirdStore.Models.AccessControl
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+
+        public int StatusID { get; set; }
+
+        public IList<SelectListItem> YesOrNo { get; set; }
     }
     
 }

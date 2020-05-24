@@ -287,15 +287,19 @@ namespace ThirdStoreBusiness.JobItem
             var currentTime = DateTime.Now;
             var currentUser = Constants.SystemUser;
             if (_workContext.CurrentUser!=null)
+            {
                 currentUser = _workContext.CurrentUser.Email;
+                jobItem.EditBy = currentUser;
+                jobItem.EditTime = currentTime;
+            }
+                
 
             //auto update shiptime when status change to shipped
             if (jobItem.StatusID == ThirdStoreJobItemStatus.SHIPPED.ToValue() && jobItem.ShipTime == null)
                 jobItem.ShipTime = currentTime;
 
             jobItem.FillOutNull();
-            jobItem.EditBy = currentUser;
-            jobItem.EditTime = currentTime;
+            
 
 
             foreach (var line in jobItem.JobItemLines)
