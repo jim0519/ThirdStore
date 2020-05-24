@@ -122,6 +122,7 @@ namespace ThirdStore.Controllers
                 if (i.JobItemLines.Count > 0)
                     viewModel.SKUs = GetSKUsDetails(i);
                 viewModel.Reference = _jobItemService.GetJobItemReference(i);
+                viewModel.CBM = i.JobItemLines.Sum(l =>Convert.ToDecimal( l.Ref1));
                 return viewModel;
             } );
 
