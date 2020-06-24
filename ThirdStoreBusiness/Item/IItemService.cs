@@ -45,6 +45,8 @@ namespace ThirdStoreBusiness.Item
 
         void DeleteChildItem(D_Item_Relationship childItem);
 
+        void AddOrUpdateItem(IList<D_Item> items);
+
         void UpdateChannelData();
 
         void FetchNetoProducts();

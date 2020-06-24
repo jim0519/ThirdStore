@@ -24,6 +24,7 @@ using ThirdStoreBusiness.Order;
 using ThirdStoreBusiness.ReportPrint;
 using LINQtoCSV;
 using ThirdStoreFramework.Controllers;
+using ThirdStoreBusiness.DSChannel;
 
 namespace ThirdStoreFramework
 {
@@ -104,6 +105,9 @@ namespace ThirdStoreFramework
 
             //Schedule Rule
             builder.RegisterType<ScheduleRuleService>().As<IScheduleRuleService>().InstancePerLifetimeScope();
+
+            //Dropship Channels
+            builder.RegisterAssemblyTypes(assemblies).Where(t => typeof(IDSChannel).IsAssignableFrom(t)).InstancePerLifetimeScope().AsImplementedInterfaces();
         }
 
         public int Order

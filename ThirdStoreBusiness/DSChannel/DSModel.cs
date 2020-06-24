@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace ThirdStoreBusiness.Item
+namespace ThirdStoreBusiness.DSChannel
 {
-    public class DSZSKUModel
+    public class DSZModel
     {
         public string SKU { get; set; }
         public string Category { get; set; }
@@ -143,5 +143,62 @@ namespace ThirdStoreBusiness.Item
         //public string Image14 { get; set; }
         //[CsvColumn(Name = "Image 15")]
         //public string Image15 { get; set; }
+    }
+
+    public class SelloDSModel
+    {
+        public string sku { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public int qty { get; set; }
+        public decimal price { get; set; }
+        public decimal special_price { get; set; }
+        public string length { get; set; }
+        public string width { get; set; }
+        public string height { get; set; }
+        public string weight { get; set; }
+        public string main_image { get; set; }
+        public string additional_images { get; set; }
+        [CsvColumn(Name = "Shipping Operation")]
+        public string shipping_operation { get; set; }
+        public string UPC { get; set; }
+        public string Brand { get; set; }
+    }
+
+    public class DSZImportLine
+    {
+        public string serial_number { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public string address1 { get; set; }
+        public string address2 { get; set; }
+        public string suburb { get; set; }
+        public string state { get; set; }
+        public string country { get; set; }
+        public string postcode { get; set; }
+        public string telephone { get; set; }
+        public string sku { get; set; }
+        public decimal price { get; set; }
+        public decimal postage { get; set; }
+        public int qty { get; set; }
+        public string comment { get; set; }
+
+    }
+
+    public class SelloImportLine
+    {
+        public string serial_number { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public string address1 { get; set; }
+        public string address2 { get; set; }
+        public string suburb { get; set; }
+        public string state { get; set; }
+        public string country { get; set; }
+        public string postcode { get; set; }
+        public string telephone { get; set; }
+        public string sku { get; set; }
+        public int qty { get; set; }
+        public string comment { get; set; }
     }
 }

@@ -21,6 +21,7 @@ using ThirdStoreBusiness.ReportPrint;
 using HtmlAgilityPack;
 using LINQtoCSV;
 using System.IO;
+using ThirdStoreBusiness.DSChannel;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -35,6 +36,7 @@ namespace ThirdStoreBusiness.JobItem
         private readonly INetoAPICallManager _netoAPIManager;
         private readonly IImageService _imageService;
         private readonly IReportPrintService _reportPrintService;
+        private readonly IEnumerable<IDSChannel> _dsChannels;
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
 
@@ -46,7 +48,8 @@ namespace ThirdStoreBusiness.JobItem
             IWorkContext workContext,
             INetoAPICallManager netoAPIManager,
             IImageService imageService,
-            IReportPrintService reportPrintService)
+            IReportPrintService reportPrintService,
+            IEnumerable<IDSChannel> dsChannels)
         {
             _jobItemRepository = jobItemRepository;
             _jobItemLineRepository = jobItemLineRepository;
@@ -57,6 +60,7 @@ namespace ThirdStoreBusiness.JobItem
             _netoAPIManager = netoAPIManager;
             _imageService = imageService;
             _reportPrintService = reportPrintService;
+            _dsChannels = dsChannels.OrderBy(c => c.Order);
             _csvContext = new CsvContext();
             _csvFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default };
         }
@@ -604,35 +608,57 @@ namespace ThirdStoreBusiness.JobItem
 
                 #region Finalize ExportProductListing (decide what qty need to be sync)
 
-                var di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreDSZData);
-                if (di.Exists)
-                {
-                    FileInfo[] files = di.GetFiles().ToArray();
-                    if (files.Count() > 0)
-                    {
-                        var dszDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
-                        var dszData = _csvContext.Read<DSZSKUModel>(dszDataFile.FullName, _csvFileDescription);
-                        var tmpExportProductListing = new List<ExportProductListing>();
-                        foreach (var epl in lstExportProductListing)
-                        {
-                            if (epl.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
-                                && epl.Qty == 0)
-                            {
-                                var dszSKU = dszData.FirstOrDefault(d => d.SKU.ToLower().Equals(epl.SKU.ToLower()));
-                                var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
-                                if (dszSKU != null
-                                    && dszSKU.InventoryQty >= dsInventoryThredshold
-                                    && dszSKU.Price<=Convert.ToDecimal( ThirdStoreConfig.Instance.SyncDSPriceBelow))
-                                {
-                                    epl.Qty = dsInventoryThredshold;
-                                }
-                            }
-                            tmpExportProductListing.Add(epl);
-                        }
-                        lstExportProductListing = tmpExportProductListing;
-                    }
-                }
+                //var di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreDSZData);
+                //if (di.Exists)
+                //{
+                //    FileInfo[] files = di.GetFiles().ToArray();
+                //    if (files.Count() > 0)
+                //    {
+                //        var dszDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                //        var dszData = _csvContext.Read<DSZSKUModel>(dszDataFile.FullName, _csvFileDescription);
+                //        var tmpExportProductListing = new List<ExportProductListing>();
+                //        foreach (var epl in lstExportProductListing)
+                //        {
+                //            if (epl.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
+                //                && epl.Qty == 0)
+                //            {
+                //                var dszSKU = dszData.FirstOrDefault(d => d.SKU.ToLower().Equals(epl.SKU.ToLower()));
+                //                var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
+                //                if (dszSKU != null
+                //                    && dszSKU.InventoryQty >= dsInventoryThredshold
+                //                    && dszSKU.Price<=Convert.ToDecimal( ThirdStoreConfig.Instance.SyncDSPriceBelow))
+                //                {
+                //                    epl.Qty = dsInventoryThredshold;
+                //                }
+                //            }
+                //            tmpExportProductListing.Add(epl);
+                //        }
+                //        lstExportProductListing = tmpExportProductListing;
+                //    }
+                //}
 
+                var grpListingItems = listingItems.GroupBy(l=>l.SupplierID);
+                var lstDSInventory = new List<Tuple<string, int>>();
+                foreach(var grp in grpListingItems)
+                {
+                    var dsChannel = _dsChannels.FirstOrDefault(c => c.DSChannel.Equals(grp.Key));
+                    lstDSInventory.AddRange(dsChannel.GetInventoryQtyBySKUs(grp.Select(i=>i.SKU).ToList()));
+                }
+                var tmpExportProductListing = new List<ExportProductListing>();
+                foreach (var epl in lstExportProductListing)
+                {
+                    if (epl.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
+                                && epl.Qty == 0)
+                    {
+                        var matchInv = lstDSInventory.FirstOrDefault(inv=>inv.Item1.ToLower().Equals(epl.SKU.ToLower()));
+                        if(matchInv!=null)
+                        {
+                            epl.Qty = matchInv.Item2;
+                        }
+                    }
+                    tmpExportProductListing.Add(epl);
+                }
+                lstExportProductListing = tmpExportProductListing;
 
                 #endregion
 

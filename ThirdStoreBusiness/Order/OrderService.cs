@@ -14,6 +14,8 @@ using ThirdStoreBusiness.JobItem;
 using ThirdStoreBusiness.Item;
 using ThirdStoreCommon.Models.Item;
 using LINQtoCSV;
+using ThirdStoreBusiness.DSChannel;
+using Ionic.Zip;
 
 namespace ThirdStoreBusiness.Order
 {
@@ -27,6 +29,7 @@ namespace ThirdStoreBusiness.Order
         private readonly IItemService _itemService;
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDesc;
+        private readonly IEnumerable<IDSChannel> _dsChannels;
 
         public OrderService(IRepository<D_Order_Header> orderRepository,
             INetoAPICallManager netoAPICallManager,
@@ -34,6 +37,7 @@ namespace ThirdStoreBusiness.Order
             IWorkContext workContext,
             IJobItemService jobItemService,
             IItemService itemService,
+            IEnumerable<IDSChannel> dsChannels,
             CsvContext csvContext,
             CsvFileDescription csvFileDesc)
         {
@@ -45,6 +49,7 @@ namespace ThirdStoreBusiness.Order
             _itemService = itemService;
             _csvContext = csvContext;
             _csvFileDesc = csvFileDesc;
+            _dsChannels = dsChannels.OrderBy(c => c.Order);
         }
 
         public void DeleteOrder(D_Order_Header order)
@@ -557,49 +562,73 @@ namespace ThirdStoreBusiness.Order
             return item?.Description;
         }
 
-        public Stream ExportDSZImportFile(IList<int> orderids)
+        public Stream ExportDSImportFile(IList<int> orderids)
         {
-            Stream retStream = new MemoryStream();
-            var listDSZImportLine = new List<DSZImportLine>();
-
-            var orders = GetOrdersByIDs(orderids);
-            foreach(var o in orders)
+            try
             {
-                foreach(var line in o.OrderLines)
+                MemoryStream zipStream = new MemoryStream();
+                var listDSZImportLine = new List<DSZImportLine>();
+
+                //var orders = GetOrdersByIDs(orderids);
+                var selectedOrders = (from o in _orderRepository.Table
+                                     where orderids.Contains(o.ID)
+                                     select o).ToList();
+                var orders = from o in selectedOrders
+                             from ol in o.OrderLines
+                             join itm in _itemService.GetAllItems() on ol.SKU.ToLower() equals itm.SKU.ToLower()
+                             where orderids.Contains(o.ID)
+                             group new { OrderLine=ol } by itm.SupplierID into grpOrders
+                             select grpOrders;
+
+                using (var zip = new ZipFile())
                 {
-                    if (string.IsNullOrWhiteSpace(line.Ref5))//item has been allocated and not local stock item
+                    foreach (var grp in orders)
                     {
-                        var importLine = new DSZImportLine();
-                        importLine.serial_number = line.Ref1;
-                        var firstName = o.ConsigneeName.Substring(0, o.ConsigneeName.IndexOf(" "));
-                        var lastName = o.ConsigneeName.Substring(o.ConsigneeName.IndexOf(" ") + 1);
-                        importLine.first_name = firstName;
-                        importLine.last_name = lastName;
+                        var dsChannel = _dsChannels.FirstOrDefault(c => c.DSChannel.Equals(grp.Key));
+                        if (dsChannel != null)
+                        {
+                            var stream = dsChannel.ExportBatchOrderFile(grp.Select(o => o.OrderLine).ToList());
+                            zip.AddEntry(CommonFunc.ToCSVFileName($"Export{dsChannel.GetType().Name}Orders"), stream);
+                        }
+                        //foreach (var line in o.OrderLines)
+                        //{
+                        //    if (string.IsNullOrWhiteSpace(line.Ref5))//item has been allocated and not local stock item
+                        //    {
+                        //        var importLine = new DSZImportLine();
+                        //        importLine.serial_number = line.Ref1;
+                        //        var firstName = o.ConsigneeName.Substring(0, o.ConsigneeName.IndexOf(" "));
+                        //        var lastName = o.ConsigneeName.Substring(o.ConsigneeName.IndexOf(" ") + 1);
+                        //        importLine.first_name = firstName;
+                        //        importLine.last_name = lastName;
 
-                        importLine.address1 = o.ShippingAddress1;
-                        importLine.address2 = o.ShippingAddress2;
-                        importLine.suburb = o.ShippingSuburb;
-                        importLine.state = o.ShippingState;
-                        importLine.country = o.ShippingCountry;
-                        importLine.postcode = o.ShippingPostcode;
-                        importLine.telephone = o.ConsigneePhoneNo;
-                        importLine.sku = line.SKU;
-                        importLine.price = 10;
-                        importLine.postage = 0;
-                        importLine.qty = line.Qty;
-                        importLine.comment = o.BuyerNote;
+                        //        importLine.address1 = o.ShippingAddress1;
+                        //        importLine.address2 = o.ShippingAddress2;
+                        //        importLine.suburb = o.ShippingSuburb;
+                        //        importLine.state = o.ShippingState;
+                        //        importLine.country = o.ShippingCountry;
+                        //        importLine.postcode = o.ShippingPostcode;
+                        //        importLine.telephone = o.ConsigneePhoneNo;
+                        //        importLine.sku = line.SKU;
+                        //        importLine.price = 10;
+                        //        importLine.postage = 0;
+                        //        importLine.qty = line.Qty;
+                        //        importLine.comment = o.BuyerNote;
 
-                        listDSZImportLine.Add(importLine);
+                        //        listDSZImportLine.Add(importLine);
+                        //    }
+                        //}
                     }
+                    zip.Save(zipStream);
+                    zipStream.Position = 0;
                 }
+
+                return zipStream;
             }
-
-            var stWriter = new StreamWriter(retStream);
-            _csvContext.Write(listDSZImportLine, stWriter, _csvFileDesc);
-            stWriter.Flush();
-            retStream.Position = 0;
-
-            return retStream;
+            catch(Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                throw ex;
+            }
         }
 
         public IList<D_Order_Header> GetOrdersByIDs(IList<int> orderids)

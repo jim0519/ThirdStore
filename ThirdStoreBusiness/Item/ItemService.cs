@@ -13,6 +13,7 @@ using LINQtoCSV;
 using ThirdStoreBusiness.Image;
 using ThirdStoreCommon.Models.Image;
 using ThirdStoreBusiness.API.Neto;
+using ThirdStoreBusiness.DSChannel;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -26,6 +27,7 @@ namespace ThirdStoreBusiness.Item
         private readonly IWorkContext _workContext;
         private readonly IImageService _imageService;
         private readonly INetoAPICallManager _netoAPIManager;
+        private readonly IEnumerable<IDSChannel> _dsChannels;
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
 
@@ -37,6 +39,7 @@ namespace ThirdStoreBusiness.Item
             IDbContext dbContext,
             IImageService imageService,
             INetoAPICallManager netoAPIManager,
+            IEnumerable<IDSChannel> dsChannels,
             CsvContext csvContext,
             CsvFileDescription csvFileDescription)
         {
@@ -48,6 +51,7 @@ namespace ThirdStoreBusiness.Item
             _imageService = imageService;
             _netoAPIManager = netoAPIManager;
             _netoProductsRepository = netoProductsRepository;
+            _dsChannels = dsChannels.OrderBy(c => c.Order);
             _csvContext = csvContext;
             _csvFileDescription = csvFileDescription;
         }
@@ -212,6 +216,236 @@ namespace ThirdStoreBusiness.Item
         {
             var query = _itemRepository.Table.Where(i => ids.Contains(i.ID));
             return query.ToList();
+        }
+
+
+        public void AddOrUpdateItem(IList<D_Item> items)
+        {
+            try
+            {
+                var createTime = DateTime.Now;
+                var createBy = _workContext.CurrentUserName;
+                var localItemList = GetAllItems();
+
+                #region Update Section
+
+                var updateItemList = from sl in items
+                                     join li in localItemList on sl.SKU.ToUpper() equals li.SKU.ToUpper()
+                                     select new {updateData= sl, LocalItem= li };
+
+                var upds = new List<D_Item>();
+                foreach (var updateItem in updateItemList)
+                {
+                    var item = updateItem.LocalItem;
+                    var updateData = updateItem.updateData;
+                    if (!string.IsNullOrWhiteSpace(updateData.Description))
+                        item.Description = updateData.Description;
+                    item.Cost = updateData.Cost;
+                    item.Price = updateData.Price;
+                    upds.Add(item);
+                }
+                _itemRepository.Update(upds, itm => itm.Description, itm => itm.Cost, itm => itm.Price);
+                #endregion
+
+                #region Add Section
+                var addItemList = from sl in items
+                                  where !localItemList.Any(li => li.SKU.ToUpper().Equals(sl.SKU.ToUpper()))
+                                  select sl;
+
+                foreach (var additem in addItemList)
+                {
+                    try
+                    {
+                        var newItem = new D_Item();
+                        //newItem.SKU = additem.SKU;
+                        //newItem.Name = additem.Name;
+                        //newItem.Cost = additem.Cost;
+                        //newItem.Price = additem.Price;
+                        //newItem.Description = additem.Description;
+                        AutoMapper.Mapper.Map(additem,newItem);
+                        newItem.CreateTime = createTime;
+                        newItem.CreateBy = createBy;
+                        newItem.EditTime = createTime;
+                        newItem.EditBy = createBy;
+                        newItem.FillOutNull();
+
+                        var imageURLs = newItem.Ref5.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        //DownloadItemImages(imageURLs,newItem);
+                        PreDownloadItemImages(imageURLs, newItem);
+                        //RestoreItemImages(imageURLs, newItem);
+
+                        _itemRepository.Insert(newItem);
+                    }
+                    catch(Exception ex)
+                    {
+                        LogManager.Instance.Error(ex.Message);
+                    }
+                }
+
+                #endregion
+
+
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                throw ex;
+            }
+        }
+
+        private void RestoreItemImages(List<string> imageURLs, D_Item newItem)
+        {
+            #region Fetch/Restore from Pre-Downloaded Images
+
+            DirectoryInfo di = new DirectoryInfo(@"C:\Users\gdutj\Downloads\3rdStockSystem\DSImages20200615\" + newItem.SKU + "\\");
+            if (di.Exists)
+            {
+                var imageFiles = di.GetFiles("*", SearchOption.AllDirectories);
+                int j = 0;
+                foreach (var fi in imageFiles)
+                {
+                    //Image img = Image.FromFile(imgFile);
+
+                    using (var stream = new MemoryStream(System.IO.File.ReadAllBytes(fi.FullName)))
+                    {
+                        var fileName = newItem.SKU + "-" + j.ToString().PadLeft(2, '0') + ".jpg";
+                        var imgObj = _imageService.SaveImage(stream, fileName);
+                        newItem.ItemImages.Add(new M_ItemImage()
+                        {
+                            Image = imgObj,
+                            DisplayOrder = j,
+                            StatusID = 0,//TODO Get item active status id
+                            CreateTime = DateTime.Now,
+                            CreateBy = "System",
+                            EditTime = DateTime.Now,
+                            EditBy = "System"
+                        });
+                    }
+                    j++;
+                }
+            }
+            else
+            {
+                int i = 0;
+                using (var wc = new ThirdStoreWebClient())
+                {
+                    foreach (var imageURL in imageURLs)
+                    {
+                        try
+                        {
+                            var imgBytes = wc.DownloadData(imageURL);
+                            using (var stream = new MemoryStream(imgBytes))
+                            {
+                                var fileName = newItem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                                var imgObj = _imageService.SaveImage(stream, fileName);
+                                newItem.ItemImages.Add(new M_ItemImage()
+                                {
+                                    Image = imgObj,
+                                    DisplayOrder = i,
+                                    StatusID = 0,//TODO Get item active status id
+                                    CreateTime = DateTime.Now,
+                                    CreateBy = "System",
+                                    EditTime = DateTime.Now,
+                                    EditBy = "System"
+                                });
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                        }
+
+                        i++;
+                    }
+                }
+            }
+
+            #endregion
+        }
+
+        private void PreDownloadItemImages(List<string> imageURLs, D_Item newItem)
+        {
+            #region Pre-Download and Save Images grouped by SKU
+            DirectoryInfo di = new DirectoryInfo(@"C:\Users\gdutj\Downloads\3rdStockSystem\DSImages20200615\" + newItem.SKU + "\\");
+
+            if (!di.Exists)
+            {
+                di.Create();
+            }
+
+            using (var wc = new ThirdStoreWebClient())
+            {
+                int i = 1;
+                foreach (var imageURL in imageURLs)
+                {
+                    try
+                    {
+                        var imageFileName = newItem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                        var saveImageFileFullName = Path.Combine(di.FullName, imageFileName);
+
+                        wc.DownloadFile(imageURL, saveImageFileFullName);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                    }
+
+                    i++;
+                }
+            }
+
+
+            #endregion
+
+            
+        }
+
+        private void DownloadItemImages(List<string> imageURLs, D_Item item)
+        {
+            if (imageURLs == null || imageURLs.Count == 0)
+                return;
+
+            var createTime = DateTime.Now;
+            var createBy = _workContext.CurrentUserName;
+            if (item.ItemImages.Count > 0)
+            {
+                var itemImages = GetItemImagesByItemID(item.ID);
+                foreach (var existPic in itemImages)
+                    DeleteItemImage(existPic);
+            }
+
+            int i = 0;
+            using (var wc = new ThirdStoreWebClient())
+            {
+                foreach (var imageURL in imageURLs)
+                {
+                    try
+                    {
+                        var imgBytes = wc.DownloadData(imageURL);
+                        using (var stream = new MemoryStream(imgBytes))
+                        {
+                            var fileName = item.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                            var imgObj = _imageService.SaveImage(stream, fileName);
+                            item.ItemImages.Add(new M_ItemImage()
+                            {
+                                Image = imgObj,
+                                DisplayOrder = i,
+                                StatusID = 0,//TODO Get item active status id
+                                CreateTime = createTime,
+                                CreateBy = createBy,
+                                EditTime = createTime,
+                                EditBy = createBy
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                    }
+
+                    i++;
+                }
+            }
         }
 
         public void UpdateChannelData()
@@ -406,102 +640,7 @@ namespace ThirdStoreBusiness.Item
 
                         //DirectoryInfo di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreImagesPath + "\\" + additem.SKU + "\\");
                         //DirectoryInfo di = new DirectoryInfo(@"C:\Users\gdutj\Downloads\3rdStockSystem\DSZImages20191120\" + additem.SKU + "\\");
-                        #region Pre-Download and Save Images grouped by SKU
-
-                        //if (!di.Exists)
-                        //{
-                        //    di.Create();
-                        //}
-
-                        //using (var wc = new ThirdStoreWebClient())
-                        //{
-                        //    int i = 1;
-                        //    foreach (var imageURL in imagesURL)
-                        //    {
-                        //        try
-                        //        {
-                        //            var imageFileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
-                        //            var saveImageFileFullName = Path.Combine(di.FullName, imageFileName);
-
-                        //            wc.DownloadFile(imageURL, saveImageFileFullName);
-                        //        }
-                        //        catch (Exception ex)
-                        //        {
-                        //            LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
-                        //        }
-
-                        //        i++;
-                        //    }
-                        //}
-
-
-                        #endregion
-
-                        #region Fetch/Restore from Pre-Downloaded Images
-
-                        //if (di.Exists)
-                        //{
-                        //    var imageFiles = di.GetFiles("*", SearchOption.AllDirectories);
-                        //    int j = 0;
-                        //    foreach (var fi in imageFiles)
-                        //    {
-                        //        //Image img = Image.FromFile(imgFile);
-
-                        //        using (var stream = new MemoryStream(System.IO.File.ReadAllBytes(fi.FullName)))
-                        //        {
-                        //            var fileName = additem.SKU + "-" + j.ToString().PadLeft(2, '0') + ".jpg";
-                        //            var imgObj = _imageService.SaveImage(stream, fileName);
-                        //            newItem.ItemImages.Add(new M_ItemImage()
-                        //            {
-                        //                Image = imgObj,
-                        //                DisplayOrder = j,
-                        //                StatusID = 0,//TODO Get item active status id
-                        //                CreateTime = DateTime.Now,
-                        //                CreateBy = "System",
-                        //                EditTime = DateTime.Now,
-                        //                EditBy = "System"
-                        //            });
-                        //        }
-                        //        j++;
-                        //    }
-                        //}
-                        //else
-                        //{
-                        //    int i = 0;
-                        //    using (var wc = new ThirdStoreWebClient())
-                        //    {
-                        //        foreach (var imageURL in imagesURL)
-                        //        {
-                        //            try
-                        //            {
-                        //                var imgBytes = wc.DownloadData(imageURL);
-                        //                using (var stream = new MemoryStream(imgBytes))
-                        //                {
-                        //                    var fileName = additem.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
-                        //                    var imgObj = _imageService.SaveImage(stream, fileName);
-                        //                    newItem.ItemImages.Add(new M_ItemImage()
-                        //                    {
-                        //                        Image = imgObj,
-                        //                        DisplayOrder = i,
-                        //                        StatusID = 0,//TODO Get item active status id
-                        //                        CreateTime = createTime,
-                        //                        CreateBy = createBy,
-                        //                        EditTime = createTime,
-                        //                        EditBy = createBy
-                        //                    });
-                        //                }
-                        //            }
-                        //            catch (Exception ex)
-                        //            {
-                        //                LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
-                        //            }
-
-                        //            i++;
-                        //        }
-                        //    }
-                        //}
-
-                        #endregion
+                        
 
                         _itemRepository.Insert(newItem);
                     }
@@ -544,7 +683,7 @@ namespace ThirdStoreBusiness.Item
         private void DownloadItemImages(DSZSKUModel dszData,D_Item item)
         {
             var createTime = DateTime.Now;
-            var createBy= (_workContext.CurrentUser != null ? _workContext.CurrentUser.Name : Constants.SystemUser);
+            var createBy= _workContext.CurrentUserName;
             if(item.ItemImages.Count>0)
             {
                 var itemImages = GetItemImagesByItemID(item.ID);
@@ -628,8 +767,14 @@ namespace ThirdStoreBusiness.Item
                     Directory.CreateDirectory(ThirdStoreConfig.Instance.ThirdStoreDSZData);
                 //var byCsv = webClient.DownloadData(Constants.DSZSKUListURL);
                 var fileName = ThirdStoreConfig.Instance.ThirdStoreDSZData + "\\" + CommonFunc.ToCSVFileName("DSZData");
-                webClient.DownloadFile(Constants.DSZSKUListURL, fileName);
-                skuList=_csvContext.Read<DSZSKUModel>(fileName, _csvFileDescription).ToList();
+                //var fileName = ThirdStoreConfig.Instance.ThirdStoreDSZData + "\\DSZData_20200602125553.csv";
+
+                //webClient.DownloadFile(@"https://idropship.com.au/pub/media/export_product_all_generic.csv", fileName);
+                skuList = _csvContext.Read<DSZSKUModel>(fileName, _csvFileDescription).ToList();
+
+                //webClient.DownloadFile(Constants.DSZSKUListURL, fileName);
+                //skuList=_csvContext.Read<DSZSKUModel>(fileName, _csvFileDescription).ToList();
+
                 //using (var ms = new MemoryStream(byCsv))
                 //{
                 //    ms.Position = 0;
@@ -721,30 +866,49 @@ namespace ThirdStoreBusiness.Item
         {
             try
             {
-                var di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreDSZData);
-                if (di.Exists)
+                //var di = new DirectoryInfo(ThirdStoreConfig.Instance.ThirdStoreDSZData);
+                //if (di.Exists)
+                //{
+                //    FileInfo[] files = di.GetFiles().ToArray();
+                //    if (files.Count() > 0)
+                //    {
+                //        var topDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                //        var dszDatas = _csvContext.Read<DSZSKUModel>(topDataFile.FullName, _csvFileDescription);
+                //        var items = this.GetItemsByIDs(ids);
+
+                //        foreach(var item in items)
+                //        {
+                //            var dszData = dszDatas.FirstOrDefault(d=>d.SKU.ToLower().Equals(item.SKU.ToLower()));
+                //            if(dszData!=null)
+                //            {
+                //                DownloadItemImages(dszData,item);
+                //            }
+
+                //            UpdateItem(item);
+                //        }
+
+                //    }
+                //}
+
+
+                var lstSKUImages = new List<Tuple<string, IList<string>>>();
+                var items = this.GetItemsByIDs(ids);
+                var grpItems = items.GroupBy(i=>i.SupplierID);
+                foreach(var grp in grpItems)
                 {
-                    FileInfo[] files = di.GetFiles().ToArray();
-                    if (files.Count() > 0)
-                    {
-                        var topDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
-                        var dszDatas = _csvContext.Read<DSZSKUModel>(topDataFile.FullName, _csvFileDescription);
-                        var items = this.GetItemsByIDs(ids);
-
-                        foreach(var item in items)
-                        {
-                            var dszData = dszDatas.FirstOrDefault(d=>d.SKU.ToLower().Equals(item.SKU.ToLower()));
-                            if(dszData!=null)
-                            {
-                                DownloadItemImages(dszData,item);
-                            }
-
-                            UpdateItem(item);
-                        }
-
-                    }
+                    var dsChannel = _dsChannels.FirstOrDefault(c => c.DSChannel.Equals(grp.Key));
+                    lstSKUImages.AddRange(dsChannel.GetImagesPathsBySKUs(grp.Select(i => i.SKU).ToList()));
                 }
 
+                foreach(var item in items)
+                {
+                    var images = lstSKUImages.FirstOrDefault(img=>img.Item1.ToLower().Equals(item.SKU.ToLower()));
+                    if(images!=null)
+                    {
+                        DownloadItemImages(images.Item2.ToList(), item);
+                        UpdateItem(item);
+                    }
+                }
 
 
             }

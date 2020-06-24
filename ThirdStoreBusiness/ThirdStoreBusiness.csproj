@@ -49,6 +49,9 @@
     <Reference Include="HtmlAgilityPack, Version=1.11.7.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.11.7\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ionic.Zip.1.9.1.8\lib\Ionic.Zip.dll</HintPath>
+    </Reference>
     <Reference Include="LINQtoCSV, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LINQtoCSV.1.5.0.0\lib\net35\LINQtoCSV.dll</HintPath>
     </Reference>
@@ -113,6 +116,8 @@
     <Compile Include="API\Neto\UpdateItemResponse.cs" />
     <Compile Include="API\Neto\UpdateItem.cs" />
     <Compile Include="API\Neto\NetoAPI.cs" />
+    <Compile Include="DSChannel\DSModel.cs" />
+    <Compile Include="DSChannel\IDSChannel.cs" />
     <Compile Include="Image\IImageService.cs" />
     <Compile Include="Image\ImageService.cs" />
     <Compile Include="Item\DSZSKUModel.cs" />

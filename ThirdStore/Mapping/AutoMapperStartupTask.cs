@@ -31,6 +31,7 @@ namespace ThirdStore.Infrastructure
             Mapper.CreateMap<UserViewModel, T_User>();
 
             //Item
+            Mapper.CreateMap<D_Item, D_Item>();
             Mapper.CreateMap<D_Item, ItemGridViewModel>()
                 .ForMember(dest => dest.Type, mce => mce.MapFrom(s => s.Type.ToEnumName<ThirdStoreItemType>()))
                 .ForMember(dest => dest.Supplier, mce => mce.MapFrom(s => s.SupplierID.ToEnumName<ThirdStoreSupplier>()));

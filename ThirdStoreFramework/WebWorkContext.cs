@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Web;
 using ThirdStoreCommon.Infrastructure;
+using ThirdStoreCommon;
 
 namespace ThirdStoreFramework
 {
@@ -95,6 +96,8 @@ namespace ThirdStoreFramework
                 _cachedUser = value;
             }
         }
+
+        public string CurrentUserName => (CurrentUser != null ? CurrentUser.Name : Constants.SystemUser);
 
         #endregion
     }

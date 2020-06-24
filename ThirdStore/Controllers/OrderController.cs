@@ -124,7 +124,7 @@ namespace ThirdStore.Controllers
         {
             try
             {
-                byte[] bytes = null;
+                string handle = Guid.NewGuid().ToString();
                 if (orderIds != null)
                 {
                     var ids = orderIds
@@ -132,19 +132,38 @@ namespace ThirdStore.Controllers
                         .Select(x => Convert.ToInt32(x))
                         .ToList();
 
-                    using (var stream = _orderService.ExportDSZImportFile(ids) as MemoryStream)
+                    using (var stream = _orderService.ExportDSImportFile(ids) as MemoryStream)
                     {
-                        bytes = stream.ToArray();
+                        TempData[handle] = stream.ToArray();
                     }
                 }
 
-                return File(bytes, "text/csv", CommonFunc.ToCSVFileName("DSZOrderFile"));
+                return new JsonResult()
+                {
+                    Data = new { Result = true, FileGuid = handle }
+                };
             }
             catch (Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
                 ErrorNotification("Export file failed." + ex.Message);
-                return RedirectToAction("List");
+                return Json(new { Result = false, FileGuid = string.Empty });
+            }
+        }
+
+        [HttpGet]
+        public virtual ActionResult Download(string fileGuid)
+        {
+            if (TempData[fileGuid] != null)
+            {
+                byte[] data = TempData[fileGuid] as byte[];
+                return File(data, "text/csv, application/zip", CommonFunc.ToCSVFileName("ExportOrders").Replace("csv", "zip"));
+            }
+            else
+            {
+                // Problem - Log the error, generate a blank file,
+                //           redirect to another controller action - whatever fits with your application
+                return new EmptyResult();
             }
         }
 

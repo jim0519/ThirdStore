@@ -81,12 +81,42 @@
                             e.preventDefault();
                             if (selectedIds.length == 0) {
                                 alert("Please select more than one order to export.");
+                                return false;
+                            } 
 
-                            } else {
-                                var ids = selectedIds.join(",");
-                                $('#export-dszfile-form #orderIds').val(ids);
-                                $('#export-dszfile-form').submit();
-                            }
+                            var link = "@Html.Raw(Url.Action("ExportDSZFile", "Order"))"
+                            var ids = selectedIds.join(",");
+                            var postData = {
+                                orderIds: ids
+                            };
+
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                //contentType: "application/json; charset=utf-8",
+                                data: postData,
+                                dataType: "json",
+                                beforeSend: function () {
+                                    $("#imgLoading").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoading").hide();
+                                },
+                                success: function (data) {
+                                    if (data.Result) {
+                                        window.location = '@Html.Raw(Url.Action("Download", new { FileGuid = "_FileGuid_" }))'.replace('_FileGuid_', data.FileGuid);
+                                    }
+                                    else {
+                                        alert("Export Orders Failed");
+                                        window.location = '@Url.Action("List")';
+                                    }
+
+                                },
+                                error: function (data) {
+                                    //debugger;
+                                    alert("error");
+                                }
+                            });
                             return false;
                         });
 

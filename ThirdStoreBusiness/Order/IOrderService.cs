@@ -42,7 +42,7 @@ namespace ThirdStoreBusiness.Order
 
         string GetOrderScreenshot(string orderTran);
 
-        Stream ExportDSZImportFile(IList<int> orderids);
+        Stream ExportDSImportFile(IList<int> orderids);
 
         
     }

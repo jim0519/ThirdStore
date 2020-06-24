@@ -1029,7 +1029,7 @@ namespace ThirdStore.Controllers
         {
             try
             {
-                var type2 = System.Type.GetType("ThirdStoreBusiness.ScheduleTask.SyncInventoryForLastDayTask, ThirdStoreBusiness");
+                var type2 = System.Type.GetType("ThirdStoreBusiness.ScheduleTask.UpdateDSDataAndSync, ThirdStoreBusiness");
                 object instance;
                 if (!ThirdStoreWebContext.Instance.TryResolve(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope(), out instance))
                 {

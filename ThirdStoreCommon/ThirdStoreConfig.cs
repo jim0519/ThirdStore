@@ -96,6 +96,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string SyncDSPriceAbove
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings["SyncDSPriceAbove"];
+            }
+        }
+
         public string DSInventoryThreshold
         {
             get
