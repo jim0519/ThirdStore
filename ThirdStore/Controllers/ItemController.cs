@@ -190,12 +190,17 @@ namespace ThirdStore.Controllers
         public ActionResult Edit(int itemID)
         {
             var editItemViewModel = new ItemViewModel();
+            
 
             var item = _itemService.GetItemByID(itemID);
             if (item != null)
             {
                 editItemViewModel = item.ToCreateNewModel();
             }
+
+            var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
+            if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
+                editItemViewModel.ShowSyncInventory = true;
 
             FillDropDownDS(editItemViewModel);
             return View(editItemViewModel);
