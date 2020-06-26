@@ -174,6 +174,8 @@ namespace ThirdStore.Controllers
             var newEntityModel = model.ToCreateNewEntity();
             if(!string.IsNullOrEmpty(newEntityModel.DesignatedSKU))
                 newEntityModel.DesignatedSKU = newEntityModel.DesignatedSKU.Trim().ToUpper();
+            if (!string.IsNullOrEmpty(newEntityModel.Location))
+                newEntityModel.Location = newEntityModel.Location.Trim().ToUpper();
             if (model.JobItemViewLines != null && model.JobItemViewLines.Count > 0)
             {
                 foreach (var lModel in model.JobItemViewLines)
@@ -246,6 +248,8 @@ namespace ThirdStore.Controllers
             editEntityModel = model.ToCreateNewEntity(editEntityModel).FillOutNull();
             if (!string.IsNullOrEmpty(editEntityModel.DesignatedSKU))
                 editEntityModel.DesignatedSKU = editEntityModel.DesignatedSKU.Trim().ToUpper();
+            if (!string.IsNullOrEmpty(editEntityModel.Location))
+                editEntityModel.Location = editEntityModel.Location.Trim().ToUpper();
             //editEntityModel.D_Order_Line.Remove(editEntityModel.D_Order_Line.FirstOrDefault());
             //editEntityModel.D_Order_Line.Clear();
             //foreach (var removeLine in editEntityModel.D_Order_Line)

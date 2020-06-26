@@ -50,6 +50,8 @@ namespace ThirdStore.Models.Item
         [Display(Name = "Notes")]
         public string Ref4 { get; set; }
 
+        public bool ShowSyncInventory { get; set; }
+
         public IList<SelectListItem> ItemTypes { get; set; }
         public IList<SelectListItem> YesOrNo { get; set; }
         public IList<SelectListItem> Suppliers { get; set; }

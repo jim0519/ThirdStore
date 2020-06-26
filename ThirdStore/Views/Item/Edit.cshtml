@@ -9,6 +9,57 @@
 
 @using (Html.BeginForm())
 {
+    if (Model.ShowSyncInventory)
+    {
+        <div id="divOperationBtn" style="float:right; margin-bottom:5px;">
+            <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+            <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
+        </div>
+        <div style="clear:both"></div>
+    }
+    <script>
+        $(document).ready(function () {
+            //Update Selected button
+            $('#btnSyncInventory').click(function () {
+                    //e.preventDefault();
+                    var id = @Model.ID;
+                    var postData = {
+                        selectedIDs: id
+                    };
+                    var link = '@Url.Action("SyncInventory", "Item")';
+                    $.ajax({
+                        url: link,
+                        type: "POST",
+                        //contentType: "application/json; charset=utf-8",
+                        data: postData,
+                        dataType: "json",
+                        beforeSend: function () {
+                            $("#imgLoading").show();
+                        },
+                        complete: function () {
+                            $("#imgLoading").hide();
+                        },
+                        success: function (data) {
+                            if (data.Result) {
+                                alert("Sync Inventory Finished");
+                            }
+                            else {
+                                if (data.Message != "")
+                                    alert(data.Message);
+                                else
+                                    alert("Unknown error occurred.");
+                            }
+                        },
+                        error: function (data) {
+                            //debugger;
+                            alert("error");
+                        }
+                    });
+
+                return false;
+            });
+        });
+    </script>
     @Html.Partial("_CreateOrEdit", Model)
 }
 
