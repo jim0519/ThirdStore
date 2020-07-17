@@ -270,8 +270,8 @@ namespace ThirdStoreBusiness.Item
                         newItem.FillOutNull();
 
                         var imageURLs = newItem.Ref5.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                        //DownloadItemImages(imageURLs,newItem);
-                        PreDownloadItemImages(imageURLs, newItem);
+                        DownloadItemImages(imageURLs, newItem);
+                        //PreDownloadItemImages(imageURLs, newItem);
                         //RestoreItemImages(imageURLs, newItem);
 
                         _itemRepository.Insert(newItem);

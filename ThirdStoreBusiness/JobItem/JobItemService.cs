@@ -642,7 +642,8 @@ namespace ThirdStoreBusiness.JobItem
                 foreach(var grp in grpListingItems)
                 {
                     var dsChannel = _dsChannels.FirstOrDefault(c => c.DSChannel.Equals(grp.Key));
-                    lstDSInventory.AddRange(dsChannel.GetInventoryQtyBySKUs(grp.Select(i=>i.SKU).ToList()));
+                    if(dsChannel!=null)
+                        lstDSInventory.AddRange(dsChannel.GetInventoryQtyBySKUs(grp.Select(i=>i.SKU).ToList()));
                 }
                 var tmpExportProductListing = new List<ExportProductListing>();
                 foreach (var epl in lstExportProductListing)
