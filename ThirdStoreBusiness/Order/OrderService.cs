@@ -524,6 +524,7 @@ namespace ThirdStoreBusiness.Order
             string channelOrderID = null, 
             string jobItemID = null, 
             string customerID=null,
+            string consigneeName = null,
             int statusID=0,
             int pageIndex = 0, 
             int pageSize = int.MaxValue)
@@ -548,7 +549,10 @@ namespace ThirdStoreBusiness.Order
             if (customerID != null)
                 query = query.Where(o => o.CustomerID.Contains(customerID));
 
-            if(jobItemID!=null)
+            if(consigneeName!=null)
+                query = query.Where(o => o.ConsigneeName.Contains(consigneeName));
+
+            if (jobItemID!=null)
                 query=query.Where(o => o.BuyerNote.Contains(jobItemID)||o.OrderLines.Any(l=>l.Ref5.Contains(jobItemID)));
 
             query = query.OrderByDescending(o => o.OrderTime);

@@ -153,6 +153,14 @@
         </tr>
         <tr>
             <td>
+                @Html.LabelFor(model => model.SearchConsigneeName):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchConsigneeName)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.LabelFor(model => model.OrderTimeFrom):
             </td>
             <td>
@@ -401,6 +409,7 @@
             $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val("");
             $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val("");
             $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchConsigneeName)').val("");
             $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val("");
             $('#@Html.FieldIdFor(model => model.SearchStatusID)').val("0");
 
@@ -426,6 +435,7 @@
             OrderTimeTo: $('#@Html.FieldIdFor(model => model.OrderTimeTo)').val(),
             SearchChannelOrderID: $('#@Html.FieldIdFor(model => model.SearchChannelOrderID)').val(),
             SearchCustomerID: $('#@Html.FieldIdFor(model => model.SearchCustomerID)').val(),
+            SearchConsigneeName: $('#@Html.FieldIdFor(model => model.SearchConsigneeName)').val(),
             SearchJobItemID: $('#@Html.FieldIdFor(model => model.SearchJobItemID)').val(),
             SearchStatusID: $('#@Html.FieldIdFor(model => model.SearchStatusID)').val(),
         };

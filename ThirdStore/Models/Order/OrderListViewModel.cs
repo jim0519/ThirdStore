@@ -32,7 +32,7 @@ namespace ThirdStore.Models.Order
         public DateTime? OrderTimeTo { get; set; }
 
         public string SearchCustomerID { get; set; }
-
+        public string SearchConsigneeName { get; set; }
         public int SearchStatusID { get; set; }
 
 
