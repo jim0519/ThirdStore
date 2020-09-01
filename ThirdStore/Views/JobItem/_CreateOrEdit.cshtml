@@ -442,11 +442,13 @@
         }
 
         function editNumber(container, options) {
-            $('<input data-bind="value:' + options.field + '" name="' + options.field + '"/>')
+            let placeHolder = "";
+            if (options.field == "Weight") { placeHolder = "kg"; } else if (options.field == "CubicWeight" || options.field == "Ref1") { placeHolder = "m3"; } else { placeHolder = "m"; }
+            $('<input data-bind="value:' + options.field + '" name="' + options.field + '" placeholder="' + placeHolder + '" />' + placeHolder )
                 .appendTo(container)
                 .kendoNumericTextBox({
                     spinners: false,
-                    format: "n4",
+                    format: "#.00" + placeHolder,
                     decimals: 4
                 });
         }
@@ -467,8 +469,12 @@
         $(document).ready(function () {
             $("#tabs").tabs();
 
+             $('#@Html.FieldIdFor(model => model.ItemName)').on('input propertychange', function () {
+            CharLimit(this, 80);
+                });
+
             $("input[type=submit]").click(function () {
-                debugger;
+                //debugger;
                 var isValid = true;
                 $.ajax({
                     url: '@Url.Action("ValidateInput", "JobItem")',
@@ -728,6 +734,13 @@
             // Add the appropriate class to the summary div
             $summary.removeClass("validation-summary-valid")
                 .addClass("validation-summary-errors");
+        }
+    }
+
+    function CharLimit(input, maxChar) {
+        var len = $(input).val().length;
+        if (len > maxChar) {
+            $(input).val($(input).val().substring(0, maxChar));
         }
     }
 </script>

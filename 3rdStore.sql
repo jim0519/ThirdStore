@@ -1234,3 +1234,40 @@ and sku not in
 )
 and SKU not like '%_D'
 and convert(int,Qty)>0
+
+
+--Import fastway rate on neto
+
+select 
+'AU' as Country,
+'Fastway Jim 20200728' as Courier, 
+Town as [City/Suburb],
+Postcode as [From Post Code],
+Postcode as [To Post Code],
+ZoneCode,
+ZoneCode as ZoneName
+from
+(
+	select Town,Postcode,[Local Product] as ZoneCode from ThirdStoreFastwayPostcode
+	where [Local Product] is not null
+
+union all
+
+	select Town,Postcode,[Road Product] as ZoneCode from ThirdStoreFastwayPostcode
+	where [Road Product] is not null
+
+union all
+	
+	select Town,Postcode,[Shorthaul Product] as ZoneCode from ThirdStoreFastwayPostcode
+	where [Shorthaul Product] is not null
+
+union all
+
+	select Town,Postcode,[Satchel Product] as ZoneCode from ThirdStoreFastwayPostcode
+	where [Satchel Product] is not null
+
+union all
+
+	select Town,Postcode,[Fastway Boxes Product] as ZoneCode from ThirdStoreFastwayPostcode
+	where [Fastway Boxes Product] is not null
+) S

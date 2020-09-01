@@ -534,6 +534,11 @@ namespace ThirdStore.Controllers
                 }
             }
 
+            if(model.JobItemViewLines.Count>0&&model.JobItemViewLines.Any(l=>l.Width.Equals(0)||l.Length.Equals(0)||l.Height.Equals(0)||l.Weight.Equals(0)||l.CubicWeight.Equals(0)))
+            {
+                return Json(new { Result = false, Message = "The length, width, height, weight and cubic weight must not be equal to 0." });
+            }
+
             if (!Regex.IsMatch(model.PricePercentage.ToString(), @"^[0-1]\.\d{1,2}$"))
             {
                 return Json(new { Result = false, Message = "Percentage only can be decimal and 2 decimal places." });
@@ -542,6 +547,11 @@ namespace ThirdStore.Controllers
             if(model.Ref2==null||model.Ref2.Count==0)
             {
                 return Json(new { Result = false, Message = "Please input as least one inspector." });
+            }
+
+            if(string.IsNullOrWhiteSpace( model.Location))
+            {
+                return Json(new { Result = false, Message = "Please input the item location." });
             }
 
             if (model.JobItemViewImages==null||model.JobItemViewImages.Count == 0)

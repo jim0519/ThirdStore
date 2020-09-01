@@ -30,8 +30,18 @@
 <script>
     $(document).ready(function () {
         $("#tabs").tabs();
+
+        $('#@Html.FieldIdFor(model => model.Name)').on('input propertychange', function () {
+            CharLimit(this, 80);
+        });
     });
 
+    function CharLimit(input, maxChar) {
+        var len = $(input).val().length;
+        if (len > maxChar) {
+            $(input).val($(input).val().substring(0, maxChar));
+        }
+    }
 </script>
 
 
@@ -77,15 +87,15 @@
             @Html.LabelFor(m => m.GrossWeight)
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.GrossWeight)
+            @Html.EditorFor(model => model.GrossWeight) kg
         </td>
     </tr>
     <tr>
         <td class="adminTitle">
-            @Html.LabelFor(m => m.NetWeight)
+            @Html.LabelFor(m => m.NetWeight) 
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.NetWeight)
+            @Html.EditorFor(model => model.NetWeight) kg
         </td>
         <td class="adminTitle">
             @Html.LabelFor(m => m.Price)
@@ -99,13 +109,13 @@
             @Html.LabelFor(m => m.Length)
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.Length)
+            @Html.EditorFor(model => model.Length) m
         </td>
         <td class="adminTitle">
             @Html.LabelFor(m => m.Width)
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.Width)
+            @Html.EditorFor(model => model.Width) m
         </td>
     </tr>
     <tr>
@@ -113,7 +123,7 @@
             @Html.LabelFor(m => m.Height)
         </td>
         <td class="adminData">
-            @Html.EditorFor(model => model.Height)
+            @Html.EditorFor(model => model.Height) m
         </td>
         <td class="adminTitle">
             @Html.LabelFor(m => m.SupplierID)
