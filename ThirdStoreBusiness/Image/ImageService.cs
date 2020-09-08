@@ -61,15 +61,8 @@ namespace ThirdStoreBusiness.Image
                     img = ResizeImage(img,new Size(img.Width, img.Height));
                 }
 
-                var currentUser = (_workContext.CurrentUser != null ? _workContext.CurrentUser.Name : Constants.SystemUser);
-                var entityImg = new D_Image() {  ImageName=fileName, ImageLocalPath=string.Empty, CreateBy= currentUser, CreateTime=DateTime.Now, EditBy= currentUser, EditTime= DateTime.Now };
-                entityImg=this.InsertImage(entityImg);
-                string savefileName = string.Format("{0}.{1}", entityImg.ID.ToString("0000000"), "jpg");
-                if (!Directory.Exists(ThirdStoreConfig.Instance.ThirdStoreImagesPath))
-                {
-                    Directory.CreateDirectory(ThirdStoreConfig.Instance.ThirdStoreImagesPath);
-                }
-                img.Save(ThirdStoreConfig.Instance.ThirdStoreImagesPath+"\\"+ savefileName, ImageFormat.Jpeg);
+
+                var entityImg = SaveImageToLocal(img,fileName);
                 return entityImg;
                 //Image img = Image.FromFile(imgFile);
             }
@@ -78,6 +71,20 @@ namespace ThirdStoreBusiness.Image
                 LogManager.Instance.Error(ex.Message);
                 return default(D_Image);
             }
+        }
+
+        private D_Image SaveImageToLocal(System.Drawing.Image img,string fileName)
+        {
+            var currentUser = (_workContext.CurrentUser != null ? _workContext.CurrentUser.Name : Constants.SystemUser);
+            var entityImg = new D_Image() { ImageName = fileName, ImageLocalPath = string.Empty, CreateBy = currentUser, CreateTime = DateTime.Now, EditBy = currentUser, EditTime = DateTime.Now };
+            entityImg = this.InsertImage(entityImg);
+            string savefileName = string.Format("{0}.{1}", entityImg.ID.ToString("0000000"), "jpg");
+            if (!Directory.Exists(ThirdStoreConfig.Instance.ThirdStoreImagesPath))
+            {
+                Directory.CreateDirectory(ThirdStoreConfig.Instance.ThirdStoreImagesPath);
+            }
+            img.Save(ThirdStoreConfig.Instance.ThirdStoreImagesPath + "\\" + savefileName, ImageFormat.Jpeg);
+            return entityImg;
         }
 
         private System.Drawing.Image ResizeImage(System.Drawing.Image image,Size size, bool preserveAspectRatio = true)
@@ -117,6 +124,26 @@ namespace ThirdStoreBusiness.Image
         {
             var url = $"{ThirdStoreConfig.Instance.ThirdStoreDomainURL}/ThirdStoreImagesPath/{string.Format("{0}.{1}", imageID.ToString("0000000"), "jpg")}";
             return url;
+        }
+
+        public D_Image DuplicateImageByID(int id)
+        {
+            try
+            {
+                //load img
+                var img = GetImageByID(id);
+                var localPath= $"{AppDomain.CurrentDomain.BaseDirectory}/ThirdStoreImagesPath/{string.Format("{0}.{1}", id.ToString("0000000"), "jpg")}";
+                var imgObj = System.Drawing.Image.FromFile(localPath);
+                //save image
+                var entityImg = SaveImageToLocal(imgObj, img.ImageName);
+                return entityImg;
+               
+            }
+            catch(Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                return default(D_Image);
+            }
         }
     }
 }
