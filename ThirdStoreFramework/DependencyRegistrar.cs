@@ -25,6 +25,7 @@ using ThirdStoreBusiness.ReportPrint;
 using LINQtoCSV;
 using ThirdStoreFramework.Controllers;
 using ThirdStoreBusiness.DSChannel;
+using ThirdStoreBusiness.Report;
 
 namespace ThirdStoreFramework
 {
@@ -108,6 +109,9 @@ namespace ThirdStoreFramework
 
             //Dropship Channels
             builder.RegisterAssemblyTypes(assemblies).Where(t => typeof(IDSChannel).IsAssignableFrom(t)).InstancePerLifetimeScope().AsImplementedInterfaces();
+
+            //Report
+            builder.RegisterType<ReportService>().As<IReportService>().InstancePerLifetimeScope();
         }
 
         public int Order

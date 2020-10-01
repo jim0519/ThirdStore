@@ -1,0 +1,162 @@
+﻿@model KPIReportViewModel
+@{
+    ViewBag.Title = "KPI Report";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+<h2>KPI Report</h2>
+@using (Html.BeginForm())
+{
+<table width="100%">
+    <tr>
+        <td>
+            @Html.LabelFor(model => model.CreateTimeFrom): @Html.EditorFor(model => model.CreateTimeFrom)
+            @Html.LabelFor(model => model.CreateTimeTo):@Html.EditorFor(model => model.CreateTimeTo)
+        </td>
+       
+    </tr>
+    
+    <tr>
+        <td class="adminTitle" colspan="2">
+            <input type="button" id="btnSearch" class="k-button" value="Search" />
+            <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+        </td>
+    </tr>
+</table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="kpiRpt-grid"></div>
+
+                <script>
+    $(document).ready(function () {
+        $("#kpiRpt-grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Html.Raw(Url.Action("KPIReport", "Report"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "100",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["100", "200", "300"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            toolbar: ["excel"],
+                            excel: {
+                                allPages: true,
+                                fileName: "KPI.xlsx"
+                            },
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "CreateDate",
+                                    title: "Create Date",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy}"
+                                }, {
+                                    field: "StaffNum",
+                                    title: "Staff Num"
+                                }, {
+                                    field: "TotalValue",
+                                    title: "Total Value"
+                                }, {
+                                    field: "AVGValue",
+                                    title: "AVG Value"
+                                }, {
+                                    field: "TotalQty",
+                                    title: "Total Qty"
+                                }, {
+                                    field: "AVGQty",
+                                    title: "AVG Qty"
+                                },{
+                                    field: "TotalQtyD",
+                                    title: "Total Qty D"
+                                }, {
+                                    field: "TotalQtyLocFRS",
+                                    title: "Total Qty Loc FRS"
+                                }, {
+                                    field: "TotalQtyLocT",
+                                    title: "Total Qty Loc T"
+                                }, {
+                                    field: "TotalQtyLocOther",
+                                    title: "Total Qty Loc Other"
+                                }, {
+                                    field: "QMW",
+                                    title: "QMW"
+                                }, {
+                                    field: "QMWD",
+                                    title: "QMW D"
+                                }, {
+                                    field: "AVGQMW",
+                                    title: "AVG QMW"
+                                }
+                            ]
+                        });
+    });
+
+                    
+                </script>
+            </td>
+        </tr>
+    </table>
+    <script>
+    $(document).ready(function () {
+
+        //search button
+        $('#btnSearch').click(function () {
+            //search
+            var grid = $('#kpiRpt-grid').data('kendoGrid');
+            grid.dataSource.page(1);
+
+            return false;
+        });
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+
+            $('#@Html.FieldIdFor(model => model.CreateTimeFrom)').val("");
+            $('#@Html.FieldIdFor(model => model.CreateTimeTo)').val("");
+
+            selectedIds = [];
+
+            var grid = $('#kpiRpt-grid').data('kendoGrid');
+            grid.dataSource.page(1);
+
+            return false;
+        });
+
+    });
+        function additionalData() {
+            return {
+                CreateTimeFrom: $('#@Html.FieldIdFor(model => model.CreateTimeFrom)').val(),
+                CreateTimeTo: $('#@Html.FieldIdFor(model => model.CreateTimeTo)').val()
+            };
+        }
+
+    </script>
+}

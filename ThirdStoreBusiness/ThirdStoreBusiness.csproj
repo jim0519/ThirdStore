@@ -131,6 +131,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportPrint\IReportPrintService.cs" />
     <Compile Include="ReportPrint\ReportPrintService.cs" />
+    <Compile Include="Report\IReportService.cs" />
+    <Compile Include="Report\ReportService.cs" />
     <Compile Include="ScheduleTask\IScheduleRuleService.cs" />
     <Compile Include="ScheduleTask\UpdateDSZDataAndSync.cs" />
     <Compile Include="ScheduleTask\SyncInventoryForLastDayTask.cs" />

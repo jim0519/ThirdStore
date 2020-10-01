@@ -1,6 +1,6 @@
 
-declare @FromDate datetime='20200701'
-declare @ToDate datetime='20200717'
+declare @FromDate datetime='1970-01-01 00:00:00'
+declare @ToDate datetime='2050-12-31 00:00:00'
 
 --select 
 --CONVERT(date,H.CreateTime) as CreateDate,
@@ -201,8 +201,11 @@ inner join
 (
 	select
 	CONVERT(date,L.CreateTime) as CreateDate,
-	SUM(L.CubicWeight) QMW,
-	SUM(case when Type=1 then 0 else L.CubicWeight end) QMWD
+	SUM(cast(L.LRef1 as decimal(18,8))) QMW,
+	SUM(case when Type=1 then 0 else cast(L.LRef1 as decimal(18,8)) end) QMWD
+	--SUM(L.CubicWeight) QMW,
+	--SUM(case when Type=1 then 0 else L.CubicWeight end ) QMWD
+	--SUM(case when Type=1 then 0 else cast(L.Ref1 as decimal(18,8)) end) QMWD
 	from JobItemL L
 	group by CONVERT(date,L.CreateTime)
 ) LT on HT.CreateDate=LT.CreateDate
