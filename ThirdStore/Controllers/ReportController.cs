@@ -21,8 +21,10 @@ namespace ThirdStore.Controllers
         private readonly IReportService _reportService;
         private readonly IPermissionService _permissionService;
         private readonly ICacheManager _cacheManager;
+        private readonly IWorkContext _workContext;
 
         public ReportController(IReportService reportService,
+            IWorkContext workContext,
             IPermissionService permissionService,
             ICacheManager cacheManager
             )
@@ -30,6 +32,7 @@ namespace ThirdStore.Controllers
             _reportService = reportService;
             _permissionService = permissionService;
             _cacheManager = cacheManager;
+            _workContext = workContext;
         }
         // GET: Report
         public ActionResult Index()
@@ -39,7 +42,14 @@ namespace ThirdStore.Controllers
 
         public ActionResult KPIReport()
         {
-            //if (!_permissionService.Authorize("KPIReport"))
+            var kpiPermitUsers = new int[] { 1, 4, 17 };
+            if (!kpiPermitUsers.Contains(_workContext.CurrentUser.ID))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return RedirectToAction("List", "JobItem");
+            }
+
+            //    if (!_permissionService.Authorize("KPIReport"))
             //{
             //    ErrorNotification("You do not have permission to process this page.");
             //    return RedirectToAction("List", "JobItem");

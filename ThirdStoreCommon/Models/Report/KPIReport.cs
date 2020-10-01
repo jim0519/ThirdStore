@@ -15,6 +15,7 @@ namespace ThirdStoreCommon.Models.Report
         public decimal TotalValue { get; set; }
         public decimal AVGValue { get; set; }
         public int TotalQty { get; set; }
+        public decimal AVGQty { get; set; }
         public int TotalQtyD { get; set; }
         public int TotalQtyLocFRS { get; set; }
         public int TotalQtyLocT { get; set; }
