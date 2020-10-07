@@ -54,7 +54,8 @@ namespace ThirdStoreCommon
         READY=2,
         ALLOCATED=3,
         SHIPPED=4,
-        BOOKED=5
+        BOOKED=5,
+        HOLD=6
     }
 
     public enum ThirdStoreJobItemType
