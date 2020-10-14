@@ -22,5 +22,7 @@ namespace ThirdStoreBusiness.Image
         D_Image SaveImage(Stream imgStream, string fileName);
 
         string GetImageURL(int imageID);
+
+        D_Image DuplicateImageByID(int id);
     }
 }

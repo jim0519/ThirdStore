@@ -149,6 +149,14 @@ namespace ThirdStore.Controllers
                     newJobItemViewModel.ShipTime = null;
                     newJobItemViewModel.TrackingNumber = string.Empty;
                     newJobItemViewModel.StatusID = ThirdStoreJobItemStatus.PENDING.ToValue();
+
+                    //newJobItemViewModel.JobItemViewImages.Clear();
+                    //foreach (var oriImg in jobItem.JobItemImages)
+                    //{
+                    //    var img = _imageService.DuplicateImageByID(oriImg.ImageID);
+                    //    var imgViewModel = new JobItemViewModel.JobItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID) };
+                    //    newJobItemViewModel.JobItemViewImages.Add(imgViewModel);
+                    //}
                 }
             }
 
@@ -672,11 +680,34 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
-        public ActionResult ReadJobItemImages(DataSourceRequest command, int jobItemID)
+        public ActionResult ReadJobItemImages(DataSourceRequest command, int jobItemID, int fromJobItemID = 0)
         {
-            if (jobItemID > 0)
+            IList<JobItemViewModel.JobItemImageViewModel> jobItemImages = null;
+            if (fromJobItemID>0)
             {
-                IList<JobItemViewModel.JobItemImageViewModel> jobItemImages = null;
+                var jobItem = _jobItemService.GetJobItemByID(fromJobItemID);
+                if (jobItem != null)
+                {
+                    jobItemImages = jobItem.JobItemImages.Select(r =>
+                    {
+                        var img = _imageService.DuplicateImageByID(r.ImageID);
+                        return new JobItemViewModel.JobItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID), StatusID=Convert.ToBoolean( r.StatusID), DisplayOrder=r.DisplayOrder };
+                    }).ToList();
+                }
+
+
+                var gridModel = new DataSourceResult() { Data = jobItemImages, Total = jobItemImages.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else if (jobItemID > 0)
+            {
+
                 var jobItem = _jobItemService.GetJobItemByID(jobItemID);
                 if (jobItem != null)
                 {

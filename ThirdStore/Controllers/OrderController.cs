@@ -36,7 +36,7 @@ namespace ThirdStore.Controllers
 
         public ActionResult List()
         {
-            var allowOrderDownloadUserIDs = new int[] { 1,4,6,10,14,16,17 };
+            var allowOrderDownloadUserIDs = new int[] { 1,4,6,10,11,12,14,16,17,22};
             
             if (!allowOrderDownloadUserIDs.Contains(_workContext.CurrentUser.ID))
             {
@@ -49,7 +49,7 @@ namespace ThirdStore.Controllers
             model.OrderStatuses = ThirdStoreOrderStatus.AllGood.ToSelectList(false).ToList();
             model.OrderStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0", Selected = true });
 
-            var canEditOrder = new int[] { 1, 4, 10, 14, 16, 17 };
+            var canEditOrder = new int[] { 1, 4,6, 10,11,12, 14, 16, 17,22 };
             model.CanEditOrder = canEditOrder.Contains(_workContext.CurrentUser.ID);
 
             return View(model);

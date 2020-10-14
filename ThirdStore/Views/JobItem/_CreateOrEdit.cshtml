@@ -578,7 +578,7 @@
                     type: "json",
                     transport: {
                         read: {
-                            url: "@Html.Raw(Url.Action("ReadJobItemImages", "JobItem", new { jobItemID = Model.ID }))",
+                            url: "@Html.Raw(Url.Action("ReadJobItemImages", "JobItem", new { jobItemID = Model.ID,fromJobItemID= Request.Params["FromJobItemID"] }))",
                             type: "POST",
                             dataType: "json"
                         },
