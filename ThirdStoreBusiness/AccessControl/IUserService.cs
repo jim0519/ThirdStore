@@ -33,6 +33,8 @@ namespace ThirdStoreBusiness.AccessControl
 
         bool SignOut();
 
+        T_User GetUserByID(int id);
+
         T_User GetUserByEmail(string email);
 
         T_User GetAuthenticatedUser();

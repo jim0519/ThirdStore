@@ -1,0 +1,13 @@
+﻿@model UserViewModel
+@{
+    ViewBag.Title = "Edit User";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+
+@using (Html.BeginForm())
+{
+
+    @Html.Partial("_CreateOrEditUser", Model)
+    
+}

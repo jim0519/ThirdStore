@@ -17,29 +17,52 @@ namespace ThirdStoreBusiness.AccessControl
         private readonly IRepository<T_User> _userRepository;
         private readonly IEncryptionService _encryptionService;
         private readonly HttpContextBase _httpContext;
+        //private readonly IWorkContext _workContext;
         private T_User _cachedUser;
 
         public UserService(IRepository<T_User> userRepository,
             IEncryptionService encryptionService,
+            //IWorkContext workContext,
             HttpContextBase httpContext)
         {
             _userRepository = userRepository;
             _encryptionService = encryptionService;
             _httpContext = httpContext;
+            //_workContext = workContext;
         }
 
 
 
         public void InsertUser(T_User user)
         {
-            if (user != null)
-                _userRepository.Insert(user);
+            if (user == null)
+                throw new ArgumentNullException("user null");
+
+            //var currentTime = DateTime.Now;
+            //var currentUser = Constants.SystemUser;
+            //if (_workContext.CurrentUser != null)
+            //    currentUser = _workContext.CurrentUser.Email;
+            //user.CreateTime = currentTime;
+            //user.CreateBy = currentUser;
+            //user.EditBy = currentUser;
+            //user.EditTime = currentTime;
+
+            _userRepository.Insert(user);
         }
 
         public void UpdateUser(T_User user)
         {
-            if (user != null)
-                _userRepository.Update(user);
+            if (user == null)
+                throw new ArgumentNullException("user null");
+
+            //var currentTime = DateTime.Now;
+            //var currentUser = Constants.SystemUser;
+            //if (_workContext.CurrentUser != null)
+            //    currentUser = _workContext.CurrentUser.Email;
+            //user.EditBy = currentUser;
+            //user.EditTime = currentTime;
+
+            _userRepository.Update(user);
         }
 
         public bool RegisterUser(T_User user)
@@ -51,12 +74,12 @@ namespace ThirdStoreBusiness.AccessControl
                 user.PasswordSalt = saltKey;
                 user.Password = _encryptionService.CreatePasswordHash(inputPassword, saltKey);
                 user.StatusID = 1;//TODO: get user active status ID in status list
-                var now = DateTime.Now;
-                var createBy = Constants.SystemUser;
-                user.CreateTime = now;
-                user.CreateBy = createBy;
-                user.EditTime = now;
-                user.EditBy = createBy;
+                //var now = DateTime.Now;
+                //var createBy = Constants.SystemUser;
+                //user.CreateTime = now;
+                //user.CreateBy = createBy;
+                //user.EditTime = now;
+                //user.EditBy = createBy;
                 user.FillOutNull();
 
                 InsertUser(user);
@@ -207,6 +230,12 @@ namespace ThirdStoreBusiness.AccessControl
             query = query.OrderBy(i => i.Email);
 
             return new PagedList<T_User>(query, pageIndex, pageSize);
+        }
+
+        public T_User GetUserByID(int id)
+        {
+            var user = _userRepository.GetById(id);
+            return user;
         }
     }
 }

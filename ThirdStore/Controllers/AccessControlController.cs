@@ -116,19 +116,22 @@ namespace ThirdStore.Controllers
         //
         // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [ValidateAntiForgeryToken]
         public ActionResult CreateUser(UserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var createTime = DateTime.Now;
-                var createBy = Constants.SystemUser;
+                var currentTime = DateTime.Now;
+                var currentUser = Constants.SystemUser;
+                if (_workContext.CurrentUser != null)
+                    currentUser = _workContext.CurrentUser.Email;
+                
                 var newEntityModel = model.ToCreateNewEntity().FillOutNull();
-                newEntityModel.CreateTime = createTime;
-                newEntityModel.CreateBy = createBy;
-                newEntityModel.EditTime = createTime;
-                newEntityModel.EditBy = createBy;
+                newEntityModel.CreateTime = currentTime;
+                newEntityModel.CreateBy = currentUser;
+                newEntityModel.EditBy = currentUser;
+                newEntityModel.EditTime = currentTime;
                 _userService.RegisterUser(newEntityModel);
 
                 _userService.SignIn(model.Email, model.Password);
@@ -136,6 +139,64 @@ namespace ThirdStore.Controllers
             }
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        public ActionResult Edit(int userID)
+        {
+            var allowEditNewUserUserIDs = new int[] { 1 };
+            if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/"); ;
+            }
+
+            var editUserViewModel = new UserViewModel();
+            var user = _userService.GetUserByID(userID);
+            if (user != null)
+            {
+                editUserViewModel = user.ToCreateNewModel();
+            }
+
+
+            FillDropDownDS(editUserViewModel);
+
+            return View(editUserViewModel);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(UserViewModel model)
+        {
+            var allowEditNewUserUserIDs = new int[] { 1 };
+            if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/"); ;
+            }
+            FillDropDownDS(model);
+
+            if (!ModelState.IsValid)
+            {
+                var errMsg = ModelState.Values.SelectMany(v => v.Errors.Select(er => er.ErrorMessage)).Aggregate((current, next) => current + Environment.NewLine + next);
+                ErrorNotification(errMsg);
+                return View(model);
+            }
+
+            var currentTime = DateTime.Now;
+            var currentUser = Constants.SystemUser;
+            if (_workContext.CurrentUser != null)
+                currentUser = _workContext.CurrentUser.Email;
+            
+            var editEntityModel = _userService.GetUserByID(model.ID);
+            editEntityModel = model.ToCreateNewEntity(editEntityModel).FillOutNull();
+            editEntityModel.EditBy = currentUser;
+            editEntityModel.EditTime = currentTime;
+            _userService.UpdateUser(editEntityModel);
+
+            return RedirectToAction("List");
+
+            //return RedirectToAction("Edit", new { userID = editEntityModel.ID });
         }
 
         [HttpPost]
