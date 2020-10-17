@@ -12,7 +12,8 @@
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
             <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
-            <input type="button" id="btnCreateNew" class="k-button" value="Create New SKU" />
+            <input type="button" id="btnChangePassword" class="k-button" value="Change Password" />
+            <input type="button" id="btnCreateNew" class="k-button" value="Create New User" />
             <script>
                 $(document).ready(function () {
 
@@ -21,7 +22,30 @@
                         location.href = link;
                     });
 
+                    $('#btnChangePassword').click(function (e) {
+                        //debugger;
 
+                        if (selectedIds.length != 1) {
+                            alert("Please select one user.");
+                            return false;
+                        }
+
+                        e.preventDefault();
+                        var ids = selectedIds.join(",");
+                        //debugger;
+                        $('#change-password-form #userID').val(ids);
+                        var window = $("#changePassword-window");
+                        if (!window.data("kendoWindow")) {
+                            window.kendoWindow({
+                                modal: true,
+                                width: "600px",
+                                title: "Change Password",
+                                actions: ["Close"]
+                            });
+                        }
+                        window.data('kendoWindow').center().open();
+                        return;
+                    });
                 });
             </script>
         </div>
@@ -122,7 +146,7 @@
                                     width: 50
                                 }, {
                                     field: "Name",
-                                    template: "<a href='@Url.Action("Edit")?UserID=#=ID#' target='_blank' > #=Name#</a>",
+                                    template: "<a href='@Url.Action("EditUser")?UserID=#=ID#' target='_blank' > #=Name#</a>",
                                     title: "Name"
                                 }, {
                                     field: "Description",
@@ -174,3 +198,34 @@
     </script>
 
 }
+
+
+    <div id="changePassword-window" style="display:none;">
+        @using (Html.BeginForm("ChangePassword", "AccessControl", FormMethod.Post, new { id = "change-password-form" }))
+        {
+            @Html.ValidationSummary()
+            <input type="hidden" id="userID" name="userID" value="" />
+            <table style="text-align:left;">
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.ChangePasswordModel.Password):
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => model.ChangePasswordModel.Password)
+                    </td>
+                    <td>
+                        @Html.LabelFor(model => model.ChangePasswordModel.ConfirmPassword):
+                    </td>
+                    <td>
+                        @Html.EditorFor(model => model.ChangePasswordModel.ConfirmPassword)
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <input type="submit" class="k-button" value="Submit" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>

@@ -15,6 +15,7 @@ namespace ThirdStoreBusiness.AccessControl
     public class UserService : IUserService
     {
         private readonly IRepository<T_User> _userRepository;
+        private readonly IRepository<M_UserRole> _userRoleRepository;
         private readonly IEncryptionService _encryptionService;
         private readonly HttpContextBase _httpContext;
         //private readonly IWorkContext _workContext;
@@ -23,10 +24,12 @@ namespace ThirdStoreBusiness.AccessControl
         public UserService(IRepository<T_User> userRepository,
             IEncryptionService encryptionService,
             //IWorkContext workContext,
+            IRepository<M_UserRole> userRoleRepository,
             HttpContextBase httpContext)
         {
             _userRepository = userRepository;
             _encryptionService = encryptionService;
+            _userRoleRepository = userRoleRepository;
             _httpContext = httpContext;
             //_workContext = workContext;
         }
@@ -69,10 +72,7 @@ namespace ThirdStoreBusiness.AccessControl
         {
             try
             {
-                var inputPassword = user.Password;
-                string saltKey = _encryptionService.CreateSaltKey(5);
-                user.PasswordSalt = saltKey;
-                user.Password = _encryptionService.CreatePasswordHash(inputPassword, saltKey);
+                EncryptPassword(user);
                 user.StatusID = 1;//TODO: get user active status ID in status list
                 //var now = DateTime.Now;
                 //var createBy = Constants.SystemUser;
@@ -91,6 +91,14 @@ namespace ThirdStoreBusiness.AccessControl
                 return false;
             }
             
+        }
+
+        public void EncryptPassword(T_User user)
+        {
+            var inputPassword = user.Password;
+            string saltKey = _encryptionService.CreateSaltKey(5);
+            user.PasswordSalt = saltKey;
+            user.Password = _encryptionService.CreatePasswordHash(inputPassword, saltKey);
         }
 
         public bool ValidateUser(string email, string password)
@@ -236,6 +244,13 @@ namespace ThirdStoreBusiness.AccessControl
         {
             var user = _userRepository.GetById(id);
             return user;
+        }
+
+        public void RemoveUserRole(M_UserRole userRole)
+        {
+            if (userRole == null)
+                return;
+            _userRoleRepository.Delete(userRole);
         }
     }
 }

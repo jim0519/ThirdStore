@@ -48,6 +48,26 @@ namespace ThirdStore.Extensions
             return model.MapTo<UserViewModel, T_User>(destination);
         }
 
+
+        public static RoleGridViewModel ToModel(this T_Role entity)
+        {
+            return entity.MapTo<T_Role, RoleGridViewModel>();
+        }
+
+        public static RoleViewModel ToCreateNewModel(this T_Role entity)
+        {
+            return entity.MapTo<T_Role, RoleViewModel>();
+        }
+
+        public static T_Role ToCreateNewEntity(this RoleViewModel model)
+        {
+            return model.MapTo<RoleViewModel, T_Role>();
+        }
+
+        public static T_Role ToCreateNewEntity(this RoleViewModel model, T_Role destination)
+        {
+            return model.MapTo<RoleViewModel, T_Role>(destination);
+        }
         #endregion
 
         #region Item

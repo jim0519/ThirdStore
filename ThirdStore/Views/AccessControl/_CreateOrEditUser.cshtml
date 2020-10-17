@@ -1,7 +1,7 @@
 ﻿@model UserViewModel
 
 @Html.HiddenFor(model => model.ID)
-<div id="tabs">
+@*<div id="tabs">
     <ul>
         <li><a href="#tabs-1">Basic Info</a></li>
         <li><a href="#tabs-2">Roles</a></li>
@@ -30,55 +30,77 @@
         $("#tabs").tabs();
     });
 
-</script>
+</script>*@
+
+@Html.AntiForgeryToken()
+@Html.ValidationSummary("", new { @class = "text-danger" })
+<div>
+    @BasicInfo()
+</div>
+<div>
+
+    <input type="submit" id="btnSave" class="k-button" value="Save" />
+    <a href="@Html.Raw(Url.Action("UserList"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
+</div>
 
 
 @helper BasicInfo()
 {
-<table style="width:100%;">
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Name)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Name)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Description)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Description)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Password)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Password)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.ConfirmPassword)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.ConfirmPassword)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Email)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Email)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.StatusID)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.StatusID, Model.YesOrNo)
-        </td>
-    </tr>
-</table>
+    <table style="width:100%;">
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Name)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Name)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Description)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Description)
+            </td>
+        </tr>
+        @if (!ViewContext.RouteData.GetRequiredString("action").Contains("Edit"))
+        {
+            <tr>
+                <td class="adminTitle">
+                    @Html.LabelFor(m => m.Password)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.Password)
+                </td>
+                <td class="adminTitle">
+                    @Html.LabelFor(m => m.ConfirmPassword)
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.ConfirmPassword)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Email)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Email)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.StatusID)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.StatusID, Model.YesOrNo)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.Roles):
+            </td>
+            <td colspan="3">
+                @Html.EditorFor(model => model.Roles, new { SelectList = Model.AllRoles })
+            </td>
+        </tr>
+    </table>
 
 }
 
@@ -86,7 +108,7 @@
 @helper Roles()
 {
 
-    
+
 }
 
 

@@ -54,14 +54,14 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Password).HasColumnName("Password");
             this.Property(t => t.PasswordSalt).HasColumnName("PasswordSalt");
 
-            this.HasMany(u => u.UserRoles)
-                .WithMany()
-                .Map(m =>
-                {
-                    m.MapLeftKey("UserID");
-                    m.MapRightKey("RoleID");
-                    m.ToTable("M_UserRole");
-                });
+            //this.HasMany(u => u.UserRoles)
+            //    .WithMany()
+            //    .Map(m =>
+            //    {
+            //        m.MapLeftKey("UserID");
+            //        m.MapRightKey("RoleID");
+            //        m.ToTable("M_UserRole");
+            //    });
                 
         }
     }

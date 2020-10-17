@@ -75,9 +75,9 @@ namespace ThirdStoreBusiness.AccessControl
             if (String.IsNullOrEmpty(permissionName))
                 return false;
 
-            var userRoles = user.UserRoles.Where(ur => ur.IsActive);
+            var userRoles = user.UserRoles.Where(ur => ur.Role.IsActive);
             foreach (var role in userRoles)
-                if (Authorize(permissionName, role))
+                if (Authorize(permissionName, role.Role))
                     //yes, we have such permission
                     return true;
 
@@ -91,11 +91,23 @@ namespace ThirdStoreBusiness.AccessControl
                 return false;
 
             foreach (var permission1 in userRole.RolePermissions)
-                if (permission1.Name.Equals(permissionName, StringComparison.InvariantCultureIgnoreCase))
+                if (permission1.Permission.Name.Equals(permissionName, StringComparison.InvariantCultureIgnoreCase))
                     return true;
 
             return false;
            
+        }
+
+        public T_Permission GetPermissionByID(int id)
+        {
+            var role = _permissionRepository.GetById(id);
+            return role;
+        }
+
+        public IList<T_Permission> GetAllPermissions()
+        {
+            var query = _permissionRepository.Table.Where(p => p.IsActive);
+            return query.ToList();
         }
     }
 }

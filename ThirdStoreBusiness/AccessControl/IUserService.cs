@@ -27,6 +27,8 @@ namespace ThirdStoreBusiness.AccessControl
 
         IList<T_User> GetAllUsers();
 
+        void EncryptPassword(T_User user);
+
         bool ValidateUser(string email, string password);
 
         bool SignIn(string email, string password);
@@ -40,5 +42,9 @@ namespace ThirdStoreBusiness.AccessControl
         T_User GetAuthenticatedUser();
 
         T_User GetAuthenticatedUserFromTicket(FormsAuthenticationTicket ticket);
+
+        void RemoveUserRole(M_UserRole userRole);
+
+        
     }
 }

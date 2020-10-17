@@ -39,14 +39,14 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.EditBy).HasColumnName("EditBy");
             this.Property(t => t.IsActive).HasColumnName("IsActive");
 
-            this.HasMany(r => r.RolePermissions)
-                .WithMany()
-                .Map(m =>
-                {
-                    m.MapLeftKey("RoleID");
-                    m.MapRightKey("PermissionID");
-                    m.ToTable("M_RolePermission");
-                });
+            //this.HasMany(r => r.RolePermissions)
+            //    .WithMany()
+            //    .Map(m =>
+            //    {
+            //        m.MapLeftKey("RoleID");
+            //        m.MapRightKey("PermissionID");
+            //        m.ToTable("M_RolePermission");
+            //    });
         }
     }
 }

@@ -11,6 +11,7 @@ namespace ThirdStore.Models.AccessControl
         [Display(Name = "User Name")]
         public string Name { get; set; }
 
+        [Display(Name = "Abbr.")]
         public string Description { get; set; }
 
         [Required]
@@ -32,7 +33,14 @@ namespace ThirdStore.Models.AccessControl
 
         public int StatusID { get; set; }
 
+        [UIHint("MultiSelect")]
+        public List<int> Roles { get; set; }
+
         public IList<SelectListItem> YesOrNo { get; set; }
+
+        public IList<SelectListItem> AllRoles { get; set; }
+
+
     }
     
 }

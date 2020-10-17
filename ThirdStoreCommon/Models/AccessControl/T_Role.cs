@@ -15,6 +15,6 @@ namespace ThirdStoreCommon.Models.AccessControl
         public System.DateTime EditTime { get; set; }
         public string EditBy { get; set; }
 
-        public virtual ICollection<T_Permission> RolePermissions { get; set; }
+        public virtual ICollection<M_RolePermission> RolePermissions { get; set; }
     }
 }

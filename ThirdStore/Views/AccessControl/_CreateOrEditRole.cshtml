@@ -1,0 +1,56 @@
+﻿@model RoleViewModel
+
+@Html.HiddenFor(model => model.ID)
+
+@Html.AntiForgeryToken()
+@Html.ValidationSummary("", new { @class = "text-danger" })
+<div>
+    @BasicInfo()
+</div>
+<div>
+
+    <input type="submit" id="btnSave" class="k-button" value="Save" />
+    <a href="@Html.Raw(Url.Action("RoleList"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
+</div>
+
+
+@helper BasicInfo()
+{
+    <table style="width:100%;">
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Name)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Name)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Description)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Description)
+            </td>
+        </tr>
+           
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.IsActive)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.IsActive, Model.YesOrNo)
+            </td>
+            <td>
+                @Html.LabelFor(model => model.Permissions):
+            </td>
+            <td colspan="3">
+                @Html.EditorFor(model => model.Permissions, new { SelectList = Model.AllPermissions })
+            </td>
+        </tr>
+    </table>
+
+}
+
+
+
+
+
