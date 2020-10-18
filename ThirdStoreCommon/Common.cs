@@ -106,6 +106,16 @@ namespace ThirdStoreCommon
         Error
     }
 
+    public enum ThirdStorePermission
+    {
+        KPIReport=1,
+        OrderList=2,
+        OrderEdit=3,
+        JobItemSync=4,
+        SKUEdit=5,
+        UserAccessControl=6
+    }
+
 
     public sealed class ThirdStoreCacheKey
     {

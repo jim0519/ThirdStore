@@ -35,6 +35,11 @@ namespace ThirdStore.Controllers
         public ActionResult UserList()
         {
 
+            if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/");
+            }
             var model = new UserListViewModel();
 
             model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
@@ -74,6 +79,11 @@ namespace ThirdStore.Controllers
 
         public ActionResult RoleList()
         {
+            if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/");
+            }
 
             var model = new RoleListViewModel();
 
@@ -140,11 +150,17 @@ namespace ThirdStore.Controllers
         // GET: /Account/Register
         public ActionResult CreateUser()
         {
-            var allowCreateNewUserUserIDs = new int[] { 1 };
-            if (!allowCreateNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //var allowEditNewUserUserIDs = new int[] { 1 };
+            //if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             var newItemViewModel = new UserViewModel() { StatusID = 1 };
@@ -184,11 +200,17 @@ namespace ThirdStore.Controllers
 
         public ActionResult EditUser(int userID)
         {
-            var allowEditNewUserUserIDs = new int[] { 1 };
-            if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //var allowEditNewUserUserIDs = new int[] { 1 };
+            //if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             var editUserViewModel = new UserViewModel();
@@ -207,12 +229,6 @@ namespace ThirdStore.Controllers
         public ActionResult EditUser(UserViewModel model)
         {
 
-            var allowEditNewUserUserIDs = new int[] { 1 };
-            if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
-            {
-                ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
-            }
             FillDropDownDS(model);
             //if (!ModelState.IsValid)
             //{
@@ -275,11 +291,17 @@ namespace ThirdStore.Controllers
         {
             try
             {
-                var allowEditNewUserUserIDs = new int[] { 1 };
-                if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+                //var allowEditNewUserUserIDs = new int[] { 1 };
+                //if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+                //{
+                //    ErrorNotification("You do not have permission to process this page.");
+                //    return Redirect("~/"); ;
+                //}
+
+                if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
                 {
                     ErrorNotification("You do not have permission to process this page.");
-                    return Redirect("~/"); ;
+                    return Redirect("~/");
                 }
 
                 //if (!ModelState.IsValid)
@@ -327,11 +349,17 @@ namespace ThirdStore.Controllers
  
         public ActionResult CreateRole()
         {
-            var allowCreateNewUserUserIDs = new int[] { 1 };
-            if (!allowCreateNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //var allowEditNewUserUserIDs = new int[] { 1 };
+            //if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             var newRoleViewModel = new RoleViewModel() { IsActive = 1 };
@@ -370,11 +398,17 @@ namespace ThirdStore.Controllers
 
         public ActionResult EditRole(int roleID)
         {
-            var allowEditNewUserUserIDs = new int[] { 1 };
-            if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //var allowEditNewUserUserIDs = new int[] { 1 };
+            //if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.UserAccessControl.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             var editRoleViewModel = new RoleViewModel();
@@ -393,12 +427,6 @@ namespace ThirdStore.Controllers
         public ActionResult EditRole(RoleViewModel model)
         {
 
-            var allowEditNewUserUserIDs = new int[] { 1 };
-            if (!allowEditNewUserUserIDs.Contains(_workContext.CurrentUser.ID))
-            {
-                ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
-            }
             FillDropDownDSForRole(model);
             if (!ModelState.IsValid)
             {

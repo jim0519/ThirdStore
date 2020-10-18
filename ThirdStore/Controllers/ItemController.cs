@@ -22,6 +22,7 @@ using ThirdStoreBusiness.JobItem;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using ThirdStoreBusiness.AccessControl;
 
 namespace ThirdStore.Controllers
 {
@@ -32,11 +33,13 @@ namespace ThirdStore.Controllers
         private readonly IDbContext _dbContext;
         private readonly IWorkContext _workContext;
         private readonly IJobItemService _jobItemService;
+        private readonly IPermissionService _permissionService;
 
         public ItemController(IItemService itemService,
             IImageService imageService,
             IDbContext dbContext,
             IWorkContext workContext,
+            IPermissionService permissionService,
             IJobItemService jobItemService)
         {
             _itemService = itemService;
@@ -44,6 +47,7 @@ namespace ThirdStore.Controllers
             _dbContext = dbContext;
             _workContext = workContext;
             _jobItemService = jobItemService;
+            _permissionService = permissionService;
         }
 
         // GET: Item
@@ -69,9 +73,10 @@ namespace ThirdStore.Controllers
             model.BulkUpdate.IsReadyForList = -1;
             model.BulkUpdate.IsActive = -1;
 
-            var showSyncInvUsers = new int[] { 1,4 ,10, 14,16,17 };
-            if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
-                model.ShowSyncInventory = true;
+            //var showSyncInvUsers = new int[] { 1,4 ,10, 14,16,17 };
+            //if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
+            //    model.ShowSyncInventory = true;
+            model.ShowSyncInventory = _permissionService.Authorize(ThirdStorePermission.JobItemSync.ToName());
 
             return View(model);
         }
@@ -104,11 +109,17 @@ namespace ThirdStore.Controllers
 
         public ActionResult Create()
         {
-            var allowCreateNewItemUserIDs = new int[] { 1,4,6,7, 14, 17 };
-            if (!allowCreateNewItemUserIDs.Contains(_workContext.CurrentUser.ID))
+            //var allowCreateNewItemUserIDs = new int[] { 1,4,6,7, 14, 17 };
+            //if (!allowCreateNewItemUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.SKUEdit.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             var newItemViewModel = new ItemViewModel() { IsActive=1,Type=ThirdStoreItemType.SINGLE.ToValue(),IsReadyForList=0};
@@ -189,6 +200,8 @@ namespace ThirdStore.Controllers
 
         public ActionResult Edit(int itemID)
         {
+            
+
             var editItemViewModel = new ItemViewModel();
             
 
@@ -198,9 +211,10 @@ namespace ThirdStore.Controllers
                 editItemViewModel = item.ToCreateNewModel();
             }
 
-            var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
-            if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
-                editItemViewModel.ShowSyncInventory = true;
+            //var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
+            //if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
+            //    editItemViewModel.ShowSyncInventory = true;
+            editItemViewModel.ShowSyncInventory = _permissionService.Authorize(ThirdStorePermission.JobItemSync.ToName());
 
             FillDropDownDS(editItemViewModel);
             return View(editItemViewModel);
@@ -209,11 +223,17 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult Edit(ItemViewModel model)
         {
-            var allowEditItemUserIDs = new int[] { 1,4, 6, 7,10, 14,16, 17 };
-            if (!allowEditItemUserIDs.Contains(_workContext.CurrentUser.ID))
+            //var allowEditItemUserIDs = new int[] { 1,4, 6, 7,10, 14,16, 17 };
+            //if (!allowEditItemUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.SKUEdit.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             FillDropDownDS(model);

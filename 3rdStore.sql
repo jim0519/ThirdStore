@@ -1271,3 +1271,291 @@ union all
 	select Town,Postcode,[Fastway Boxes Product] as ZoneCode from ThirdStoreFastwayPostcode
 	where [Fastway Boxes Product] is not null
 ) S
+
+
+
+
+--Permission Change
+
+
+insert into T_Role
+select 
+'Administrator' as Name,
+'Administrator' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+
+insert into T_Role
+select 
+'CustomerService' as Name,
+'Customer Service' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Role
+select 
+'WarehouseStaff' as Name,
+'Warehouse Staff' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_Role
+select 
+'WarehouseManager' as Name,
+'Warehouse Manager' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_Role
+select 
+'ListingManager' as Name,
+'Listing Manager' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+
+insert into T_Permission
+select 
+'KPIReport' as Name,
+'KPI Report' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Permission
+select 
+'OrderList' as Name,
+'Order List' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Permission
+select 
+'OrderEdit' as Name,
+'Order Edit' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_Permission
+select 
+'JobItemSync' as Name,
+'Job Item Sync' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Permission
+select 
+'SKUEdit' as Name,
+'SKU Edit' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_Permission
+select 
+'SKUCreate' as Name,
+'SKU Create' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Permission
+select 
+'UserAccessControl' as Name,
+'User Access Control' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_Permission
+select 
+'SKUList' as Name,
+'SKU List' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+--User Role
+
+insert into M_UserRole
+select 
+ID as UserID,
+ (select ID from T_Role where Name='Administrator') as RoleID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+from T_User
+where Name in ('Jim','Sandy','Keith')
+
+
+insert into M_UserRole
+select 
+ID as UserID,
+ (select ID from T_Role where Name='CustomerService') as RoleID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+from T_User
+where Name in ('Kun','Danni','William','Jaizen','Peggy','Chenny','Floria')
+
+
+insert into M_UserRole
+select 
+ID as UserID,
+ (select ID from T_Role where Name='WarehouseManager') as RoleID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+from T_User
+where Name in ('Kun','Danni','William','Jaizen','Peggy','Chenny','Floria')
+
+
+
+insert into M_UserRole
+select 
+ID as UserID,
+ (select ID from T_Role where Name='WarehouseStaff') as RoleID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+from T_User
+where Name in ('Linyan','Sunny','Isa','Qiang','Ken','Raisy','Kevin','Jeffery')
+
+
+
+insert into M_UserRole
+select 
+ID as UserID,
+ (select ID from T_Role where Name='ListingManager') as RoleID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+from T_User
+where Name in ('Danni','Peggy')
+
+
+
+
+
+
+--Role Permission
+insert into M_RolePermission
+select
+ (select id from T_Role where Name='Administrator') as RoleID,
+ ID as PermissionID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+ from T_Permission
+
+
+ insert into M_RolePermission
+select
+ (select id from T_Role where Name='CustomerService') as RoleID,
+ ID as PermissionID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+ from T_Permission
+ where Name in ('OrderList','OrderEdit')
+
+
+
+-- insert into M_RolePermission
+--select
+-- (select id from T_Role where Name='WarehouseStaff') as RoleID,
+-- ID as PermissionID,
+-- GETDATE(),
+--'System',
+--GETDATE(),
+--'System'
+-- from T_Permission
+-- where Name in ('SKUEdit')
+
+
+  insert into M_RolePermission
+select
+ (select id from T_Role where Name='WarehouseManager') as RoleID,
+ ID as PermissionID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+ from T_Permission
+ where Name in ('SKUEdit')
+
+
+ 
+ insert into M_RolePermission
+select
+ (select id from T_Role where Name='ListingManager') as RoleID,
+ ID as PermissionID,
+ GETDATE(),
+'System',
+GETDATE(),
+'System'
+ from T_Permission
+ where Name in ('JobItemSync','OrderList','OrderEdit','SKUEdit')
+
+
+
+
+
+select
+U.Name,
+P.Name as PermissionName
+from T_User U
+inner join M_UserRole UR on U.ID=UR.UserID
+inner join M_RolePermission RP on RP.RoleID=UR.RoleID
+inner join T_Permission P on RP.PermissionID=P.ID
+where U.Name in ('Jaizen')
