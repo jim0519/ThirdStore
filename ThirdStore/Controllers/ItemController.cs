@@ -104,7 +104,7 @@ namespace ThirdStore.Controllers
 
         public ActionResult Create()
         {
-            var allowCreateNewItemUserIDs = new int[] { 1,4,6,7, 14, 17 };
+            var allowCreateNewItemUserIDs = new int[] { 1,4,6,7, 14, 17, 22 };
             if (!allowCreateNewItemUserIDs.Contains(_workContext.CurrentUser.ID))
             {
                 ErrorNotification("You do not have permission to process this page.");
@@ -198,7 +198,7 @@ namespace ThirdStore.Controllers
                 editItemViewModel = item.ToCreateNewModel();
             }
 
-            var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
+            var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17,22 };
             if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
                 editItemViewModel.ShowSyncInventory = true;
 
@@ -209,7 +209,7 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult Edit(ItemViewModel model)
         {
-            var allowEditItemUserIDs = new int[] { 1,4, 6, 7,10, 14,16, 17 };
+            var allowEditItemUserIDs = new int[] { 1,4, 6, 7,10, 14,16, 17, 22 };
             if (!allowEditItemUserIDs.Contains(_workContext.CurrentUser.ID))
             {
                 ErrorNotification("You do not have permission to process this page.");
