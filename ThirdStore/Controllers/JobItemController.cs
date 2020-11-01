@@ -111,6 +111,8 @@ namespace ThirdStore.Controllers
                 location:model.SearchLocation,
                 inspector: inspector,
                 trackingNumber:model.SearchTrackingNumber,
+                shipTimeFrom:model.ShipTimeFrom,
+                shipTimeTo:model.ShipTimeTo,
                 hasStocktakeTime:model.HasStocktakeTime,
                 isExcludeShippedStatus:model.IsExcludeShippedStatus,
                 pageIndex: command.Page - 1,

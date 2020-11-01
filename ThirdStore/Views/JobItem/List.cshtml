@@ -406,6 +406,22 @@
         </tr>
         <tr>
             <td>
+                @Html.LabelFor(model => model.ShipTimeFrom):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.ShipTimeFrom)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.ShipTimeTo):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.ShipTimeTo)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.LabelFor(model => model.SearchTrackingNumber):
             </td>
             <td>
@@ -470,6 +486,11 @@
                                 mode: "inline"
                             },
                             scrollable: false,
+                            toolbar: ["excel"],
+                            excel: {
+                                allPages: true,
+                                fileName: "JobItemList.xlsx"
+                            },
                             dataBound: onDataBound,
                             columns: [
                                 {
@@ -559,6 +580,8 @@
             $('#@Html.FieldIdFor(model => model.SearchStatus)').val("0");
             $('#@Html.FieldIdFor(model => model.SearchLocation)').val("");
             //$('#@Html.FieldIdFor(model => model.SearchInspector)').val("");
+            $('#@Html.FieldIdFor(model => model.ShipTimeFrom)').val("");
+            $('#@Html.FieldIdFor(model => model.ShipTimeTo)').val("");
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
             $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
             $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').prop('checked', false);
@@ -587,6 +610,8 @@
             SearchStatus: $('#@Html.FieldIdFor(model => model.SearchStatus)').val(),
             SearchLocation: $('#@Html.FieldIdFor(model => model.SearchLocation)').val(),
             SearchInspector: $('#@Html.FieldIdFor(model => model.SearchInspector)').val(),
+            ShipTimeFrom: $('#@Html.FieldIdFor(model => model.ShipTimeFrom)').val(),
+            ShipTimeTo: $('#@Html.FieldIdFor(model => model.ShipTimeTo)').val(),
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
             HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val(),
             IsExcludeShippedStatus: $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').is(':checked')

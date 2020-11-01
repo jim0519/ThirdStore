@@ -84,6 +84,8 @@ namespace ThirdStoreBusiness.JobItem
             ThirdStoreSupplier? jobItemSupplier = null,
             string location = null,
              List<string> inspector = null,
+             DateTime? shipTimeFrom = null,
+            DateTime? shipTimeTo = null,
             string trackingNumber = null,
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus=false,
@@ -155,6 +157,15 @@ namespace ThirdStoreBusiness.JobItem
                 {
                     query = query.Where(i => i.Ref2.Contains(sp));
                 }
+            }
+
+            if (shipTimeFrom != null)
+                query = query.Where(o => o.ShipTime >= shipTimeFrom);
+
+            if (shipTimeTo != null)
+            {
+                shipTimeTo = shipTimeTo.Value.AddDays(1);
+                query = query.Where(o => o.ShipTime < shipTimeTo);
             }
 
             if (trackingNumber != null)

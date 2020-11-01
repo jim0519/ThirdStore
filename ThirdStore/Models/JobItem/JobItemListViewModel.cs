@@ -36,6 +36,10 @@ namespace ThirdStore.Models.JobItem
         [Display(Name = "Exclude Shipped")]
         public bool IsExcludeShippedStatus { get; set; }
         public string SearchLocation { get; set; }
+        [UIHint("DateNullable"), Display(Name = "Ship Time From")]
+        public DateTime? ShipTimeFrom { get; set; }
+        [Display(Name = "Ship Time To"), UIHint("DateNullable")]
+        public DateTime? ShipTimeTo { get; set; }
         public string SearchTrackingNumber { get; set; }
         public string SearchReference { get; set; }
         [UIHint("MultiSelectString")]

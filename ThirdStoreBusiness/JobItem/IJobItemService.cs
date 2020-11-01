@@ -29,6 +29,8 @@ namespace ThirdStoreBusiness.JobItem
             ThirdStoreSupplier? jobItemSupplier = null,
             string location = null,
             List<string> inspector = null,
+            DateTime? shipTimeFrom = null,
+            DateTime? shipTimeTo = null,
             string trackingNumber = null,
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus = false,
