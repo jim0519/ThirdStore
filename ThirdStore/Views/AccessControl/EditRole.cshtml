@@ -1,0 +1,13 @@
+﻿@model RoleViewModel
+@{
+    ViewBag.Title = "Edit Role";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+
+@using (Html.BeginForm())
+{
+
+    @Html.Partial("_CreateOrEditRole", Model)
+    
+}

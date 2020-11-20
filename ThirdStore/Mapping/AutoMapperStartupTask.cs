@@ -27,8 +27,18 @@ namespace ThirdStore.Infrastructure
             //Access Control
             Mapper.CreateMap<T_User, UserGridViewModel>();
 
-            Mapper.CreateMap<T_User, UserViewModel>();
-            Mapper.CreateMap<UserViewModel, T_User>();
+            Mapper.CreateMap<T_User, UserViewModel>()
+                .ForMember((dest => dest.Roles), mce => mce.MapFrom(s => s.UserRoles.Select(ur => ur.RoleID).ToList())); ;
+            Mapper.CreateMap<UserViewModel, T_User>().ForAllMembers(opts => opts.Condition(vm =>!vm.IsSourceValueNull));
+
+            Mapper.CreateMap<T_Role, RoleGridViewModel>();
+
+            Mapper.CreateMap<T_Role, RoleViewModel>()
+                .ForMember(dest => dest.IsActive, mce => mce.MapFrom(s => Convert.ToInt32(s.IsActive)))
+                .ForMember((dest => dest.Permissions), mce => mce.MapFrom(s => s.RolePermissions.Select(ur => ur.PermissionID).ToList())); 
+            Mapper.CreateMap<RoleViewModel, T_Role>()
+                .ForMember(dest => dest.IsActive, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsActive)));
+
 
             //Item
             Mapper.CreateMap<D_Item, D_Item>();

@@ -103,6 +103,7 @@
     <Compile Include="AccessControl\IPermissionService.cs" />
     <Compile Include="AccessControl\IUserService.cs" />
     <Compile Include="AccessControl\PermissionService.cs" />
+    <Compile Include="AccessControl\RoleService.cs" />
     <Compile Include="AccessControl\UserService.cs" />
     <Compile Include="API\eBay\eBayAPI.cs" />
     <Compile Include="API\Neto\GetItem.cs" />

@@ -12,6 +12,7 @@ using ThirdStoreCommon;
 using ThirdStoreFramework.MVC;
 using ThirdStoreCommon.Infrastructure;
 using System.IO;
+using ThirdStoreBusiness.AccessControl;
 
 namespace ThirdStore.Controllers
 {
@@ -19,13 +20,16 @@ namespace ThirdStore.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IWorkContext _workContext;
+        private readonly IPermissionService _permissionService;
 
         public OrderController(IOrderService orderService,
+            IPermissionService permissionService,
             IWorkContext workContext
             )
         {
             _orderService = orderService;
             _workContext = workContext;
+            _permissionService = permissionService;
         }
 
         // GET: Item
@@ -36,12 +40,18 @@ namespace ThirdStore.Controllers
 
         public ActionResult List()
         {
-            var allowOrderDownloadUserIDs = new int[] { 1,4,6,10,11,12,14,16,17,22};
+            //var allowOrderDownloadUserIDs = new int[] { 1,4,6,10,11,12,14,16,17,22};
             
-            if (!allowOrderDownloadUserIDs.Contains(_workContext.CurrentUser.ID))
+            //if (!allowOrderDownloadUserIDs.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.OrderList.ToName()))
             {
                 ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
+                return Redirect("~/");
             }
 
             var model = new OrderListViewModel();
@@ -49,8 +59,9 @@ namespace ThirdStore.Controllers
             model.OrderStatuses = ThirdStoreOrderStatus.AllGood.ToSelectList(false).ToList();
             model.OrderStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0", Selected = true });
 
-            var canEditOrder = new int[] { 1, 4,6, 10,11,12, 14, 16, 17,22 };
-            model.CanEditOrder = canEditOrder.Contains(_workContext.CurrentUser.ID);
+            //var canEditOrder = new int[] { 1, 4,6, 10,11,12, 14, 16, 17,22 };
+            //model.CanEditOrder = canEditOrder.Contains(_workContext.CurrentUser.ID);
+            model.CanEditOrder = _permissionService.Authorize(ThirdStorePermission.OrderEdit.ToName());
 
             return View(model);
         }

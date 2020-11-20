@@ -190,6 +190,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Mapping\AutoMapperStartupTask.cs" />
+    <Compile Include="Models\AccessControl\RoleListViewModel.cs" />
+    <Compile Include="Models\AccessControl\RoleGridViewModel.cs" />
+    <Compile Include="Models\AccessControl\RoleViewModel.cs" />
     <Compile Include="Models\AccessControl\UserViewModel.cs" />
     <Compile Include="Models\AccessControl\UserGridViewModel.cs" />
     <Compile Include="Models\AccessControl\UserListViewModel.cs" />
@@ -405,6 +408,12 @@
     <Content Include="Views\AccessControl\UserList.cshtml" />
     <Content Include="Views\AccessControl\_CreateOrEditUser.cshtml" />
     <Content Include="Views\Report\KPIReport.cshtml" />
+    <Content Include="Views\AccessControl\EditUser.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\MultiSelect.cshtml" />
+    <Content Include="Views\AccessControl\RoleList.cshtml" />
+    <Content Include="Views\AccessControl\_CreateOrEditRole.cshtml" />
+    <Content Include="Views\AccessControl\CreateRole.cshtml" />
+    <Content Include="Views\AccessControl\EditRole.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -18,6 +18,6 @@ namespace ThirdStoreCommon.Models.AccessControl
         public System.DateTime EditTime { get; set; }
         public string EditBy { get; set; }
 
-        public virtual ICollection<T_Role> UserRoles { get; set; }
+        public virtual ICollection<M_UserRole> UserRoles { get; set; }
     }
 }

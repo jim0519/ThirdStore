@@ -14,5 +14,9 @@ namespace ThirdStoreBusiness.AccessControl
         void UpdatePermission(T_Permission permission);
 
         bool Authorize(string permissionRecordSystemName);
+
+        T_Permission GetPermissionByID(int id);
+
+        IList<T_Permission> GetAllPermissions();
     }
 }

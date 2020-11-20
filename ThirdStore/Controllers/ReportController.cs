@@ -42,18 +42,18 @@ namespace ThirdStore.Controllers
 
         public ActionResult KPIReport()
         {
-            var kpiPermitUsers = new int[] { 1, 4, 17 };
-            if (!kpiPermitUsers.Contains(_workContext.CurrentUser.ID))
-            {
-                ErrorNotification("You do not have permission to process this page.");
-                return RedirectToAction("List", "JobItem");
-            }
-
-            //    if (!_permissionService.Authorize("KPIReport"))
+            //var kpiPermitUsers = new int[] { 1, 4, 17 };
+            //if (!kpiPermitUsers.Contains(_workContext.CurrentUser.ID))
             //{
             //    ErrorNotification("You do not have permission to process this page.");
             //    return RedirectToAction("List", "JobItem");
             //}
+
+            if (!_permissionService.Authorize(ThirdStorePermission.KPIReport.ToName()))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/");
+            }
 
 
             var model = new KPIReportViewModel();

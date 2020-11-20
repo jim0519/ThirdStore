@@ -1,0 +1,106 @@
+﻿@model RoleListViewModel
+@{
+    ViewBag.Title = "Role List";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
+        <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
+        <div id="divOperationBtn" style="float:right">
+            <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+            <input type="button" id="btnCreateNew" class="k-button" value="Create New Role" />
+            <script>
+                $(document).ready(function () {
+
+                    $('#btnCreateNew').click(function () {
+                        var link="@Html.Raw(Url.Action("CreateRole", "AccessControl"))"
+                        location.href = link;
+                    });
+                    
+                });
+            </script>
+        </div>
+    </div>
+    
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="role-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#role-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("RoleList", "AccessControl"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: {}
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "50",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["20", "50", "100"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                }, {
+                                    field: "Name",
+                                    template: "<a href='@Url.Action("EditRole")?RoleID=#=ID#' target='_blank' > #=Name#</a>",
+                                    title: "Name"
+                                }, {
+                                    field: "Description",
+                                    title: "Description"
+                                },{
+                                    field: "IsActive",
+                                    title: "Is Active",
+                                    template: "#= !!IsActive#"
+                                }
+                            ]
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+    var selectedIds = [];
+    
+    </script>
+
+}

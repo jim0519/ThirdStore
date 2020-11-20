@@ -39,6 +39,8 @@ namespace ThirdStore.Controllers
         private readonly IWorkContext _workContext;
         private readonly ICacheManager _cacheManager;
         private readonly IUserService _userService;
+        private readonly IPermissionService _permissionService;
+
         public JobItemController(IJobItemService jobItemService,
             IItemService itemService,
             IImageService imageService,
@@ -46,6 +48,7 @@ namespace ThirdStore.Controllers
             IDbContext dbContext,
             IWorkContext workContext,
             ICacheManager cacheManager,
+            IPermissionService permissionService,
             IUserService userService)
         {
             _jobItemService = jobItemService;
@@ -56,6 +59,7 @@ namespace ThirdStore.Controllers
             _workContext = workContext;
             _cacheManager = cacheManager;
             _userService = userService;
+            _permissionService = permissionService;
         }
 
         public ActionResult List()
@@ -82,9 +86,10 @@ namespace ThirdStore.Controllers
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
             model.HasStocktakeTime = -1;
 
-            var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
-            if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
-                model.ShowSyncInventory = true;
+            //var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
+            //if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
+            //    model.ShowSyncInventory = true;
+            model.ShowSyncInventory = _permissionService.Authorize(ThirdStorePermission.JobItemSync.ToName());
 
             return View(model);
         }
