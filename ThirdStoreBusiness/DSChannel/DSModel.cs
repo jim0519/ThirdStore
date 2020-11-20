@@ -12,7 +12,7 @@ namespace ThirdStoreBusiness.DSChannel
         public string Category { get; set; }
         public string Title { get; set; }
         [CsvColumn(Name = "Stock Qty")]
-        public int InventoryQty { get; set; }
+        public decimal InventoryQty { get; set; }
         public string Status { get; set; }
         [CsvColumn(Name = "price")]
         public decimal Price { get; set; }
