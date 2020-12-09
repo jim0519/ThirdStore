@@ -1434,14 +1434,17 @@ namespace ThirdStoreBusiness.JobItem
                 }
 
                 var jobItems = new List<D_JobItem>() ;
+                var notInStatus = new int[] { ThirdStoreJobItemStatus.SHIPPED.ToValue() };
+                var notInTypes = new int[] { ThirdStoreJobItemType.DISTRIBUTED.ToValue()};
                 if (jobItemLineIDs != null)
                 {
                     var intJobItemLineIDs = jobItemLineIDs.Select(id => Convert.ToInt32(id));
-                    var notInStatus = new int[] { ThirdStoreJobItemStatus.SHIPPED.ToValue() };
+                    
                     jobItems = (from ji in _jobItemRepository.Table
                                    from line in ji.JobItemLines
                                    where intJobItemLineIDs.Contains(line.ID)
                                    && !notInStatus.Contains(ji.StatusID)
+                                   //&&!notInTypes.Contains(ji.Type)
                                     select ji).ToList();
 
                     var notLocateLineIDs = from jilid in jobItemLineIDs.Select(lid=>Convert.ToInt32(lid))
@@ -1455,7 +1458,18 @@ namespace ThirdStoreBusiness.JobItem
                             returnMessage.Mesage += $"Cannot locate job item line id {lid}, ";
                         }
                     }
-                       
+
+                    var distributedJobItems = jobItems.Where(ji => notInTypes.Contains(ji.Type)).ToList();
+                    if(distributedJobItems.Count>0)
+                    {
+                        foreach(var dji in distributedJobItems)
+                        {
+                            returnMessage.Mesage += $"Job item {GetJobItemReference(dji)} is a distributed item, ";
+                        }
+
+                        jobItems = jobItems.Where(ji => !distributedJobItems.Contains(ji)).ToList();
+                    }
+
                 }
                 else if(jobItemLineRefs!=null)
                 {
@@ -1464,10 +1478,14 @@ namespace ThirdStoreBusiness.JobItem
                         var jobItemsByRef = GetJobItemByReference(jir);
                         if (jobItemsByRef != null && jobItemsByRef.Count > 0)
                         {
-                            jobItemsByRef = jobItemsByRef.Where(ji => ji.StatusID != ThirdStoreJobItemStatus.SHIPPED.ToValue()).ToList();
+                            jobItemsByRef = jobItemsByRef.Where(ji => !notInStatus.Contains(ji.StatusID)).ToList();
                             if (jobItemsByRef.Count == 1)
                             {
-                                jobItems.Add(jobItemsByRef.FirstOrDefault());
+                                var locatedJobItem = jobItemsByRef.FirstOrDefault();
+                                if (!notInTypes.Contains( locatedJobItem.Type))
+                                    jobItems.Add(locatedJobItem);
+                                else
+                                    returnMessage.Mesage += $"Job item {GetJobItemReference(locatedJobItem)} is a distributed item, ";
                             }
                             else
                             {

@@ -46,12 +46,12 @@ namespace ThirdStore.Controllers
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
             model.SearchStatus = -1;
 
-            var allowAccessUserList = new int[] { 1 };
-            if (!allowAccessUserList.Contains(_workContext.CurrentUser.ID))
-            {
-                ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
-            }
+            //var allowAccessUserList = new int[] { 1 };
+            //if (!allowAccessUserList.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
 
             return View(model);
         }
@@ -90,12 +90,12 @@ namespace ThirdStore.Controllers
             model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
 
-            var allowAccessUserList = new int[] { 1 };
-            if (!allowAccessUserList.Contains(_workContext.CurrentUser.ID))
-            {
-                ErrorNotification("You do not have permission to process this page.");
-                return Redirect("~/"); ;
-            }
+            //var allowAccessUserList = new int[] { 1 };
+            //if (!allowAccessUserList.Contains(_workContext.CurrentUser.ID))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/"); ;
+            //}
 
             return View(model);
         }

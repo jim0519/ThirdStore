@@ -365,6 +365,7 @@ namespace ThirdStoreBusiness.Order
                         var soldItemSnapshot = _eBayAPICallManager.GetSoldItemSnapshot(orderLine.Ref2);
                         if (soldItemSnapshot != null)
                         {
+                            var lstOrderLineAllocateInvJobItemIDs = new List<string>();
                             var description = HttpUtility.HtmlDecode(soldItemSnapshot.Description);
                             var htmlDoc = new HtmlDocument();
                             htmlDoc.LoadHtml(description);
@@ -377,7 +378,7 @@ namespace ThirdStoreBusiness.Order
                                 var allocateInvJobItemIDs = nodeJID.Attributes["value"].Value;
                                 var allocateInvJobItemRefs = nodeRef.InnerText;
 
-                                lstAllocateInvJobItemIDs.Add(allocateInvJobItemIDs);
+                                lstOrderLineAllocateInvJobItemIDs.Add(allocateInvJobItemIDs);
 
                                 //if (orderLine.Qty > 1)
                                 //{
@@ -394,15 +395,15 @@ namespace ThirdStoreBusiness.Order
                                             if (i > orderLine.Qty)
                                                 break;
 
-                                            lstAllocateInvJobItemIDs.Add(jobItemInvIDs);
+                                            lstOrderLineAllocateInvJobItemIDs.Add(jobItemInvIDs);
                                             i++;
                                         }
                                     }
                                 //}
 
-                                var allocateInvJobItems = _jobItemService.GetJobItemsByIDs(lstAllocateInvJobItemIDs.SelectMany(jiids=>jiids.Split(',')).Select(s=>Convert.ToInt32(s)).ToList());
-                                orderLine.Ref5 = _jobItemService.ConvertToJobItemReference(lstAllocateInvJobItemIDs).Aggregate((current, next) => current + "," + next);
-                                
+                                var allocateInvJobItems = _jobItemService.GetJobItemsByIDs(lstOrderLineAllocateInvJobItemIDs.SelectMany(jiids=>jiids.Split(',')).Select(s=>Convert.ToInt32(s)).ToList());
+                                orderLine.Ref5 = _jobItemService.ConvertToJobItemReference(lstOrderLineAllocateInvJobItemIDs).Aggregate((current, next) => current + "," + next);
+                                orderLine.Ref6 = lstOrderLineAllocateInvJobItemIDs.SelectMany(jiids => jiids.Split(',')).Aggregate((current, next) => current + "," + next);
 
                                 var jobItemRefs = Constants.FirstInvJobItemsRef+": ";
                                 foreach(var ji in allocateInvJobItems)
@@ -431,7 +432,9 @@ namespace ThirdStoreBusiness.Order
                             {
                                 lstCustomInstruction.Add(orderCustomInstruction);
                             }
+                            lstAllocateInvJobItemIDs.AddRange(lstOrderLineAllocateInvJobItemIDs);
                         }
+                        
                     }
 
                     //add allocated job item to list
