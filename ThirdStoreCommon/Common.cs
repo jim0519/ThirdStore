@@ -122,10 +122,16 @@ namespace ThirdStoreCommon
         public const string ThirdStoreJobItemConditionListCache = "ThirdStoreJobItemConditionListCache";
     }
 
-    public class ThirdStoreReturnMessage
+    public class ThirdStoreReturnResult<T> where T:new()
     {
         public bool IsSuccess { get; set; }
         public string Mesage { get; set; }
+        public T Entity { get; set; }
+    }
+
+    public class ThirdStoreReturnMessage: ThirdStoreReturnResult<dynamic>
+    {
+
 
     }
 }

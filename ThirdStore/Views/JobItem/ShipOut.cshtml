@@ -11,6 +11,7 @@
 
 @using (Html.BeginForm())
 {
+    @Html.HiddenFor(m => m.LocatedJobItemID)
     <table width="100%">
         <tr>
             <td>
@@ -61,6 +62,34 @@
                     $.tabNext();
                     //alert(barcode);
                 } // main callback function
+            });
+
+            $('#btnSubmitNext').click(function () {
+
+                var isValid = true;
+                $.ajax({
+                    url: '@Url.Action("MatchJobItemVerifyTracking", "JobItem")',
+                    type: "POST",
+                    async: false,
+                    data: $("#opForm").serialize(),
+                    success: function (response) {
+                        //debugger;
+                        if (response.Result)
+                            //$(form).submit();
+                            isValid = true;
+                        else {
+                            if (response.Message != undefined) {
+                                appendValidateSummary(response.Message);
+                            }
+                            isValid = false;
+                        }
+                    },
+                    error: function (response) {
+                        //form.submit();
+                        isValid = false;
+                    }
+                });
+                return isValid;
             });
 
         });

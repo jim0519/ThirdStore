@@ -11,5 +11,6 @@ namespace ThirdStore.Models.JobItem
         public string JobItemLineID { get; set; }
         public string JobItemLineReference { get; set; }
         public string TrackingNumber { get; set; }
+        public int LocatedJobItemID { get; set; }
     }
 }

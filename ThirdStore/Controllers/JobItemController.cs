@@ -827,6 +827,25 @@ namespace ThirdStore.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult MatchJobItemVerifyTracking(JobItemShipOutViewModel model)
+        {
+            try
+            {
+                
+
+               var result= _jobItemService.MatchJobItemVerifyTracking(model.JobItemLineID,model.JobItemLineReference,model.TrackingNumber);
+                
+
+                return Json(new { Result = true, LocatedJobItemID = result.Entity.ID });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = false, ErrMsg = ex.Message });
+            }
+        }
+
+
         #region Private Methods
 
         private void FillDropDownDS(JobItemViewModel model)

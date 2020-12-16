@@ -82,5 +82,7 @@ namespace ThirdStoreBusiness.JobItem
         IList<string> ConvertToJobItemReference(IList<string> invJobItemIDs);
 
         ThirdStoreReturnMessage SyncInventory(int[] jobItemIDs);
+
+        ThirdStoreReturnResult<D_JobItem> MatchJobItemVerifyTracking(string jobItemLineID, string jobItemLineRef, string trackingNumber);
     }
 }

@@ -1179,44 +1179,160 @@ namespace ThirdStoreBusiness.JobItem
 
         public ThirdStoreReturnMessage ShipOut(string jobItemLineID, string jobItemLineRef, string trackingNumber)
         {
+            //var returnMessage = new ThirdStoreReturnMessage();
+            //try
+            //{
+            //    if (string.IsNullOrEmpty(jobItemLineID)&& string.IsNullOrEmpty(jobItemLineRef))
+            //    {
+            //        throw new Exception("No job item line id or job item line reference was provided.");
+            //    }
+
+            //    D_JobItem jobItem = null;
+            //    var cannotLocateItemReason = string.Empty;
+            //    var inStatus = new int[] {  ThirdStoreJobItemStatus.BOOKED.ToValue() };
+            //    if (!string.IsNullOrEmpty(jobItemLineID))
+            //    {
+            //        var intJobItemLineID = Convert.ToInt32(jobItemLineID);
+            //        jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID))&&inStatus.Contains( ji.StatusID));
+            //    }
+            //    else if(!string.IsNullOrEmpty(jobItemLineRef))
+            //    {
+            //        var jobItemsByRef = GetJobItemByReference(jobItemLineRef);
+            //        if (jobItemsByRef != null && jobItemsByRef.Count > 0)
+            //        {
+
+            //            jobItemsByRef = jobItemsByRef.Where(ji => inStatus.Contains(ji.StatusID)).ToList();
+            //            if (jobItemsByRef.Count == 1)
+            //            {
+            //                jobItem = jobItemsByRef.FirstOrDefault();
+            //            }
+            //            else
+            //                cannotLocateItemReason = $"No corresponding job item is in {ThirdStoreJobItemStatus.BOOKED.ToName()} status.";
+            //        }
+            //        else
+            //            cannotLocateItemReason = "Cannot locate job item.";
+            //    }
+
+            //    if(jobItem!=null)
+            //    {
+            //        if(!string.IsNullOrWhiteSpace(trackingNumber))
+            //            jobItem.TrackingNumber =trackingNumber.Trim();
+            //        jobItem.StatusID = ThirdStoreJobItemStatus.SHIPPED.ToValue();
+            //        jobItem.ShipTime = DateTime.Now;
+            //        this.UpdateJobItem(jobItem);
+            //        returnMessage.IsSuccess = true;
+            //        returnMessage.Mesage += $"Job item { GetJobItemReference(jobItem)} has been shipped out.";
+            //    }
+            //    else
+            //    {
+            //        returnMessage.IsSuccess = false;
+            //        returnMessage.Mesage += cannotLocateItemReason;
+            //    }
+
+            //    return returnMessage;
+
+            //    //var jobItemLine = _jobItemLineRepository.Table.FirstOrDefault(l => l.ID.Equals(intJobItemLineID));
+            //    //if (jobItemLine != null)
+            //    //{
+            //    //    var jobItem = jobItemLine.JobItem;
+
+
+            //    //}
+            //    //else
+            //    //{
+            //    //    return default(D_JobItem);
+            //    //}
+            //}
+            //catch(Exception ex)
+            //{
+            //    LogManager.Instance.Error(ex.Message);
+            //    returnMessage.IsSuccess = false;
+            //    returnMessage.Mesage = ex.Message;
+            //    return returnMessage;
+            //}
+            var returnMessage = new ThirdStoreReturnMessage();
+            var result = MatchShipoutJobItem(jobItemLineID, jobItemLineRef, trackingNumber);
+
+            returnMessage=ShipOut(result.Entity, trackingNumber);
+
+            return returnMessage;
+        }
+
+        public ThirdStoreReturnResult<D_JobItem> MatchJobItemVerifyTracking(string jobItemLineID, string jobItemLineRef, string trackingNumber)
+        {
+            var matchShipoutJobItemResult = MatchShipoutJobItem(jobItemLineID, jobItemLineRef, trackingNumber);
+            var jobItem = matchShipoutJobItemResult.Entity;
+            if (matchShipoutJobItemResult.IsSuccess&& jobItem != null)
+            {
+                if (!trackingNumber.Contains(jobItem.TrackingNumber) && !jobItem.TrackingNumber.Contains(trackingNumber))
+                {
+                    matchShipoutJobItemResult.Mesage = "Booked tracking number does not match the input tracking number. ";
+                }
+            }
+
+            return matchShipoutJobItemResult;
+
+        }
+
+        protected ThirdStoreReturnResult<D_JobItem> MatchShipoutJobItem(string jobItemLineID, string jobItemLineRef, string trackingNumber)
+        {
+            var returnResult = new ThirdStoreReturnResult<D_JobItem>();
+            if (string.IsNullOrEmpty(jobItemLineID) && string.IsNullOrEmpty(jobItemLineRef))
+            {
+                returnResult.Mesage="No job item line id or job item line reference was provided.";
+                return returnResult;
+            }
+
+            D_JobItem jobItem = null;
+            var cannotLocateItemReason = string.Empty;
+            var inStatus = new int[] { ThirdStoreJobItemStatus.BOOKED.ToValue() };
+            if (!string.IsNullOrEmpty(jobItemLineID))
+            {
+                var intJobItemLineID = Convert.ToInt32(jobItemLineID);
+                jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID)) && inStatus.Contains(ji.StatusID));
+            }
+            else if (!string.IsNullOrEmpty(jobItemLineRef))
+            {
+                var jobItemsByRef = GetJobItemByReference(jobItemLineRef);
+                if (jobItemsByRef != null && jobItemsByRef.Count > 0)
+                {
+
+                    jobItemsByRef = jobItemsByRef.Where(ji => inStatus.Contains(ji.StatusID)).ToList();
+                    if (jobItemsByRef.Count == 1)
+                    {
+                        returnResult.IsSuccess = true;
+                        jobItem = jobItemsByRef.FirstOrDefault();
+                    }
+                    else
+                        returnResult.Mesage = $"No corresponding job item is in {ThirdStoreJobItemStatus.BOOKED.ToName()} status.";
+                }
+            }
+
+            //if(jobItem!=null)
+            //{
+            //    returnResult.IsSuccess = true;
+            //    if (!trackingNumber.Contains( jobItem.TrackingNumber)&&!jobItem.TrackingNumber.Contains(trackingNumber))
+            //    {
+            //        returnResult.Mesage = "Booked tracking number does not match the input tracking number.";
+            //    }
+            //}
+            
+            if(!returnResult.IsSuccess&&string.IsNullOrWhiteSpace( returnResult.Mesage))
+                returnResult.Mesage = "Cannot locate job item.";
+            returnResult.Entity = jobItem;
+
+            return returnResult;
+        }
+
+        public ThirdStoreReturnMessage ShipOut(D_JobItem jobItem, string trackingNumber)
+        {
             var returnMessage = new ThirdStoreReturnMessage();
             try
             {
-                if (string.IsNullOrEmpty(jobItemLineID)&& string.IsNullOrEmpty(jobItemLineRef))
+                if (jobItem != null)
                 {
-                    throw new Exception("No job item line id or job item line reference was provided.");
-                }
-
-                D_JobItem jobItem = null;
-                var cannotLocateItemReason = string.Empty;
-                var inStatus = new int[] {  ThirdStoreJobItemStatus.BOOKED.ToValue() };
-                if (!string.IsNullOrEmpty(jobItemLineID))
-                {
-                    var intJobItemLineID = Convert.ToInt32(jobItemLineID);
-                    jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID))&&inStatus.Contains( ji.StatusID));
-                }
-                else if(!string.IsNullOrEmpty(jobItemLineRef))
-                {
-                    var jobItemsByRef = GetJobItemByReference(jobItemLineRef);
-                    if (jobItemsByRef != null && jobItemsByRef.Count > 0)
-                    {
-
-                        jobItemsByRef = jobItemsByRef.Where(ji => inStatus.Contains(ji.StatusID)).ToList();
-                        if (jobItemsByRef.Count == 1)
-                        {
-                            jobItem = jobItemsByRef.FirstOrDefault();
-                        }
-                        else
-                            cannotLocateItemReason = $"No corresponding job item is in {ThirdStoreJobItemStatus.BOOKED.ToName()} status.";
-                    }
-                    else
-                        cannotLocateItemReason = "Cannot locate job item.";
-                }
-
-                if(jobItem!=null)
-                {
-                    if(!string.IsNullOrWhiteSpace(trackingNumber))
-                        jobItem.TrackingNumber =trackingNumber.Trim();
+                    if (!string.IsNullOrWhiteSpace(trackingNumber))
+                        jobItem.TrackingNumber = trackingNumber.Trim();
                     jobItem.StatusID = ThirdStoreJobItemStatus.SHIPPED.ToValue();
                     jobItem.ShipTime = DateTime.Now;
                     this.UpdateJobItem(jobItem);
@@ -1226,22 +1342,9 @@ namespace ThirdStoreBusiness.JobItem
                 else
                 {
                     returnMessage.IsSuccess = false;
-                    returnMessage.Mesage += cannotLocateItemReason;
+                    returnMessage.Mesage += "Cannot locate job item.";
                 }
-
                 return returnMessage;
-
-                //var jobItemLine = _jobItemLineRepository.Table.FirstOrDefault(l => l.ID.Equals(intJobItemLineID));
-                //if (jobItemLine != null)
-                //{
-                //    var jobItem = jobItemLine.JobItem;
-                    
-                    
-                //}
-                //else
-                //{
-                //    return default(D_JobItem);
-                //}
             }
             catch(Exception ex)
             {
