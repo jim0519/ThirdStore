@@ -111,7 +111,7 @@ namespace ThirdStoreData.Mapping
 
             this.Property(t => t.BuyerNote)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(4000);
 
             this.Property(t => t.OrderNote)
                 .IsRequired()

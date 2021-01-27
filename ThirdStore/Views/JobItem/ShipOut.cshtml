@@ -9,7 +9,7 @@
     Layout = "~/Views/Shared/FormPage.cshtml";
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "opForm", name = "opForm" }))
 {
     @Html.HiddenFor(m => m.LocatedJobItemID)
     <table width="100%">
@@ -75,11 +75,21 @@
                     success: function (response) {
                         //debugger;
                         if (response.Result)
-                            //$(form).submit();
-                            isValid = true;
+                        {
+                            if (response.Message != undefined && response.Message != "") {
+                                if (!confirm("The tracking number scanned does not match the booked one, are you sure to ship out this job item?")) {
+                                    isValid = false;
+                                }
+                            }
+                            else
+                                isValid = true;
+
+                            $('#@Html.FieldIdFor(model => model.LocatedJobItemID)').val(response.LocatedJobItemID);
+                        }
                         else {
                             if (response.Message != undefined) {
-                                appendValidateSummary(response.Message);
+                                //appendValidateSummary(response.Message);
+                                alert(response.Message);
                             }
                             isValid = false;
                         }

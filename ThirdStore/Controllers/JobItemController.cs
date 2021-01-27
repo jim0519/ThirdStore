@@ -535,6 +535,11 @@ namespace ThirdStore.Controllers
                         }
 
                     }
+
+                    if(model.ItemPrice>0&& model.ItemPrice< designatedItem.Cost*Convert.ToDecimal( 0.7))
+                    {
+                        return Json(new { Result = false, Message = "Item price cannot be smaller than the reasonal amount." });
+                    }
                 }
                 else
                 {
@@ -576,6 +581,54 @@ namespace ThirdStore.Controllers
 
             //if(model.JobItemViewLines.Any(l=>l.Qty>1))
             return Json(new { Result=true});
+        }
+
+
+        [HttpPost]
+        public ActionResult BulkEditValidate(JobItemListViewModel.BulkUpdateJobItemModel bulkUpdate, string jobItemIdsBulkUpdate)
+        {
+            try
+            {
+                if (bulkUpdate.ItemPrice != 0)
+                {
+                    if (!string.IsNullOrEmpty(jobItemIdsBulkUpdate))
+                    {
+                        var ids = jobItemIdsBulkUpdate
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => Convert.ToInt32(x))
+                        .ToList();
+
+                        var jobItems = _jobItemService.GetJobItemsByIDs(ids);
+
+                        foreach (var jobItem in jobItems)
+                        {
+                            if (!string.IsNullOrWhiteSpace(jobItem.DesignatedSKU))
+                            {
+                                var item = _itemService.GetItemBySKU(jobItem.DesignatedSKU);
+                                if (bulkUpdate.ItemPrice < item.Cost * Convert.ToDecimal(0.85))
+                                {
+                                    throw new Exception($"{item.SKU } Item price is set to be smaller than the reasonal amount.");
+                                }
+                            }
+                            else
+                            {
+                                var item = _itemService.GetItemByID(jobItem.JobItemLines.FirstOrDefault().ItemID);
+                                if (bulkUpdate.ItemPrice < item.Cost * Convert.ToDecimal(0.85))
+                                {
+                                    throw new Exception($"{item.SKU } Item price is set to be smaller than the reasonal amount");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return Json(new { Result = true });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = false, ErrMsg = ex.Message });
+            }
         }
 
         //[HttpPost]
@@ -832,12 +885,11 @@ namespace ThirdStore.Controllers
         {
             try
             {
-                
-
-               var result= _jobItemService.MatchJobItemVerifyTracking(model.JobItemLineID,model.JobItemLineReference,model.TrackingNumber);
-                
-
-                return Json(new { Result = true, LocatedJobItemID = result.Entity.ID });
+                var result= _jobItemService.MatchJobItemVerifyTracking(model.JobItemLineID,model.JobItemLineReference,model.TrackingNumber);
+                if(result.IsSuccess)
+                    return Json(new { Result = true, Message=result.Mesage, LocatedJobItemID = result.Entity.ID });
+                else
+                    return Json(new { Result = false, Message = result.Mesage, LocatedJobItemID = 0 });
             }
             catch (Exception ex)
             {

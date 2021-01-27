@@ -308,6 +308,35 @@
                     });*@
 
 
+                    $('#btnBulkEditSubmit').click(function () {
+
+                        var isValid = true;
+                        $.ajax({
+                            url: '@Url.Action("BulkEditValidate", "JobItem")',
+                            type: "POST",
+                            async: false,
+                            data: $("#bulk-update-jobitem-form").serialize(),
+                            success: function (response) {
+                                debugger;
+                                if (!response.Result)
+                                {
+                                    if (response.ErrMsg != undefined && response.ErrMsg != "") {
+                                        if (!confirm(response.ErrMsg+", are you sure to confirm this save?")) {
+                                            isValid = false;
+                                        }
+                                    }
+                                    else
+                                        isValid = true;
+                                }
+                            },
+                            error: function (response) {
+                                //form.submit();
+                                isValid = false;
+                            }
+                        });
+                        return isValid;
+                    });
+
                 });
             </script>
         </div>
@@ -670,7 +699,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <input type="submit" class="k-button" value="Submit" />
+                        <input type="submit" class="k-button" value="Submit" id="btnBulkEditSubmit"/>
                     </td>
                 </tr>
             </table>
