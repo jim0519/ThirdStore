@@ -124,6 +124,7 @@
     <Compile Include="Models\ScheduleTask\T_ScheduleRuleLine.cs" />
     <Compile Include="Models\ScheduleTask\T_ScheduleRule.cs" />
     <Compile Include="Models\ScheduleTask\T_ScheduleTask.cs" />
+    <Compile Include="Models\Setting\T_Setting.cs" />
     <Compile Include="ThirdStoreConfig.cs" />
     <Compile Include="PageList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

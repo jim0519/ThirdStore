@@ -145,6 +145,9 @@
     <Compile Include="ScheduleTask\Task.cs" />
     <Compile Include="ScheduleTask\TaskManager.cs" />
     <Compile Include="ScheduleTask\TaskThread.cs" />
+    <Compile Include="Setting\CommonSettings.cs" />
+    <Compile Include="Setting\ISettingService.cs" />
+    <Compile Include="Setting\SettingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ThirdStoreCommon\ThirdStoreCommon.csproj">

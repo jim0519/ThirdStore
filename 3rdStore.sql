@@ -771,6 +771,42 @@ ALTER TABLE dbo.NetoProducts ADD Qty varchar(50) NULL DEFAULT '0'
 
 
 
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_Return]') AND type in (N'U'))
+DROP TABLE [dbo].[D_Return]
+GO
+
+/****** Object:  Table [dbo].[D_Return]    Script Date: 09/15/2014 11:07:31 ******/
+
+CREATE TABLE [dbo].[D_Return](
+	[ID] INT IDENTITY(1,1) NOT NULL,
+	[Reason] [varchar](4000) NOT NULL,
+	[Detail] [nvarchar](max) NOT NULL,
+	[ChildItemQty] INT NOT NULL,
+	[DisplayOrder] INT NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+ CONSTRAINT [PK_D_Return] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_D_Return_D_JobItem_JobItemID]') AND parent_object_id = OBJECT_ID(N'[dbo].[D_Return]'))
+ALTER TABLE [dbo].[D_Return]  WITH CHECK ADD CONSTRAINT [FK_D_Return_D_JobItem] FOREIGN KEY([JobItemID])
+REFERENCES [dbo].[D_JobItem] ([ID])
+GO
+
+
+
+
 --insert fake data
 
 
@@ -1101,6 +1137,25 @@ where NP.SKU=L.SKU
 --^0\.\d{1,2}$
 
 
+
+--Bulk Sync Dropship SKU
+
+
+DECLARE @ID VARCHAR(max) 
+SELECT @ID = COALESCE(@ID + ',', '') +cast( ID as varchar)
+
+--select *
+ from D_Item
+where
+ SupplierID=1
+ and Cost<=200 and Cost>100
+ and Type in (2,3)
+ and IsReadyForList=0
+ and ((LEN(SKU)>23 and Ref2<>'' )or LEN(SKU)<=23)
+ and Name<>''
+ and Description <>''
+
+select @ID
 
 
 
@@ -1559,3 +1614,137 @@ inner join M_UserRole UR on U.ID=UR.UserID
 inner join M_RolePermission RP on RP.RoleID=UR.RoleID
 inner join T_Permission P on RP.PermissionID=P.ID
 where U.Name in ('Jaizen')
+
+
+
+
+
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[T_Setting]') AND type in (N'U'))
+DROP TABLE [dbo].[T_Setting]
+GO
+CREATE TABLE [dbo].[T_Setting](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](500) NOT NULL,
+	[Description] [varchar](4000) NOT NULL,
+	[Value] [varchar](max) NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](500) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](500) not null,
+
+ CONSTRAINT [PK_T_Setting] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+
+insert into T_Setting
+select
+'commonsettings.shippingdescriptiontemplate',
+'',
+'<p>&nbsp;</p>
+<p align="center"><strong><em><u>Shipping</u></em></strong></p>
+<p>&nbsp;</p>
+<p>We offer free shipping Australia wide; all items are shipped from our Melbourne warehouse after payment is confirmed. Delivery normally takes 4-7 days (usually faster) depending on delivery location. All shipping is set as <u>Authorize to Leave (ATL).</u></p>
+<p><strong><u>Packaging maybe repacked to compromise on economic shipping size requirements.</u></strong></p>
+<p><strong><em>Item cover&nbsp;6 months manufacture warranty with return shipping included. There will be a 15%&nbsp;restocking fee for change of mind.</em></strong></p>
+<p>We require a postal address&nbsp;NOT a PO Box or Parcel Locker. Please ensure you provide a&nbsp;correct postal address&nbsp;and a&nbsp;daytime contact number&nbsp;or it may cause a delay in your shipment.</p>
+<p>Due to the limited access of our carriers, there are certain postcodes that we are unable to deliver to. Please refer to the list below for more details.</p>
+<table width="576">
+<tbody>
+<tr>
+<td width="368">
+<p>Postcode</p>
+</td>
+<td width="208">
+<p>State</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>0800-0999</p>
+</td>
+<td width="208">
+<p>NT</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>2641</p>
+</td>
+<td width="208">
+<p>NSW</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>4185,4450-4499, 4680, 4700-4805, 9920-9959</p>
+</td>
+<td width="208">
+<p>QLD</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>4806-4899, 4900-4999, 9960-9999</p>
+</td>
+<td width="208">
+<p>QLD</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>5701</p>
+</td>
+<td width="208">
+<p>SA</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>6055</p>
+</td>
+<td width="208">
+<p>WA</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>7151</p>
+</td>
+<td width="208">
+<p>TAS</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>6215-6699</p>
+</td>
+<td width="208">
+<p>WA</p>
+</td>
+</tr>
+<tr>
+<td width="368">
+<p>6700-6799</p>
+</td>
+<td width="208">
+<p>WA</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong><u>&nbsp;</u></strong></p>
+<p><strong><u>We aim to provide the best saving for our customers. Item maybe sent via different courier services with different tracking no. in order to fit the economical shipping requirement for item size and weight. As a result, parcels may arrive in different day. Thanks for the understanding</u></strong></p>
+',
+GETDATE(),
+'System',
+GETDATE(),
+'System'

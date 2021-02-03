@@ -22,6 +22,7 @@ using HtmlAgilityPack;
 using LINQtoCSV;
 using System.IO;
 using ThirdStoreBusiness.DSChannel;
+using ThirdStoreBusiness.Setting;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -39,6 +40,8 @@ namespace ThirdStoreBusiness.JobItem
         private readonly IEnumerable<IDSChannel> _dsChannels;
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
+        private readonly ISettingService _settingService;
+        private readonly CommonSettings _commonSetting;
 
         public JobItemService(IRepository<D_JobItem> jobItemRepository,
             IRepository<D_JobItemLine> jobItemLineRepository,
@@ -49,7 +52,8 @@ namespace ThirdStoreBusiness.JobItem
             INetoAPICallManager netoAPIManager,
             IImageService imageService,
             IReportPrintService reportPrintService,
-            IEnumerable<IDSChannel> dsChannels)
+            IEnumerable<IDSChannel> dsChannels,
+            ISettingService settingService)
         {
             _jobItemRepository = jobItemRepository;
             _jobItemLineRepository = jobItemLineRepository;
@@ -61,6 +65,8 @@ namespace ThirdStoreBusiness.JobItem
             _imageService = imageService;
             _reportPrintService = reportPrintService;
             _dsChannels = dsChannels.OrderBy(c => c.Order);
+            _settingService = settingService;
+            _commonSetting = _settingService.LoadSetting<CommonSettings>();
             _csvContext = new CsvContext();
             _csvFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default };
         }
@@ -1140,7 +1146,11 @@ namespace ThirdStoreBusiness.JobItem
                             var fullDesc = htmlDoc.DocumentNode.OuterHtml;
                             var shippingNodeIndex = fullDesc.IndexOf(parentNode.OuterHtml);
                             var reserveDesc = fullDesc.Substring(shippingNodeIndex, fullDesc.Length - shippingNodeIndex);
-                            strDesc.Append(reserveDesc);
+                            var shippingDescTemplate = _commonSetting.ShippingDescriptionTemplate;
+                            if (string.IsNullOrWhiteSpace(shippingDescTemplate))
+                                strDesc.Append(reserveDesc);
+                            else
+                                strDesc.Append(shippingDescTemplate);
                         }
                     }
                 }
