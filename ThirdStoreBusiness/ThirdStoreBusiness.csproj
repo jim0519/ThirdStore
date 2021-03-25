@@ -124,6 +124,7 @@
     <Compile Include="Item\DSZSKUModel.cs" />
     <Compile Include="Item\IItemService.cs" />
     <Compile Include="Item\ItemService.cs" />
+    <Compile Include="JobItem\GumtreeFeed.cs" />
     <Compile Include="JobItem\IJobItemService.cs" />
     <Compile Include="JobItem\JobItemService.cs" />
     <Compile Include="Order\DSZImportLine.cs" />
