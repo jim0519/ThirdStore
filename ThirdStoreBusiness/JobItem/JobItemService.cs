@@ -649,8 +649,10 @@ namespace ThirdStoreBusiness.JobItem
             try
             {
                 Stream retStream = new MemoryStream();
+
+                var itemIds = GetAffectedItemIDsByJobItemIDs(jobItemIDs.ToList());
                 
-                var listingItems = FilterValidItems();
+                var listingItems = FilterValidItems(itemIds);
 
                 var lstExportProductListing = CalculateProductInventory(listingItems);
 
