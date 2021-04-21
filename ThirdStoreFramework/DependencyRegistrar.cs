@@ -27,6 +27,7 @@ using ThirdStoreFramework.Controllers;
 using ThirdStoreBusiness.DSChannel;
 using ThirdStoreBusiness.Report;
 using ThirdStoreBusiness.Setting;
+using ThirdStoreBusiness.GumtreeFeed;
 
 namespace ThirdStoreFramework
 {
@@ -111,6 +112,9 @@ namespace ThirdStoreFramework
 
             //Dropship Channels
             builder.RegisterAssemblyTypes(assemblies).Where(t => typeof(IDSChannel).IsAssignableFrom(t)).InstancePerLifetimeScope().AsImplementedInterfaces();
+
+            //Gumtree Feed
+            builder.RegisterType<GumtreeFeedService>().As<IGumtreeFeedService>().InstancePerLifetimeScope();
 
             //Report
             builder.RegisterType<ReportService>().As<IReportService>().InstancePerLifetimeScope();

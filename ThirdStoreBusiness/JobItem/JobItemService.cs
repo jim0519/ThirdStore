@@ -666,8 +666,10 @@ namespace ThirdStoreBusiness.JobItem
 
                 var gumtreeFeed = (from record in queryBase
                                    group new { record.localListing, record.jobItem, record.item } by new { record.localListing.SKUWSuffix } into grpUpdates
+                                   
                                    select new GumtreeFeed()
                                    {
+                                       
                                        SKU = grpUpdates.Key.SKUWSuffix,
                                        Title = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix) + (grpUpdates.FirstOrDefault().jobItem != null && !string.IsNullOrWhiteSpace(grpUpdates.FirstOrDefault().jobItem.ItemName) ? grpUpdates.FirstOrDefault().jobItem.ItemName : grpUpdates.FirstOrDefault().item.Name).ToLower(),
                                        Price = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Sum(ji => ji.jobItem.ItemPrice * (ji.jobItem.PricePercentage > 0 ? ji.jobItem.PricePercentage : 1)) : grpUpdates.FirstOrDefault().item.Price),
@@ -689,6 +691,9 @@ namespace ThirdStoreBusiness.JobItem
                                        Image11 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 11),
                                        Image12 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 12),
 
+                                   }).Select((x,index)=> {
+                                       x.ID = index+1;
+                                       return x;
                                    })
                               //.Where(u=>u.SKU.Contains("PIPE-CHAIR-511-BKX2"))
                               .ToList();

@@ -653,6 +653,11 @@ namespace ThirdStore.Controllers
 
                 var fileName = CommonFunc.ToCSVFileName("ExportGumtreeFeed");
 
+
+                if (!Directory.Exists(ThirdStoreConfig.Instance.GumtreeFeedPath))
+                    Directory.CreateDirectory(ThirdStoreConfig.Instance.GumtreeFeedPath);
+                System.IO.File.WriteAllBytes($"{ThirdStoreConfig.Instance.GumtreeFeedPath}/{fileName}", bytes);
+
                 //return File(outputStream, "application/zip", "filename.zip");
 
                 return File(bytes, "text/csv, application/zip", fileName);

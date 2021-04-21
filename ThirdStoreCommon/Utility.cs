@@ -130,6 +130,7 @@ namespace ThirdStoreCommon
             return default(T);
         }
     }
+    
 
     public class AppDomainTypeFinder : ITypeFinder
     {
@@ -882,6 +883,16 @@ namespace ThirdStoreCommon
             sb.Append("_");
             sb.Append(DateTime.Now.ToString("yyyyMMddHHmmss"));
             sb.Append(".csv");
+            return sb.ToString();
+        }
+
+        public static string ToFileName(string prefix, string ext)
+        {
+            var sb = new StringBuilder();
+            sb.Append(prefix);
+            sb.Append("-");
+            sb.Append(DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss"));
+            sb.Append("." + ext);
             return sb.ToString();
         }
 

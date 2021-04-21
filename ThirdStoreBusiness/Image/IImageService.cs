@@ -24,5 +24,7 @@ namespace ThirdStoreBusiness.Image
         string GetImageURL(int imageID);
 
         D_Image DuplicateImageByID(int id);
+
+        string GetLocalImagePathByURL(string imageUrl);
     }
 }

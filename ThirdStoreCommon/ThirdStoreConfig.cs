@@ -87,6 +87,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string GumtreeFeedPath
+        {
+            get
+            {
+                return AppDomain.CurrentDomain.BaseDirectory + "\\GumtreeFeedFile";
+            }
+        }
+
 
         public string SyncDSPriceBelow
         {

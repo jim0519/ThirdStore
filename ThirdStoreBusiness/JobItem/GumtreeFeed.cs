@@ -53,6 +53,7 @@ namespace ThirdStoreBusiness.JobItem
         public string Image11 { get; set; }
         [CsvColumn(FieldIndex = 20)]
         public string Image12 { get; set; }
-
+        [CsvColumn(FieldIndex = 21)]
+        public int ID { get; set; }
     }
 }

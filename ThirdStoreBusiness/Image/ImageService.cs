@@ -126,6 +126,12 @@ namespace ThirdStoreBusiness.Image
             return url;
         }
 
+        public string GetLocalImagePathByURL(string imageUrl)
+        {
+            var fileName = imageUrl.Substring(imageUrl.LastIndexOf("/") + 1);
+            return ThirdStoreConfig.Instance.ThirdStoreImagesPath + "\\" + fileName;
+        }
+
         public D_Image DuplicateImageByID(int id)
         {
             try

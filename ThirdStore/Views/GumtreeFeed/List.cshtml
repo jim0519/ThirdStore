@@ -1,0 +1,226 @@
+﻿@model GumtreeFeedListViewModel
+@{
+    ViewBag.Title = "Gumtree Feed List";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
+        <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
+        <div id="divOperationBtn" style="float:right">
+            <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+            <input type="button" id="btnRedownloadFeeds" class="k-button" value="Redownload Feeds" />
+            <input type="button" id="btnDownloadImage" class="k-button" value="Download Images" />
+            <script>
+                $(document).ready(function () {
+
+                    $('#btnDownloadImage').click(function (e) {
+                        if (selectedIds.length == 0) {
+                            alert("Please select more than one item to edit");
+                            return false;
+                        }
+                        e.preventDefault();
+
+                        var grid = $('#gumtreefeed-grid').data('kendoGrid');
+                        var selectedRowsObj = $('#gumtreefeed-grid').find('tr').has('input[type=checkbox][id!=mastercheckbox]:checked');
+                        var selectedDataItems = [];
+                        selectedRowsObj.each(function () {
+                            var di = grid.dataItem($(this));
+                            selectedDataItems.push(di);
+                        });
+                        debugger;
+
+                        var link="@Html.Raw(Url.Action("DownloadImage", "GumtreeFeed"))"
+                        var ids = selectedIds.join(",");
+                        var postData = JSON.stringify({
+                            selectedLines: selectedDataItems
+                        });
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            data: postData,
+                            dataType: "json",
+                            beforeSend: function () {
+                                $("#imgLoading").show();
+                            },
+                            complete: function () {
+                                $("#imgLoading").hide();
+                            },
+                            success: function (data) {
+                                if (data.Result) {
+                                    window.location = '@Html.Raw(Url.Action("Download", new { FileGuid = "_FileGuid_" }))'.replace('_FileGuid_', data.FileGuid);
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+                    });
+
+                });
+            </script>
+        </div>
+    </div>
+
+    <table width="100%">
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchSKU):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchSKU)
+            </td>
+        </tr>
+        
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="button" id="btnSearch" class="k-button" value="Search" />
+                <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+            </td>
+        </tr>
+    </table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="gumtreefeed-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#gumtreefeed-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("List", "GumtreeFeed"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors",
+                                    model: {
+                                        id: "ID",
+                                        fields: {
+                                            ID: { editable: false, type: "number" },
+                                            SKU: { editable: false, type: "string" },
+                                            JobItemIDs: { editable: false, type: "string" },
+                                            References: { editable: false, type: "string" },
+                                            Condition: { editable: false, type: "string" },
+                                            Price: { editable: false, type: "number" },
+                                            Title: { editable: false, type: "string" },
+                                            CreateTime: { editable: false, type: "date" },
+                                            Image1: { editable: false, type: "string" },
+                                            Image2: { editable: true, type: "string" },
+                                            Image3: { editable: true, type: "string" },
+                                            Image4: { editable: true, type: "string" },
+                                        }
+                                    }
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "2000",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["2000", "5000", "10000"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            toolbar: ["excel"],
+                            excel: {
+                                allPages: true,
+                                fileName: "Item.xlsx"
+                            },
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                }, {
+                                    field: "SKU",
+                                    title: "SKU"
+                                }, {
+                                    field: "JobItemIDs",
+                                    title: "JobItemIDs"
+                                }, {
+                                    field: "References",
+                                    title: "References"
+                                }, {
+                                    field: "CreateTime",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}",
+                                    title: "CreateTime"
+                                }, {
+                                    field: "Condition",
+                                    title: "Condition"
+                                }, {
+                                    field: "Title",
+                                    title: "Title"
+                                }, {
+                                    field: "Price",
+                                    title: "Price"
+                                }
+                            ]
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+    var selectedIds = [];
+    $(document).ready(function () {
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+
+            $('#@Html.FieldIdFor(model => model.SearchSKU)').val("");
+
+            selectedIds = [];
+
+            RefreshGrid(false);
+
+            return false;
+        });
+
+    });
+    function additionalData() {
+        return {
+            SearchSKU: $('#@Html.FieldIdFor(model => model.SearchSKU)').val()
+        };
+    }
+    </script>
+
+}

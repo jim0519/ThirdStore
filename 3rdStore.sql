@@ -1748,3 +1748,9 @@ GETDATE(),
 'System',
 GETDATE(),
 'System'
+
+
+
+---Shrink log file
+ALTER DATABASE ThirdStore SET RECOVERY SIMPLE
+ DBCC SHRINKFILE ([3rdStore_log], 1)
