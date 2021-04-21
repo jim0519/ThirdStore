@@ -815,7 +815,7 @@ namespace ThirdStoreBusiness.Item
                     newProduct.NetoProductID = p.ID;
                     newProduct.SKU = p.SKU;
                     if (p.WarehouseQuantity != null)
-                        newProduct.Qty = p.WarehouseQuantity.Quantity;
+                        newProduct.Qty = p.WarehouseQuantity[0].Quantity;
                     else
                         newProduct.Qty = "0";
                     newProduct.DefaultPrice = p.DefaultPrice.ToString();
