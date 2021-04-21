@@ -75,7 +75,7 @@
                                 });
                                 return false;
                             });
-                            
+
                         });
 
                     </script>
@@ -92,6 +92,7 @@
                 <img id="imgLoadingJobItem" src="~/Content/images/loading.gif" style="display:none;" />
                 @*<input type="button" id="btnUpdateDSZ" class="k-button" value="Update DSZ Data and Sync" />*@
                 <input type="button" id="btnSyncByJobItem" class="k-button" value="Sync Inventory" />
+                <input type="button" id="btnExportGumtreeFeed" class="k-button" value="Export Gumtree Feed" />
             }
             <input type="button" id="btnPrintLabel" class="k-button" value="Print Label" />
             <input type="button" id="btnDuplicate" class="k-button" value="Duplicate" />
@@ -593,7 +594,7 @@
                         });
                     });
 
-                    
+
                 </script>
 
             </td>
@@ -659,49 +660,70 @@
 }
 
 
-    <div id="bulkUpdateJobItem-window" style="display:none;">
-        @using (Html.BeginForm("BulkUpdateJobItem", "JobItem", FormMethod.Post, new { id = "bulk-update-jobitem-form" }))
-        {
-            @Html.ValidationSummary()
-            <input type="hidden" id="jobItemIdsBulkUpdate" name="jobItemIdsBulkUpdate" value="" />
-            <table style="text-align:left;">
-                <tr>
-                    <td>
-                        @Html.LabelFor(model => model.BulkUpdate.StatusID):
-                    </td>
-                    <td>
-                        @Html.DropDownListFor(model => model.BulkUpdate.StatusID, Model.JobItemStatuses)
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        @Html.LabelFor(model => model.BulkUpdate.Location):
-                    </td>
-                    <td>
-                        @Html.EditorFor(model => model.BulkUpdate.Location)
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        @Html.LabelFor(model => model.BulkUpdate.ItemPrice):
-                    </td>
-                    <td>
-                        @Html.EditorFor(model => model.BulkUpdate.ItemPrice)
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        @Html.LabelFor(model => model.BulkUpdate.PricePercentage):
-                    </td>
-                    <td>
-                        @Html.EditorFor(model => model.BulkUpdate.PricePercentage)
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="submit" class="k-button" value="Submit" id="btnBulkEditSubmit"/>
-                    </td>
-                </tr>
-            </table>
-        }
-    </div>
+<div id="bulkUpdateJobItem-window" style="display:none;">
+    @using (Html.BeginForm("BulkUpdateJobItem", "JobItem", FormMethod.Post, new { id = "bulk-update-jobitem-form" }))
+    {
+        @Html.ValidationSummary()
+        <input type="hidden" id="jobItemIdsBulkUpdate" name="jobItemIdsBulkUpdate" value="" />
+        <table style="text-align:left;">
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.BulkUpdate.StatusID):
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.BulkUpdate.StatusID, Model.JobItemStatuses)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.BulkUpdate.Location):
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.BulkUpdate.Location)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.BulkUpdate.ItemPrice):
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.BulkUpdate.ItemPrice)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.BulkUpdate.PricePercentage):
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.BulkUpdate.PricePercentage)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" class="k-button" value="Submit" id="btnBulkEditSubmit" />
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+
+
+@using (Html.BeginForm("ExportGumtreeFeed", "JobItem", FormMethod.Post, new { id = "export-gumtree-feed-form" }))
+{
+    <input type="hidden" id="jobItemIDs" name="jobItemIDs" value="" />
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#btnExportGumtreeFeed').click(function (e) {
+            e.preventDefault();
+            var ids = selectedIds.join(",");
+            //debugger;
+            $('#export-gumtree-feed-form #jobItemIDs').val(ids);
+            $('#export-gumtree-feed-form').submit();
+            return false;
+        });
+    });
+
+</script>

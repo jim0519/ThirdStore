@@ -26,6 +26,7 @@ using LINQtoCSV;
 using ThirdStoreFramework.Controllers;
 using ThirdStoreBusiness.DSChannel;
 using ThirdStoreBusiness.Report;
+using ThirdStoreBusiness.Setting;
 
 namespace ThirdStoreFramework
 {
@@ -113,6 +114,9 @@ namespace ThirdStoreFramework
 
             //Report
             builder.RegisterType<ReportService>().As<IReportService>().InstancePerLifetimeScope();
+
+            //Setting
+            builder.RegisterType<SettingService>().As<ISettingService>().InstancePerLifetimeScope();
         }
 
         public int Order

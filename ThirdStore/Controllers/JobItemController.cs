@@ -631,6 +631,40 @@ namespace ThirdStore.Controllers
             }
         }
 
+
+        [HttpPost]
+        public ActionResult ExportGumtreeFeed(string jobItemIDs)
+        {
+            try
+            {
+                //var csvContent = orderList.Aggregate((current, next) => current + "," + next);
+                byte[] bytes = null;
+                if (jobItemIDs != null)
+                {
+                    var ids = jobItemIDs
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => Convert.ToInt32(x))
+                        .ToArray();
+                    using (var stream = _jobItemService.ExportGumtreeFeed(ids))
+                    {
+                        bytes = ((MemoryStream)stream).ToArray();
+                    }
+                }
+
+                var fileName = CommonFunc.ToCSVFileName("ExportGumtreeFeed");
+
+                //return File(outputStream, "application/zip", "filename.zip");
+
+                return File(bytes, "text/csv, application/zip", fileName);
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Export Order Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
         //[HttpPost]
         //public ActionResult ChildItemCheck(ItemViewModel.ChildItemLineViewModel model)
         //{

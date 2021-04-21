@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ThirdStoreCommon.Models.JobItem;
 using ThirdStoreCommon;
-
+using System.IO;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -84,5 +84,7 @@ namespace ThirdStoreBusiness.JobItem
         ThirdStoreReturnMessage SyncInventory(int[] jobItemIDs);
 
         ThirdStoreReturnResult<D_JobItem> MatchJobItemVerifyTracking(string jobItemLineID, string jobItemLineRef, string trackingNumber);
+
+        Stream ExportGumtreeFeed(int[] jobItemIDs);
     }
 }
