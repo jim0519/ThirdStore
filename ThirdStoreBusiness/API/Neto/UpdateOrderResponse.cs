@@ -1,6 +1,8 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using ThirdStoreCommon;
 using ThirdStoreCommon.Models;
 
 namespace ThirdStoreBusiness.API.Neto
@@ -14,7 +16,8 @@ namespace ThirdStoreBusiness.API.Neto
 
     public partial class UpdateOrderResponseOrder
     {
-        public string OrderID { get; set; }
+        [JsonConverter(typeof(SingleValueArrayConverter<string>))]
+        public List<string> OrderID { get; set; }
     }
 
     public partial class UpdateOrderResponseMessages

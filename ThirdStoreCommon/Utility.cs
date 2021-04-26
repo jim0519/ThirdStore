@@ -132,6 +132,7 @@ namespace ThirdStoreCommon
         }
     }
 
+    //See details: https://stackoverflow.com/questions/5224697/deserializing-json-when-sometimes-array-and-sometimes-object
     public class SingleValueArrayConverter<T> : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

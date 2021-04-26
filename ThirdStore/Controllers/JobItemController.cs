@@ -497,7 +497,8 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
-        public ActionResult ValidateInput(JobItemViewModel model)
+        //[ParameterBasedOnFormName("save-print", "isPrintLabel")]
+        public ActionResult ValidateInput(JobItemViewModel model, bool isPrintLabel)
         {
             if (!string.IsNullOrEmpty(model.DesignatedSKU))
             {
@@ -574,9 +575,12 @@ namespace ThirdStore.Controllers
                 return Json(new { Result = false, Message = "Please input the item location." });
             }
 
-            if (model.JobItemViewImages==null||model.JobItemViewImages.Count == 0)
+            if (isPrintLabel)
             {
-                return Json(new { Result = false, Message = "Please upload ast least one photo." });
+                if (model.JobItemViewImages == null || model.JobItemViewImages.Count < 6)
+                {
+                    return Json(new { Result = false, Message = "Please upload ast least 6 photos." });
+                }
             }
 
             //if(model.JobItemViewLines.Any(l=>l.Qty>1))

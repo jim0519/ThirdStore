@@ -474,13 +474,15 @@
                 });
 
             $("input[type=submit]").click(function () {
-                //debugger;
+                debugger;
                 var isValid = true;
+                var isPrintLabel = ($(this).attr('name').includes("print") ? true : false);
                 $.ajax({
+                    //url: '@Url.Action("ValidateInput", "JobItem",new { IsPrintLabel= "_isPrintLabel_" })'.replace('_isPrintLabel_', isPrintLabel),
                     url: '@Url.Action("ValidateInput", "JobItem")',
                     type: "POST",
                     async: false,
-                    data: $("#opForm").serialize(),
+                    data: $("#opForm").serialize() + '&IsPrintLabel=' + isPrintLabel,
                     success: function (response) {
                         //debugger;
                         if (response.Result)
