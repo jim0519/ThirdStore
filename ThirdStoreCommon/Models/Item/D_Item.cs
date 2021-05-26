@@ -32,9 +32,9 @@ namespace ThirdStoreCommon.Models.Item
         public string Ref1 { get; set; }//Reference SKU
         public string Ref2 { get; set; }//Neto Alias SKU
         public string Ref3 { get; set; }//UPC
-        public string Ref4 { get; set; }//Notes
-        public string Ref5 { get; set; }
-
+        public string Ref4 { get; set; }//Link
+        public string Ref5 { get; set; }//For supplier P and S, Image URLs; For supplier A, Categories
+        public string Ref6 { get; set; }//Notes
 
         public System.DateTime CreateTime { get; set; }
         public string CreateBy { get; set; }

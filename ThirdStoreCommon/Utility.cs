@@ -144,14 +144,25 @@ namespace ThirdStoreCommon
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             object retVal = new Object();
-            if (reader.TokenType == JsonToken.StartObject)
+            try
             {
-                T instance = (T)serializer.Deserialize(reader, typeof(T));
-                retVal = new List<T>() { instance };
+                if (reader.TokenType == JsonToken.StartObject)
+                {
+                    T instance = (T)serializer.Deserialize(reader, typeof(T));
+                    retVal = new List<T>() { instance };
+                }
+                else if (reader.TokenType == JsonToken.StartArray)
+                {
+                    retVal = serializer.Deserialize(reader, objectType);
+                }
+                else
+                {
+                    retVal = null;
+                }
             }
-            else if (reader.TokenType == JsonToken.StartArray)
+            catch(Exception ex)
             {
-                retVal = serializer.Deserialize(reader, objectType);
+                throw ex;
             }
             return retVal;
         }

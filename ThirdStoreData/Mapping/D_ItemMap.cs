@@ -82,6 +82,7 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Ref3).HasColumnName("Ref3");
             this.Property(t => t.Ref4).HasColumnName("Ref4");
             this.Property(t => t.Ref5).HasColumnName("Ref5");
+            this.Property(t => t.Ref6).HasColumnName("Ref6");
         }
     }
 }
