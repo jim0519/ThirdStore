@@ -92,7 +92,7 @@
     </tr>
     <tr>
         <td class="adminTitle">
-            @Html.LabelFor(m => m.NetWeight) 
+            @Html.LabelFor(m => m.NetWeight)
         </td>
         <td class="adminData">
             @Html.EditorFor(model => model.NetWeight) kg
@@ -171,7 +171,20 @@
             @Html.LabelFor(m => m.Ref4)
         </td>
         <td>
-            @Html.TextAreaFor(model => model.Ref4, 4, 30, null)
+            @Html.EditorFor(model => model.Ref4)
+            @if(!string.IsNullOrWhiteSpace( Model.Ref4))
+            {
+                <text><a href="@Model.Ref4" target="_blank" style="display: inline-block;width: 50px;">Link</a></text>
+            }
+            
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.Ref6)
+        </td>
+        <td colspan="3">
+            @Html.TextAreaFor(model => model.Ref6, 4, 30, null)
         </td>
     </tr>
 </table>

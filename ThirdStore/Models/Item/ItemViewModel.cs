@@ -47,8 +47,10 @@ namespace ThirdStore.Models.Item
         public string Ref2 { get; set; }
         [Display(Name = "UPC")]
         public string Ref3 { get; set; }
-        [Display(Name = "Notes")]
+        [Display(Name = "eBay Site")]
         public string Ref4 { get; set; }
+        [Display(Name = "Notes")]
+        public string Ref6 { get; set; }
 
         public bool ShowSyncInventory { get; set; }
 

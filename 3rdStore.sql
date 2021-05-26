@@ -1748,3 +1748,55 @@ GETDATE(),
 'System',
 GETDATE(),
 'System'
+
+
+-- Add Ref6 in D_Item
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_Item' AND C.Name='Ref6')
+	ALTER TABLE dbo.D_Item ADD
+		Ref6 varchar(4000) NOT NULL CONSTRAINT DF_D_Item_Ref6 DEFAULT ''
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_Ref6')
+	ALTER TABLE dbo.D_Item
+		DROP CONSTRAINT DF_D_Item_Ref6
+GO
+
+
+
+
+-- faulty rate
+select 
+AGGR.*,
+--CONVERT(decimal(10,2), AGGR.DandP/AGGR.TotalQty) as FaultyRate
+case 
+ when I.SupplierID=1 then 'P'
+ when I.SupplierID=2 then 'A'
+ when I.SupplierID=3 then 'S'
+ when I.SupplierID=4 then 'T'
+ when I.SupplierID=5 then 'O' end  Supplier ,
+ I.Name,
+ I.Price,
+ I.Ref4 Link,
+CONVERT(decimal(10,2), AGGR.DandP)/CONVERT(decimal(10,2),AGGR.TotalQty)*100 as FaultyRate
+from 
+(
+	select 
+	SKU,
+	SUM(case when Type=1 and ConditionID=1 then 1 else 0 end) SelfNew,
+	SUM(case when Type=1 and ConditionID=2 then 1 else 0 end) SelfUsed,
+	SUM(case when Type in (2,3) then 1 else 0 end) DandP,
+	COUNT(1) TotalQty
+	from
+	(
+		select 
+		distinct
+		case when H.DesignatedSKU<>'' then H.DesignatedSKU else L.SKU end SKU,
+		H.*
+		from D_JobItem H
+		inner join D_JobItemLine L on H.ID=L.HeaderID
+
+	) DA
+	group by SKU
+) AGGR
+inner join D_Item I on AGGR.SKU=I.SKU
