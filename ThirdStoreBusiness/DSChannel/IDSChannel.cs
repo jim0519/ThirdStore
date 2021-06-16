@@ -602,7 +602,7 @@ namespace ThirdStoreBusiness.DSChannel
                         foreach (var data in dsDatasBySKUs)
                         {
                             var invQty = 0;
-                            if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow)
+                            if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove)
                                 &&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "Free")
                             {
                                 invQty = dsInventoryThredshold;
