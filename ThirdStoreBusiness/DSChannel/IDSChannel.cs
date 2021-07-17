@@ -603,7 +603,7 @@ namespace ThirdStoreBusiness.DSChannel
                         {
                             var invQty = 0;
                             if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove)
-                                &&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "Free")
+                                &&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "0")
                             {
                                 invQty = dsInventoryThredshold;
                             }
