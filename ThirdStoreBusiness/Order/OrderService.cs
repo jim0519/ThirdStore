@@ -528,6 +528,7 @@ namespace ThirdStoreBusiness.Order
             string jobItemID = null, 
             string customerID=null,
             string consigneeName = null,
+            string sku=null,
             int statusID=0,
             int pageIndex = 0, 
             int pageSize = int.MaxValue)
@@ -554,6 +555,9 @@ namespace ThirdStoreBusiness.Order
 
             if(consigneeName!=null)
                 query = query.Where(o => o.ConsigneeName.Contains(consigneeName));
+
+            if (sku != null)
+                query = query.Where(o => o.OrderLines.Any(l => l.SKU.ToUpper().Contains(sku.ToUpper())));
 
             if (jobItemID!=null)
                 query=query.Where(o => o.BuyerNote.Contains(jobItemID)||o.OrderLines.Any(l=>l.Ref5.Contains(jobItemID)));

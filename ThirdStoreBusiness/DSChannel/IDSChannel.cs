@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ThirdStoreBusiness.Item;
 using ThirdStoreBusiness.Order;
+using ThirdStoreBusiness.Setting;
 using ThirdStoreCommon;
 using ThirdStoreCommon.Models.Item;
 using ThirdStoreCommon.Models.Order;
@@ -36,12 +37,17 @@ namespace ThirdStoreBusiness.DSChannel
     {
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
+        private readonly ISettingService _settingService;
+        private readonly CommonSettings _commonSetting;
         public DSZChannel(
             CsvContext csvContext,
-            CsvFileDescription csvFileDescription)
+            CsvFileDescription csvFileDescription,
+            ISettingService settingService)
         {
             _csvContext = csvContext;
             _csvFileDescription = csvFileDescription;
+            _settingService = settingService;
+            _commonSetting = _settingService.LoadSetting<CommonSettings>();
         }
 
         public int DSChannel =>ThirdStoreSupplier.P.ToValue();
@@ -141,7 +147,7 @@ namespace ThirdStoreBusiness.DSChannel
                             dsData.NT.IsNumeric()? Convert.ToDecimal(dsData.NT):0
                             }.Max();
 
-                            newItem.Price = (newItem.Cost + postage) * Convert.ToDecimal(1.3);
+                            newItem.Price = (newItem.Cost + postage) * _commonSetting.DropshipMarkupRate;
                             newItem.Type = ThirdStoreItemType.SINGLE.ToValue();
                             newItem.SupplierID = ThirdStoreSupplier.P.ToValue();
                             newItem.GrossWeight = (!string.IsNullOrWhiteSpace(dsData.Weight) ? Convert.ToDecimal(dsData.Weight) : 0);
@@ -349,12 +355,17 @@ namespace ThirdStoreBusiness.DSChannel
     {
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
+        private readonly ISettingService _settingService;
+        private readonly CommonSettings _commonSetting;
         public SelloDSChannel(
             CsvContext csvContext,
-            CsvFileDescription csvFileDescription)
+            CsvFileDescription csvFileDescription,
+            ISettingService settingService)
         {
             _csvContext = csvContext;
             _csvFileDescription = csvFileDescription;
+            _settingService = settingService;
+            _commonSetting = _settingService.LoadSetting<CommonSettings>();
         }
 
         public int DSChannel => ThirdStoreSupplier.S.ToValue();
@@ -442,7 +453,7 @@ namespace ThirdStoreBusiness.DSChannel
                             newItem.Name = dsData.name;
                             newItem.Description = dsData.description;
                             newItem.Cost = dsData.special_price;
-                            newItem.Price = (newItem.Cost) * Convert.ToDecimal(1.3);
+                            newItem.Price = (newItem.Cost) * _commonSetting.DropshipMarkupRate;
                             newItem.Type= ThirdStoreItemType.SINGLE.ToValue();
                             newItem.SupplierID = ThirdStoreSupplier.S.ToValue();
                             newItem.GrossWeight = (!string.IsNullOrWhiteSpace(dsData.weight) ? Convert.ToDecimal(dsData.weight) : 0);

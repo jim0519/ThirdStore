@@ -34,6 +34,7 @@ namespace ThirdStore.Models.Order
         public string SearchCustomerID { get; set; }
         public string SearchConsigneeName { get; set; }
         public int SearchStatusID { get; set; }
+        public string SearchSKU { get; set; }
 
 
 

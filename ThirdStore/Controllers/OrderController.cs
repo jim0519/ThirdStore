@@ -76,6 +76,7 @@ namespace ThirdStore.Controllers
                 jobItemID:model.SearchJobItemID,
                 customerID:model.SearchCustomerID,
                 consigneeName:model.SearchConsigneeName,
+                sku:model.SearchSKU,
                 statusID:model.SearchStatusID,
                 pageIndex: command.Page - 1,
                 pageSize:command.PageSize);

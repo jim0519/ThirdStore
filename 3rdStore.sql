@@ -1747,6 +1747,18 @@ select
 GETDATE(),
 'System',
 GETDATE(),
+'System'
+
+
+insert into T_Setting
+select
+'commonsettings.dropshipmarkuprate',
+'',
+'1.4',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
 
 
 

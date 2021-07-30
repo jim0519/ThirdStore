@@ -23,8 +23,9 @@ namespace ThirdStoreBusiness.Order
             DateTime? orderTimeTo = null,
             string channelOrderID = null,
             string jobItemID = null,
-            string customerID=null,
-            string consigneeName=null,
+            string customerID = null,
+            string consigneeName = null,
+            string sku = null,
             int statusID=0,
             int pageIndex = 0,
             int pageSize = int.MaxValue);

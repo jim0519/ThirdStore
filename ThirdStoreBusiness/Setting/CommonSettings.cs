@@ -10,5 +10,7 @@ namespace ThirdStoreBusiness.Setting
         }
 
         public string ShippingDescriptionTemplate { get; set; }
+
+        public decimal DropshipMarkupRate { get; set; }
     }
 }
