@@ -95,6 +95,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string UploadTrackingPath
+        {
+            get
+            {
+                return AppDomain.CurrentDomain.BaseDirectory + "\\UploadTrackingFile";
+            }
+        }
+
 
         public string SyncDSPriceBelow
         {

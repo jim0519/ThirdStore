@@ -120,6 +120,22 @@
                             return false;
                         });
 
+
+                        $('#btnUploadTracking').click(function (e) {
+                            e.preventDefault();
+                            var window = $("#uploadTracking-window");
+                            if (!window.data("kendoWindow")) {
+                                window.kendoWindow({
+                                    modal: true,
+                                    width: "400px",
+                                    title: "Upload Tracking",
+                                    actions: ["Close"]
+                                });
+                            }
+                            window.data('kendoWindow').center().open();
+
+                        });
+
                     });
 
                 </script>
@@ -130,7 +146,8 @@
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
-                <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
+            <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
+            <input type="button" id="btnUploadTracking" class="k-button" value="Upload Tracking" />
         </div>
     </div>
 
@@ -512,3 +529,20 @@
     <input type="hidden" id="orderIds" name="orderIds" value="" />
 }
 
+    <div id="uploadTracking-window" style="display:none;">
+        @using (Html.BeginForm("UploadTracking", "Order", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <table style="text-align:left;">
+                <tr>
+                    <td>
+                        <input type="file" id="uploadTrackingFile" name="uploadTrackingFile" multiple />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" class="k-button" value="Submit" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>

@@ -10,6 +10,13 @@ using ThirdStoreCommon;
 namespace ThirdStoreBusiness.API.eBay
 {
 
+    public class ShipmentDetail
+    {
+        public string OrderLineItemID { get; set; }
+        public string ShipmentTrackingNumber { get; set; }
+        public string ShippingCarrierUsed { get; set; }
+    }
+
     public interface IeBayApiContextProvider
     {
         ApiContext GetAPIContext();
@@ -23,6 +30,8 @@ namespace ThirdStoreBusiness.API.eBay
         //ItemType[] GetSoldItemSnapshot(IList<string> orderLineItemIDs);
 
         ItemType GetSoldItemSnapshot(string orderLineItemID);
+
+        void UpdateeBayShipment(IList<ShipmentDetail> shipmentDetails);
     }
 
 
@@ -169,6 +178,58 @@ namespace ThirdStoreBusiness.API.eBay
             {
                 LogManager.Instance.Error(ex.ToString());
                 throw ex;
+            }
+        }
+
+        public void UpdateeBayShipment(IList<ShipmentDetail> shipmentDetails)
+        {
+            try
+            {
+                CompleteSaleRequestType completeSaleRequest;
+
+                var apiContext = _eBayApiContextProvider.GetAPIContext();
+
+                var completeSaleCall = new CompleteSaleCall(apiContext);
+                foreach (var shipmentDetail in shipmentDetails)
+                {
+                    try
+                    {
+                        if (string.IsNullOrEmpty(shipmentDetail.OrderLineItemID))
+                            continue;
+
+                        completeSaleRequest = new CompleteSaleRequestType();
+                        completeSaleRequest.OrderLineItemID = shipmentDetail.OrderLineItemID;
+
+                        if (!string.IsNullOrEmpty(shipmentDetail.ShipmentTrackingNumber) && !string.IsNullOrEmpty(shipmentDetail.ShippingCarrierUsed))
+                        {
+                            completeSaleRequest.Shipment = new ShipmentType();
+                            completeSaleRequest.Shipment.ShipmentTrackingNumber = shipmentDetail.ShipmentTrackingNumber;
+                            completeSaleRequest.Shipment.ShippingCarrierUsed = shipmentDetail.ShippingCarrierUsed;
+                        }
+
+                        completeSaleRequest.Shipped = true;
+
+                        var completeSaleResponse = completeSaleCall.ExecuteRequest(completeSaleRequest) as CompleteSaleResponseType;
+                        if (completeSaleResponse.Ack == AckCodeType.Failure || completeSaleResponse.Ack == AckCodeType.PartialFailure)
+                        {
+                            LogManager.Instance.Error("Update eBay Shipment Failed for Order " + shipmentDetail.OrderLineItemID + Environment.NewLine);
+                            if (completeSaleResponse.Errors != null && completeSaleResponse.Errors.Count > 0)
+                            {
+                                LogManager.Instance.Error("Error Detail:" + shipmentDetail.OrderLineItemID + " " + completeSaleResponse.Errors[0].LongMessage + Environment.NewLine);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogManager.Instance.Error("Update eBay Shipment Failed for Order " + shipmentDetail.OrderLineItemID + Environment.NewLine + ex.Message);
+                        //throw ex;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
             }
         }
 

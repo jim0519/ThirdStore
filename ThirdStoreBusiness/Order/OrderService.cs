@@ -16,12 +16,14 @@ using ThirdStoreCommon.Models.Item;
 using LINQtoCSV;
 using ThirdStoreBusiness.DSChannel;
 using Ionic.Zip;
+using System.Text.RegularExpressions;
 
 namespace ThirdStoreBusiness.Order
 {
     public class OrderService:IOrderService
     {
         private readonly IRepository<D_Order_Header> _orderRepository;
+        private readonly IRepository<D_Order_Line> _orderLineRepository;
         private readonly INetoAPICallManager _netoAPICallManager;
         private readonly IeBayAPICallManager _eBayAPICallManager;
         private readonly IWorkContext _workContext;
@@ -32,6 +34,7 @@ namespace ThirdStoreBusiness.Order
         private readonly IEnumerable<IDSChannel> _dsChannels;
 
         public OrderService(IRepository<D_Order_Header> orderRepository,
+            IRepository<D_Order_Line> orderLineRepository,
             INetoAPICallManager netoAPICallManager,
             IeBayAPICallManager eBayAPICallManager,
             IWorkContext workContext,
@@ -42,6 +45,7 @@ namespace ThirdStoreBusiness.Order
             CsvFileDescription csvFileDesc)
         {
             _orderRepository = orderRepository;
+            _orderLineRepository = orderLineRepository;
             _netoAPICallManager = netoAPICallManager;
             _eBayAPICallManager = eBayAPICallManager;
             _workContext = workContext;
@@ -646,6 +650,79 @@ namespace ThirdStoreBusiness.Order
         {
             var query = _orderRepository.Table.Where(o => orderids.Contains(o.ID));
             return query.ToList();
+        }
+
+        public void UploadTracking(StreamReader trackingStreamReader)
+        {
+            try
+            {
+                var dszTrackings = _csvContext.Read<DSZTrackingFile>(trackingStreamReader, _csvFileDesc);
+                //check file
+                //if(dszTrackings.Any(t=>!Regex.IsMatch( t.NetoOrderID,"")))
+                foreach (var tracking in dszTrackings)
+                {
+                    if (!Regex.IsMatch(tracking.NetoOrderLineID, @"^N\d+-\d{1}$"))
+                        throw new Exception($"Neto Order Line ID {tracking.NetoOrderLineID} is not matching with the pattern Nxxxx-x");
+                }
+
+                var NetoOrderLineIDs = dszTrackings.Select(t => t.NetoOrderLineID.Trim());
+                var orderLines = _orderLineRepository.Table.Where(line => NetoOrderLineIDs.Contains(line.Ref1)).ToList();
+
+                var linesNotInDB = NetoOrderLineIDs.Where(id => !orderLines.Select(line => line.Ref1).Contains(id)).ToList();
+                if (linesNotInDB.Count > 0)
+                    throw new Exception($"Neto Order Line ID {linesNotInDB.Aggregate((current, next) => current + "," + next)} do not in database.");
+
+                var linesNoteBay = orderLines.Where(line => string.IsNullOrWhiteSpace(line.Ref2)).ToList();
+                if (linesNoteBay.Count > 0)
+                    throw new Exception($"Neto Order Line ID {linesNoteBay.Select(line => line.Ref1).Aggregate((current, next) => current + "," + next)} are not from eBay.");
+
+                var orderLineTrackings = from tracking in dszTrackings
+                                         join orderLine in orderLines on tracking.NetoOrderLineID.Trim().ToUpper() equals orderLine.Ref1.ToUpper()
+                                         //select new { tracking.NetoOrderLineID, tracking.Carrier, tracking.TrackingNumber, eBayOrderLineItemID = orderLine.Ref2, OrderLineID = orderLine.ID };
+                                         select new { TrackingDetail = tracking, OrderLine = orderLine };
+
+                var shipmentDetails = new List<ShipmentDetail>();
+                foreach (var orderLineTracking in orderLineTrackings)
+                {
+                    var shipmentDetail = new ShipmentDetail();
+                    shipmentDetail.OrderLineItemID = orderLineTracking.OrderLine.Ref2;
+                    shipmentDetail.ShippingCarrierUsed = MapShippingCarrier(orderLineTracking.TrackingDetail.Carrier);
+                    shipmentDetail.ShipmentTrackingNumber = orderLineTracking.TrackingDetail.TrackingNumber;
+
+                    shipmentDetails.Add(shipmentDetail);
+
+                    var orderLine = orderLineTracking.OrderLine;
+                    orderLine.Ref3 += (string.IsNullOrEmpty(orderLine.Ref3) ? string.Empty : ";") + shipmentDetail.ShippingCarrierUsed;
+                    orderLine.Ref4 += (string.IsNullOrEmpty(orderLine.Ref4) ? string.Empty : ";") + shipmentDetail.ShipmentTrackingNumber;
+                }
+
+                _eBayAPICallManager.UpdateeBayShipment(shipmentDetails);
+
+                _orderLineRepository.Update(orderLineTrackings.Select(lt => lt.OrderLine), l => l.Ref3, l => l.Ref4);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private string MapShippingCarrier(string carrier)
+        {
+            var carrierCode = string.Empty;
+            if (carrier == "Auspost")
+                carrierCode = "Australia Post";
+            else if (carrier == "ARAMEX")
+                carrierCode = "FASTWAY COURIERS";
+            else if (carrier == "HUNTER")
+                carrierCode = "Hunter Express";
+            else if (carrier == "TOLL")
+                carrierCode = "Toll";
+            else if (carrier == "ALLIED")
+                carrierCode = "Allied Express";
+            else
+                carrierCode = "Australia Post";
+
+            return carrierCode;
         }
     }
 }

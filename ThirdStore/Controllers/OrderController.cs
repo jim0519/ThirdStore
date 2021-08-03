@@ -180,6 +180,57 @@ namespace ThirdStore.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult UploadTracking()
+        {
+            try
+            {
+                var files = Request.Files;
+                if (!Directory.Exists(ThirdStoreConfig.Instance.UploadTrackingPath))
+                {
+                    Directory.CreateDirectory(ThirdStoreConfig.Instance.UploadTrackingPath);
+                }
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var file = files[i];
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        using (var sr = new StreamReader(file.InputStream))
+                        {
+                            _orderService.UploadTracking(sr);
+
+                            file.SaveAs(ThirdStoreConfig.Instance.UploadTrackingPath + "\\" + CommonFunc.ToCSVFileName(file.FileName));
+                        }
+                    }
+                }
+                SuccessNotification("Upload Tracking Success.");
+                //if (file != null && file.ContentLength > 0)
+                //{
+
+                //    var success = _salesOrderService.UpdateSalesOrderShipment(file.InputStream, uploadFileType);
+                //    if (!success)
+                //    {
+                //        ErrorNotification("Update Sales Order Shipment Failed.");
+                //        return RedirectToAction("List");
+                //    }
+
+                //}
+                //else
+                //{
+                //    ErrorNotification("Update Sales Order Shipment Failed.");
+                //    return RedirectToAction("List");
+                //}
+                //SuccessNotification("Update Sales Order Shipment Success.");
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Upload Tracking Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
         public ActionResult ScreenshotDisplay(string orderTran)
         {
             if (!string.IsNullOrWhiteSpace(orderTran) && orderTran.Split('-').Count() == 2)

@@ -201,4 +201,25 @@ namespace ThirdStoreBusiness.DSChannel
         public int qty { get; set; }
         public string comment { get; set; }
     }
+
+
+    public class DSZTrackingFile
+    {
+        [CsvColumn(Name = "Customer Order Id")]
+        public string NetoOrderLineID { get; set; }
+
+        [CsvColumn(Name = "Order Id")]
+        public string DSZOrderID { get; set; }
+
+        [CsvColumn(Name = "Carrier")]
+        public string Carrier { get; set; }
+
+        [CsvColumn(Name = "Tracking Number")]
+        public string TrackingNumber { get; set; }
+
+        [CsvColumn(Name = "SKU")]
+        public string SKU { get; set; }
+
+
+    }
 }

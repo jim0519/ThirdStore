@@ -46,6 +46,6 @@ namespace ThirdStoreBusiness.Order
 
         Stream ExportDSImportFile(IList<int> orderids);
 
-        
+        void UploadTracking(StreamReader trackingStreamReader);
     }
 }
