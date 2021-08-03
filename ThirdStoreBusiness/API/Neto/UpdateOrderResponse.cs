@@ -10,7 +10,8 @@ namespace ThirdStoreBusiness.API.Neto
     public class UpdateOrderResponse 
     {
         public UpdateOrderResponseAck Ack { get; set; }
-        public UpdateOrderResponseOrder[] Order { get; set; }
+        [JsonConverter(typeof(SingleValueArrayConverter<UpdateOrderResponseOrder>))]
+        public List<UpdateOrderResponseOrder> Order { get; set; }
         public UpdateOrderResponseMessages Messages { get; set; }
     }
 
