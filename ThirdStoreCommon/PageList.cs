@@ -82,7 +82,7 @@ namespace ThirdStoreCommon
 
             this.PageSize = pageSize;
             this.PageIndex = pageIndex;
-            this.AddRange(source);
+            this.AddRange(source.Skip(pageIndex * pageSize).Take(pageSize).ToList());
         }
 
         public int PageIndex { get; private set; }
