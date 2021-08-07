@@ -55,8 +55,8 @@ namespace ThirdStoreBusiness.DSChannel
         public int Order => 0;
 
         protected string DSDataPath => ThirdStoreConfig.Instance.ThirdStoreDSZData + "\\DSZData";
-        protected string DSDataURL => "http://dropshipzone.com.au/sample/Standard/sku_list.csv";
-
+        protected string DSDataURL => "http://dropshipzone.com.au/sample/Standard/sku_list_zone_rates.csv";
+        //protected string DSDataURL => "https://www.dropshipzone.com.au/rsdropship/download/downloadSkuList/";
         public Stream ExportBatchOrderFile(IList<D_Order_Line> orderLines)
         {
             try
@@ -138,13 +138,22 @@ namespace ThirdStoreBusiness.DSChannel
                             newItem.Cost = dsData.Price;
 
                             var postage = new List<decimal>() {
-                            dsData.VIC.IsNumeric()? Convert.ToDecimal(dsData.VIC):0,
-                            dsData.NSW.IsNumeric()? Convert.ToDecimal(dsData.NSW):0,
-                            dsData.SA.IsNumeric()? Convert.ToDecimal(dsData.SA):0,
-                            dsData.QLD.IsNumeric()? Convert.ToDecimal(dsData.QLD):0,
-                            dsData.TAS.IsNumeric()? Convert.ToDecimal(dsData.TAS):0,
-                            dsData.WA.IsNumeric()? Convert.ToDecimal(dsData.WA):0,
-                            dsData.NT.IsNumeric()? Convert.ToDecimal(dsData.NT):0
+                            dsData.ACT.IsNumeric()? Convert.ToDecimal(dsData.ACT):0,
+                            dsData.NSW_M.IsNumeric()? Convert.ToDecimal(dsData.NSW_M):0,
+                            dsData.NSW_R.IsNumeric()? Convert.ToDecimal(dsData.NSW_R):0,
+                            dsData.NT_M.IsNumeric()? Convert.ToDecimal(dsData.NT_M):0,
+                            dsData.NT_R.IsNumeric()? Convert.ToDecimal(dsData.NT_R):0,
+                            dsData.QLD_M.IsNumeric()? Convert.ToDecimal(dsData.QLD_M):0,
+                            dsData.QLD_R.IsNumeric()? Convert.ToDecimal(dsData.QLD_R):0,
+                            dsData.REMOTE.IsNumeric()? Convert.ToDecimal(dsData.REMOTE):0,
+                            dsData.SA_M.IsNumeric()? Convert.ToDecimal(dsData.SA_M):0,
+                            dsData.SA_R.IsNumeric()? Convert.ToDecimal(dsData.SA_R):0,
+                            dsData.TAS_M.IsNumeric()? Convert.ToDecimal(dsData.TAS_M):0,
+                            dsData.TAS_R.IsNumeric()? Convert.ToDecimal(dsData.TAS_R):0,
+                            dsData.VIC_M.IsNumeric()? Convert.ToDecimal(dsData.VIC_M):0,
+                            dsData.VIC_R.IsNumeric()? Convert.ToDecimal(dsData.VIC_R):0,
+                            dsData.WA_M.IsNumeric()? Convert.ToDecimal(dsData.WA_M):0,
+                            dsData.WA_R.IsNumeric()? Convert.ToDecimal(dsData.WA_R):0
                             }.Max();
 
                             newItem.Price = (newItem.Cost + postage) * _commonSetting.DropshipMarkupRate;

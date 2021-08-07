@@ -17,13 +17,29 @@ namespace ThirdStoreBusiness.DSChannel
         [CsvColumn(Name = "price")]
         public decimal Price { get; set; }
         public string RrpPrice { get; set; }
-        public string VIC { get; set; }
-        public string NSW { get; set; }
-        public string SA { get; set; }
-        public string QLD { get; set; }
-        public string TAS { get; set; }
-        public string WA { get; set; }
-        public string NT { get; set; }
+        //public string VIC { get; set; }
+        //public string NSW { get; set; }
+        //public string SA { get; set; }
+        //public string QLD { get; set; }
+        //public string TAS { get; set; }
+        //public string WA { get; set; }
+        //public string NT { get; set; }
+        public string ACT { get; set; }
+        public string NSW_M { get; set; }
+        public string NSW_R { get; set; }
+        public string NT_M { get; set; }
+        public string NT_R { get; set; }
+        public string QLD_M { get; set; }
+        public string QLD_R { get; set; }
+        public string REMOTE { get; set; }
+        public string SA_M { get; set; }
+        public string SA_R { get; set; }
+        public string TAS_M { get; set; }
+        public string TAS_R { get; set; }
+        public string VIC_M { get; set; }
+        public string VIC_R { get; set; }
+        public string WA_M { get; set; }
+        public string WA_R { get; set; }
         [CsvColumn(Name = "bulky item")]
         public string IsBulkyItem { get; set; }
         public string Discontinued { get; set; }
