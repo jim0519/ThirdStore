@@ -248,12 +248,14 @@
                                             OrderTransactions: { editable: false, type: "string" },
                                             Ref2: { editable:@if (Model.CanEditOrder)
                                             {<text>true </text> }
-                                            else { <text> false </text>}
-                                                , type: "string" },
+                                            else { <text> false </text>}, type: "string" },
                                             Ref3: { editable: @if (Model.CanEditOrder)
                                             {<text>true </text> }
                                             else { <text> false </text>}, type: "string" },
                                             Ref4: { editable: @if (Model.CanEditOrder)
+                                            {<text>true </text> }
+                                            else { <text> false </text>}, type: "string" },
+                                            Ref5: { editable: @if (Model.CanEditOrder)
                                             {<text>true </text> }
                                             else { <text> false </text>}, type: "string" },
                                             OrderTime: { editable: false, type: "date" },
@@ -355,22 +357,28 @@
                                     width: 100
                                 },{
                                     field: "Ref2",
-                                    title: "OrderIssue(Problem)",
+                                    title: "______OrderIssue(Problem)______",
                                     width: 150,
                                     editor: customRichEditor,
                                     template: "<span style='white-space:pre-wrap; word-wrap:break-word'>#=Ref2#</span>"
                                 }, {
                                     field: "Ref3",
-                                    title: "StaffActionTaken",
+                                    title: "_________WarehouseNote_________",
                                     width: 100,
                                     editor: customRichEditor,
                                     template: "<span style='white-space:pre;'>#=Ref3#</span>"
                                 }, {
                                     field: "Ref4",
-                                    title: "CustomerServiceNotes",
+                                    title: "______CSNoteToWarehouse______" ,
                                     width: 100,
                                     editor: customRichEditor,
                                     template: "<span style='white-space:pre;'>#=Ref4#</span>"
+                                }, {
+                                    field: "Ref5",
+                                    title: "____________CSNote____________",
+                                    width: 100,
+                                    editor: customRichEditor,
+                                    template: "<span style='white-space:pre;'>#=Ref5#</span>"
                                 }, {
                                     field: "StatusID",
                                     title: "Status",
@@ -477,7 +485,7 @@
                 }
             ];
         function customRichEditor(container, options) {
-            $('<textarea cols="50" name="' + options.field + '" rows="3" class="k-input k-textbox" data-bind="value:' + options.field+'"></textarea>').appendTo(container);
+            $('<textarea cols="100" name="' + options.field + '" rows="15" class="k-input k-textbox" data-bind="value:' + options.field+'"></textarea>').appendTo(container);
         }
 
         function statusDropDownEditor(container, options) {

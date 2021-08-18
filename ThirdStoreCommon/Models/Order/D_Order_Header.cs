@@ -48,7 +48,7 @@ namespace ThirdStoreCommon.Models.Order
         public string Ref2 { get; set; }//Issue
         public string Ref3 { get; set; }//Action
         public string Ref4 { get; set; }//Note
-        public string Ref5 { get; set; }
+        public string Ref5 { get; set; }//CS Note
         public System.DateTime CreateTime { get; set; }
         public string CreateBy { get; set; }
         public System.DateTime EditTime { get; set; }

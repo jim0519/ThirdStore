@@ -111,6 +111,7 @@ namespace ThirdStore.Controllers
                     order.Ref2 = model.Ref2;
                     order.Ref3 = model.Ref3;
                     order.Ref4 = model.Ref4;
+                    order.Ref5 = model.Ref5;
                     _orderService.UpdateOrder(order);
                 }
             }

@@ -241,7 +241,25 @@ namespace ThirdStoreBusiness.DSChannel
                         foreach(var data in dsDatasBySKUs)
                         {
                             var invQty = 0;
-                            if(data.InventoryQty>=dsInventoryThredshold&& data.Price <= Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow))
+                            var postage = new List<decimal>() {
+                                    data.ACT.IsNumeric()? Convert.ToDecimal(data.ACT):0,
+                                    data.NSW_M.IsNumeric()? Convert.ToDecimal(data.NSW_M):0,
+                                    data.NSW_R.IsNumeric()? Convert.ToDecimal(data.NSW_R):0,
+                                    data.NT_M.IsNumeric()? Convert.ToDecimal(data.NT_M):0,
+                                    data.NT_R.IsNumeric()? Convert.ToDecimal(data.NT_R):0,
+                                    data.QLD_M.IsNumeric()? Convert.ToDecimal(data.QLD_M):0,
+                                    data.QLD_R.IsNumeric()? Convert.ToDecimal(data.QLD_R):0,
+                                    data.REMOTE.IsNumeric()? Convert.ToDecimal(data.REMOTE):0,
+                                    data.SA_M.IsNumeric()? Convert.ToDecimal(data.SA_M):0,
+                                    data.SA_R.IsNumeric()? Convert.ToDecimal(data.SA_R):0,
+                                    data.TAS_M.IsNumeric()? Convert.ToDecimal(data.TAS_M):0,
+                                    data.TAS_R.IsNumeric()? Convert.ToDecimal(data.TAS_R):0,
+                                    data.VIC_M.IsNumeric()? Convert.ToDecimal(data.VIC_M):0,
+                                    data.VIC_R.IsNumeric()? Convert.ToDecimal(data.VIC_R):0,
+                                    data.WA_M.IsNumeric()? Convert.ToDecimal(data.WA_M):0,
+                                    data.WA_R.IsNumeric()? Convert.ToDecimal(data.WA_R):0
+                                    }.Max();
+                            if (data.InventoryQty >= dsInventoryThredshold && data.Price <= Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow)&& postage==0)
                             {
                                 invQty = dsInventoryThredshold;
                             }
