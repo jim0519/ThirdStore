@@ -119,23 +119,23 @@ namespace ThirdStoreData.Mapping
 
             this.Property(t => t.Ref1)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(4000);
 
             this.Property(t => t.Ref2)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(4000);
 
             this.Property(t => t.Ref3)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(4000);
 
             this.Property(t => t.Ref4)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(4000);
 
             this.Property(t => t.Ref5)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(4000);
 
             this.Property(t => t.CreateBy)
                 .IsRequired()

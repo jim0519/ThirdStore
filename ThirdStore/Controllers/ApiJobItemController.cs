@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web.Http;
 using ThirdStore.Extensions;
 using ThirdStore.Models.JobItem;
@@ -90,5 +92,40 @@ namespace ThirdStore.Controllers
             return Ok(jobItemList);
         }
 
+
+        [Route("ebayaccdelete")]
+        [HttpGet]
+        public IHttpActionResult eBayAccountDeletionGet(string challenge_code)
+        {
+
+           
+            var verificationToken = "ZUJheUFjY291bnREZWxldGlvblRva2VuamltMDUxOQ==";
+            var endpoint = this.Request.RequestUri.AbsoluteUri;
+
+            IncrementalHash sha256 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            sha256.AppendData(Encoding.UTF8.GetBytes(challenge_code));
+            sha256.AppendData(Encoding.UTF8.GetBytes(verificationToken));
+            sha256.AppendData(Encoding.UTF8.GetBytes(endpoint));
+            byte[] bytes = sha256.GetHashAndReset();
+            var retChallengeResponse = BitConverter.ToString(bytes).Replace("-", string.Empty).ToLower();
+
+
+            return Json(new { challengeResponse = retChallengeResponse });
+
+            //return Ok();
+        }
+
+
+        [Route("ebayaccdelete")]
+        [HttpPost]
+        public IHttpActionResult eBayAccountDeletionPost([FromBody] eBayAccountDeletionObject obj)
+        {
+
+
+            return Ok();
+        }
+
     }
+
+    
 }
