@@ -12,7 +12,7 @@
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
             <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
-            <input type="button" id="btnRedownloadFeeds" class="k-button" value="Redownload Feeds" />
+            <input type="button" id="btnUploadDSZFile" class="k-button" value="Upload DSZ File" />
             <input type="button" id="btnDownloadImage" class="k-button" value="Download Images" />
             <script>
                 $(document).ready(function () {
@@ -71,6 +71,21 @@
                         return false;
                     });
 
+
+                    $('#btnUploadDSZFile').click(function (e) {
+                        e.preventDefault();
+                        var window = $("#uploadDSZFile-window");
+                        if (!window.data("kendoWindow")) {
+                            window.kendoWindow({
+                                modal: true,
+                                width: "400px",
+                                title: "Upload DSZ File",
+                                actions: ["Close"]
+                            });
+                        }
+                        window.data('kendoWindow').center().open();
+
+                    });
                 });
             </script>
         </div>
@@ -224,3 +239,23 @@
     </script>
 
 }
+
+
+
+    <div id="uploadDSZFile-window" style="display:none;">
+        @using (Html.BeginForm("UploadDSZFile", "GumtreeFeed", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <table style="text-align:left;">
+                <tr>
+                    <td>
+                        <input type="file" id="uploadDSZFileFile" name="uploadDSZFileFile" multiple />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" class="k-button" value="Submit" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>

@@ -123,5 +123,35 @@ namespace ThirdStore.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult UploadDSZFile()
+        {
+            try
+            {
+                var files = Request.Files;
+                var DSDataPath = ThirdStoreConfig.Instance.ThirdStoreDSZData + "\\DSZData";
+                if (!Directory.Exists(DSDataPath))
+                {
+                    Directory.CreateDirectory(DSDataPath);
+                }
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var file = files[i];
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        file.SaveAs(DSDataPath + "\\" + CommonFunc.ToCSVFileName("DSZData"));
+                    }
+                }
+                SuccessNotification("Upload File Success.");
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Upload File Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
     }
 }
