@@ -114,20 +114,25 @@ namespace ThirdStoreBusiness.DSChannel
             try
             {
                 IList<DSZModel> dsDatas = null;
-                using (var webClient = new ThirdStoreWebClient())
+                //using (var webClient = new ThirdStoreWebClient())
+                //{
+                if (!Directory.Exists(this.DSDataPath))
+                    Directory.CreateDirectory(this.DSDataPath);
+                var di = new DirectoryInfo(this.DSDataPath);
+                FileInfo[] files = di.GetFiles().ToArray();
+                if (files.Count() > 0)
                 {
-                    if (!Directory.Exists(this.DSDataPath))
-                        Directory.CreateDirectory(this.DSDataPath);
-                    var fileName = this.DSDataPath+"\\" + CommonFunc.ToCSVFileName("DSZData");
+                    //var fileName = this.DSDataPath+"\\" + CommonFunc.ToCSVFileName("DSZData");
 
-                    webClient.DownloadFile(DSDataURL, fileName);
-                    dsDatas = _csvContext.Read<DSZModel>(fileName, _csvFileDescription).ToList();
+                    //webClient.DownloadFile(DSDataURL, fileName);
+                    var topDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                    dsDatas = _csvContext.Read<DSZModel>(topDataFile.FullName, _csvFileDescription).ToList();
 
                     if (dsDatas != null)
                     {
                         dsDatas = dsDatas.Where(s => !s.SKU.Contains("*") && !Regex.IsMatch(s.SKU, @"^V\d+")).ToList();
 
-                        foreach(var dsData in dsDatas)
+                        foreach (var dsData in dsDatas)
                         {
                             var newItem = new D_Item();
                             if (dsData.SKU.Length > 23)
@@ -170,16 +175,17 @@ namespace ThirdStoreBusiness.DSChannel
 
                             var imagesURL = GetImageURLList(dsData);
                             if (imagesURL.Count > 0)
-                                newItem.Ref5=imagesURL.Aggregate((current, next) => current + ";" + next);
+                                newItem.Ref5 = imagesURL.Aggregate((current, next) => current + ";" + next);
 
                             retItems.Add(newItem);
                         }
                     }
                 }
+                //}
 
                 return retItems;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogManager.Instance.Error(ex.Message);
                 throw ex;
