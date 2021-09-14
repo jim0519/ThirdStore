@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ThirdStoreBusiness.API.Dropshipzone;
 using ThirdStoreBusiness.Item;
 using ThirdStoreBusiness.Order;
 using ThirdStoreBusiness.Setting;
@@ -39,11 +40,14 @@ namespace ThirdStoreBusiness.DSChannel
         private readonly CsvFileDescription _csvFileDescription;
         private readonly ISettingService _settingService;
         private readonly CommonSettings _commonSetting;
+        private readonly IDropshipzoneAPICallManager _dropshipzoneAPIManager;
         public DSZChannel(
+            IDropshipzoneAPICallManager dropshipzoneAPIManager,
             CsvContext csvContext,
             CsvFileDescription csvFileDescription,
             ISettingService settingService)
         {
+            _dropshipzoneAPIManager = dropshipzoneAPIManager;
             _csvContext = csvContext;
             _csvFileDescription = csvFileDescription;
             _settingService = settingService;
@@ -116,20 +120,31 @@ namespace ThirdStoreBusiness.DSChannel
                 IList<DSZModel> dsDatas = null;
                 //using (var webClient = new ThirdStoreWebClient())
                 //{
-                if (!Directory.Exists(this.DSDataPath))
-                    Directory.CreateDirectory(this.DSDataPath);
-                var di = new DirectoryInfo(this.DSDataPath);
-                FileInfo[] files = di.GetFiles().ToArray();
-                if (files.Count() > 0)
+                var dszProducts = _dropshipzoneAPIManager.GetAllProducts();
+                if (dszProducts != null && dszProducts.Count > 0)
                 {
+                    dsDatas = ConvertToDSZModel(dszProducts);
+
+
+                    //if (!Directory.Exists(this.DSDataPath))
+                    //    Directory.CreateDirectory(this.DSDataPath);
+                    //var di = new DirectoryInfo(this.DSDataPath);
+                    //FileInfo[] files = di.GetFiles().ToArray();
+                    //if (files.Count() > 0)
+                    //{
                     //var fileName = this.DSDataPath+"\\" + CommonFunc.ToCSVFileName("DSZData");
 
                     //webClient.DownloadFile(DSDataURL, fileName);
-                    var topDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
-                    dsDatas = _csvContext.Read<DSZModel>(topDataFile.FullName, _csvFileDescription).ToList();
+                    //var topDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                    //dsDatas = _csvContext.Read<DSZModel>(topDataFile.FullName, _csvFileDescription).ToList();
 
                     if (dsDatas != null)
                     {
+                        if (!Directory.Exists(this.DSDataPath))
+                            Directory.CreateDirectory(this.DSDataPath);
+                        var fileName = this.DSDataPath + "\\" + CommonFunc.ToCSVFileName("DSZData");
+                        _csvContext.Write(dsDatas, fileName, _csvFileDescription);
+
                         dsDatas = dsDatas.Where(s => !s.SKU.Contains("*") && !Regex.IsMatch(s.SKU, @"^V\d+")).ToList();
 
                         foreach (var dsData in dsDatas)
@@ -169,7 +184,7 @@ namespace ThirdStoreBusiness.DSChannel
                             newItem.Length = (!string.IsNullOrWhiteSpace(dsData.Length) ? Convert.ToDecimal(dsData.Length) / 100 : 0);
                             newItem.Width = (!string.IsNullOrWhiteSpace(dsData.Width) ? Convert.ToDecimal(dsData.Width) / 100 : 0);
                             newItem.Height = (!string.IsNullOrWhiteSpace(dsData.Height) ? Convert.ToDecimal(dsData.Height) / 100 : 0);
-                            newItem.Ref3 = dsData.EANCode.Trim();
+                            newItem.Ref3 =!string.IsNullOrWhiteSpace( dsData.EANCode)? dsData.EANCode.Trim():string.Empty;
                             newItem.IsReadyForList = (dsData.SKU.Length <= 23 && dsData.Price <= Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow) ? true : false);
                             newItem.IsActive = true;
 
@@ -180,8 +195,8 @@ namespace ThirdStoreBusiness.DSChannel
                             retItems.Add(newItem);
                         }
                     }
+                    //}
                 }
-                //}
 
                 return retItems;
             }
@@ -190,6 +205,116 @@ namespace ThirdStoreBusiness.DSChannel
                 LogManager.Instance.Error(ex.Message);
                 throw ex;
             }
+        }
+
+        private IList<DSZModel> ConvertToDSZModel(IList<DropshipzoneProduct> dszProducts)
+        {
+            var dsDatas = new List<DSZModel>();
+            foreach(var dszProduct in dszProducts)
+            {
+                var dsData = new DSZModel();
+                dsData.SKU = dszProduct.sku;
+                dsData.Category = dszProduct.Category;
+                dsData.Title = dszProduct.title;
+                dsData.InventoryQty =Convert.ToDecimal( dszProduct.stock_qty);
+                dsData.Status = dszProduct.status;
+                dsData.Price = Convert.ToDecimal(dszProduct.price);
+                dsData.RrpPrice = dszProduct.RrpPrice;
+                if(dszProduct.zone_rates!=null&&dszProduct.zone_rates.Count>0)
+                {
+                    var zoneRate = dszProduct.zone_rates.FirstOrDefault();
+                    dsData.ACT = zoneRate.act;
+                    dsData.NSW_M = zoneRate.nsw_m;
+                    dsData.NSW_R = zoneRate.nsw_r;
+                    dsData.NT_M = zoneRate.nt_m;
+                    dsData.NT_R = zoneRate.nt_r;
+                    dsData.QLD_M = zoneRate.qld_m;
+                    dsData.QLD_R = zoneRate.qld_r;
+                    dsData.REMOTE = zoneRate.remote;
+                    dsData.SA_M = zoneRate.sa_m;
+                    dsData.SA_R = zoneRate.sa_r;
+                    dsData.TAS_M = zoneRate.tas_m;
+                    dsData.TAS_R = zoneRate.tas_r;
+                    dsData.VIC_M = zoneRate.vic_m;
+                    dsData.VIC_R = zoneRate.vic_r;
+                    dsData.WA_M = zoneRate.wa_m;
+                    dsData.WA_R = zoneRate.wa_r;
+                }
+                dsData.IsBulkyItem = dszProduct.bulky_item;
+                dsData.Discontinued = dszProduct.discontinued;
+                dsData.EANCode = dszProduct.eancode;
+                dsData.Brand = dszProduct.brand;
+                //dsData.MPN=dszProduct.mpn
+                dsData.Weight = dszProduct.weight;
+                dsData.Length = dszProduct.length;
+                dsData.Width = dszProduct.width;
+                dsData.Height = dszProduct.height;
+                dsData.Description = dszProduct.desc;
+                dsData.Color = dszProduct.colour;
+                if(dszProduct.gallery!=null&&dszProduct.gallery.Count>0)
+                {
+                    var imgIndex = 1;
+                    foreach(var img in dszProduct.gallery)
+                    {
+                        switch (imgIndex)
+                        {
+                            case 1:
+                                dsData.Image1 = img;
+                                break;
+                            case 2:
+                                dsData.Image2 = img;
+                                break;
+                            case 3:
+                                dsData.Image3 = img;
+                                break;
+                            case 4:
+                                dsData.Image4 = img;
+                                break;
+                            case 5:
+                                dsData.Image5 = img;
+                                break;
+                            case 6:
+                                dsData.Image6 = img;
+                                break;
+                            case 7:
+                                dsData.Image7 = img;
+                                break;
+                            case 8:
+                                dsData.Image8 = img;
+                                break;
+                            case 9:
+                                dsData.Image9 = img;
+                                break;
+                            case 10:
+                                dsData.Image10 = img;
+                                break;
+                            case 11:
+                                dsData.Image11 = img;
+                                break;
+                            case 12:
+                                dsData.Image12 = img;
+                                break;
+                            case 13:
+                                dsData.Image13 = img;
+                                break;
+                            case 14:
+                                dsData.Image14 = img;
+                                break;
+                            case 15:
+                                dsData.Image15 = img;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        imgIndex++;   
+                    }
+                }
+
+
+                dsDatas.Add(dsData);
+            }
+            return dsDatas;
         }
 
         public IList<Tuple<string, IList<string>>> GetImagesPathsBySKUs(IList<string> skus)

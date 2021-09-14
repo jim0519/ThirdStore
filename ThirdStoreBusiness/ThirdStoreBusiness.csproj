@@ -105,6 +105,7 @@
     <Compile Include="AccessControl\PermissionService.cs" />
     <Compile Include="AccessControl\RoleService.cs" />
     <Compile Include="AccessControl\UserService.cs" />
+    <Compile Include="API\Dropshipzone\DropshipzoneAPI.cs" />
     <Compile Include="API\eBay\eBayAPI.cs" />
     <Compile Include="API\Neto\GetItem.cs" />
     <Compile Include="API\Neto\GetItemResponse.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="ScheduleTask\Task.cs" />
     <Compile Include="ScheduleTask\TaskManager.cs" />
     <Compile Include="ScheduleTask\TaskThread.cs" />
+    <Compile Include="Setting\DropshipzoneAPISettings.cs" />
     <Compile Include="Setting\CommonSettings.cs" />
     <Compile Include="Setting\ISettingService.cs" />
     <Compile Include="Setting\SettingService.cs" />

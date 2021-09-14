@@ -1818,3 +1818,38 @@ from
 	group by SKU
 ) AGGR
 inner join D_Item I on AGGR.SKU=I.SKU
+
+
+
+
+insert into T_Setting
+select
+'dropshipzoneapisettings.url',
+'',
+'https://api.dropshipzone.com.au',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Setting
+select
+'dropshipzoneapisettings.email',
+'',
+'enquiry@3rdstore.com.au',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+insert into T_Setting
+select
+'dropshipzoneapisettings.password',
+'',
+'Zh*UFatmeL6f',
+GETDATE(),
+'System',
+GETDATE(),
+'System'

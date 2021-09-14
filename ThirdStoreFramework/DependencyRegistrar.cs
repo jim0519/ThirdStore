@@ -28,6 +28,7 @@ using ThirdStoreBusiness.DSChannel;
 using ThirdStoreBusiness.Report;
 using ThirdStoreBusiness.Setting;
 using ThirdStoreBusiness.GumtreeFeed;
+using ThirdStoreBusiness.API.Dropshipzone;
 
 namespace ThirdStoreFramework
 {
@@ -96,6 +97,8 @@ namespace ThirdStoreFramework
             builder.RegisterType<NetoAPICallManager>().As<INetoAPICallManager>().InstancePerLifetimeScope();
             builder.RegisterType<eBayAPICredentialProvider>().As<IeBayApiContextProvider>().InstancePerLifetimeScope();
             builder.RegisterType<eBayAPICallManager>().As<IeBayAPICallManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DropshipzoneAPICredentialProvider>().As<IDropshipzoneCredentialProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<DropshipzoneAPICallManager>().As<IDropshipzoneAPICallManager>().InstancePerLifetimeScope();
 
             //Access Control
             builder.RegisterType<EncryptionService>().As<IEncryptionService>().InstancePerLifetimeScope();
