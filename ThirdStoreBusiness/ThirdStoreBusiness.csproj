@@ -105,6 +105,7 @@
     <Compile Include="AccessControl\PermissionService.cs" />
     <Compile Include="AccessControl\RoleService.cs" />
     <Compile Include="AccessControl\UserService.cs" />
+    <Compile Include="API\Dropshipzone\DropshipzoneAPI.cs" />
     <Compile Include="API\eBay\eBayAPI.cs" />
     <Compile Include="API\Neto\GetItem.cs" />
     <Compile Include="API\Neto\GetItemResponse.cs" />
@@ -119,8 +120,9 @@
     <Compile Include="API\Neto\NetoAPI.cs" />
     <Compile Include="DSChannel\DSModel.cs" />
     <Compile Include="DSChannel\IDSChannel.cs" />
-    <Compile Include="GumtreeFeed\IGumtreeFeedService.cs" />
-    <Compile Include="GumtreeFeed\GumtreeFeedService.cs" />
+    <Compile Include="Misc\ILogService.cs" />
+    <Compile Include="Misc\IGumtreeFeedService.cs" />
+    <Compile Include="Misc\GumtreeFeedService.cs" />
     <Compile Include="Image\IImageService.cs" />
     <Compile Include="Image\ImageService.cs" />
     <Compile Include="Item\DSZSKUModel.cs" />
@@ -148,6 +150,7 @@
     <Compile Include="ScheduleTask\Task.cs" />
     <Compile Include="ScheduleTask\TaskManager.cs" />
     <Compile Include="ScheduleTask\TaskThread.cs" />
+    <Compile Include="Setting\DropshipzoneAPISettings.cs" />
     <Compile Include="Setting\CommonSettings.cs" />
     <Compile Include="Setting\ISettingService.cs" />
     <Compile Include="Setting\SettingService.cs" />

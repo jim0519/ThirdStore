@@ -433,7 +433,7 @@ namespace ThirdStoreBusiness.JobItem
                 //}
 
                 var grpListingItems = listingItems.GroupBy(l=>l.SupplierID);
-                var lstDSInventory = new List<Tuple<string, int>>();
+                var lstDSInventory = new List<Tuple<string, int,bool>>();
                 foreach(var grp in grpListingItems)
                 {
                     var dsChannel = _dsChannels.FirstOrDefault(c => c.DSChannel.Equals(grp.Key));
@@ -441,6 +441,7 @@ namespace ThirdStoreBusiness.JobItem
                         lstDSInventory.AddRange(dsChannel.GetInventoryQtyBySKUs(grp.Select(i=>i.SKU).ToList()));
                 }
                 var tmpExportProductListing = new List<ExportProductListing>();
+                var bulkyItemDropshipSKUs = new List<string>();
                 foreach (var epl in lstExportProductListing)
                 {
                     if (epl.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
@@ -450,10 +451,15 @@ namespace ThirdStoreBusiness.JobItem
                         if(matchInv!=null)
                         {
                             epl.Qty = matchInv.Item2;
+                            if (matchInv.Item3)
+                                bulkyItemDropshipSKUs.Add(epl.SKU);
+                                
                         }
                     }
                     tmpExportProductListing.Add(epl);
                 }
+                if (bulkyItemDropshipSKUs.Count > 0)
+                    LogManager.DBLogInstance.Info(bulkyItemDropshipSKUs.Aggregate((current, next) => current + "," + next));
                 lstExportProductListing = tmpExportProductListing;
 
                 #endregion

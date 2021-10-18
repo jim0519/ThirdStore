@@ -66,6 +66,24 @@ namespace ThirdStore.Controllers
             return Ok();
         }
 
+        [Route("test")]
+        [HttpGet]
+        public IHttpActionResult Test()
+        {
+            try
+            {
+                LogManager.DBLogInstance.Info("Test Log in DB");
+            }
+            catch(Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+            }
+
+            return Json(new { });
+
+            //return Ok();
+        }
+
     }
 
 

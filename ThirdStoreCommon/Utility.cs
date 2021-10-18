@@ -48,6 +48,7 @@ namespace ThirdStoreCommon
     public class LogManager
     {
         private static ILog _instance;
+        private static ILog _dbLogInstance;
         private LogManager()
         {
 
@@ -62,6 +63,18 @@ namespace ThirdStoreCommon
                     _instance = log4net.LogManager.GetLogger("CustomLogger");
                 }
                 return _instance;
+            }
+        }
+
+        public static ILog DBLogInstance
+        {
+            get
+            {
+                if (_dbLogInstance == null)
+                {
+                    _dbLogInstance = log4net.LogManager.GetLogger("LogInDBLogger");
+                }
+                return _dbLogInstance;
             }
         }
 

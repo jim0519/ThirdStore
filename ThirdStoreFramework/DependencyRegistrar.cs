@@ -27,7 +27,8 @@ using ThirdStoreFramework.Controllers;
 using ThirdStoreBusiness.DSChannel;
 using ThirdStoreBusiness.Report;
 using ThirdStoreBusiness.Setting;
-using ThirdStoreBusiness.GumtreeFeed;
+using ThirdStoreBusiness.Misc;
+using ThirdStoreBusiness.API.Dropshipzone;
 
 namespace ThirdStoreFramework
 {
@@ -55,7 +56,7 @@ namespace ThirdStoreFramework
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<CsvContext>().InstancePerLifetimeScope();
-            builder.Register(c=>new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.Default }).InstancePerLifetimeScope();
+            builder.Register(c=>new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.UTF8 }).InstancePerLifetimeScope();
             var assemblies = typeFinder.GetAssemblies().ToArray();
             //PerHttpRequest
 
@@ -96,6 +97,8 @@ namespace ThirdStoreFramework
             builder.RegisterType<NetoAPICallManager>().As<INetoAPICallManager>().InstancePerLifetimeScope();
             builder.RegisterType<eBayAPICredentialProvider>().As<IeBayApiContextProvider>().InstancePerLifetimeScope();
             builder.RegisterType<eBayAPICallManager>().As<IeBayAPICallManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DropshipzoneAPICredentialProvider>().As<IDropshipzoneCredentialProvider>().InstancePerLifetimeScope();
+            builder.RegisterType<DropshipzoneAPICallManager>().As<IDropshipzoneAPICallManager>().InstancePerLifetimeScope();
 
             //Access Control
             builder.RegisterType<EncryptionService>().As<IEncryptionService>().InstancePerLifetimeScope();
@@ -121,6 +124,9 @@ namespace ThirdStoreFramework
 
             //Setting
             builder.RegisterType<SettingService>().As<ISettingService>().InstancePerLifetimeScope();
+
+            //Log
+            builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
         }
 
         public int Order
