@@ -12,31 +12,28 @@ using ThirdStoreBusiness.Report;
 using ThirdStoreCommon.Models;
 using ThirdStoreBusiness.AccessControl;
 using ThirdStoreCommon.Infrastructure;
-using ThirdStore.Models.GumtreeFeed;
-using ThirdStoreBusiness.GumtreeFeed;
+using ThirdStore.Models.Misc;
+using ThirdStoreBusiness.Misc;
 using ThirdStoreBusiness.JobItem;
 using System.IO;
 
 namespace ThirdStore.Controllers
 {
-    public class GumtreeFeedController : BaseController
+    public class MiscController : BaseController
     {
         private readonly IGumtreeFeedService _gumtreeFeedService;
         private readonly IPermissionService _permissionService;
-        private readonly ICacheManager _cacheManager;
-        private readonly IWorkContext _workContext;
+        private readonly ILogService _logService;
 
-        public GumtreeFeedController(
+        public MiscController(
             IGumtreeFeedService gumtreeFeedService,
-            IWorkContext workContext,
             IPermissionService permissionService,
-            ICacheManager cacheManager
+            ILogService logService
             )
         {
             _gumtreeFeedService = gumtreeFeedService;
             _permissionService = permissionService;
-            _cacheManager = cacheManager;
-            _workContext = workContext;
+            _logService = logService;
         }
         // GET: Report
         public ActionResult Index()
@@ -44,7 +41,7 @@ namespace ThirdStore.Controllers
             return View();
         }
 
-        public ActionResult List()
+        public ActionResult GumtreeFeedList()
         {
 
             //if (!_permissionService.Authorize(ThirdStorePermission.KPIReport.ToName()))
@@ -60,7 +57,7 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
-        public ActionResult List(DataSourceRequest command, GumtreeFeedListViewModel model)
+        public ActionResult GumtreeFeedList(DataSourceRequest command, GumtreeFeedListViewModel model)
         {
             var gumtreeFeedDS = _gumtreeFeedService.SearchGumtreeFeeds(
                 model.SearchSKU,
@@ -151,6 +148,47 @@ namespace ThirdStore.Controllers
                 ErrorNotification("Upload File Failed." + exc.Message);
                 return RedirectToAction("List");
             }
+        }
+
+
+        public ActionResult LogList()
+        {
+
+            //if (!_permissionService.Authorize(ThirdStorePermission.KPIReport.ToName()))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/");
+            //}
+
+
+            var model = new LogListViewModel();
+            model.LogTimeFrom = DateTime.Today;
+            model.LogTimeTo = DateTime.Today;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult LogList(DataSourceRequest command, LogListViewModel model)
+        {
+            var logDS = _logService.SearchGumtreeFeeds(
+                model.SearchMessage,
+                model.LogTimeFrom,
+                model.LogTimeTo,
+                pageIndex: command.Page - 1,
+                pageSize: command.PageSize);
+
+
+            var logGridViewList = logDS.Select(i => i.ToModel());
+
+            var gridModel = new DataSourceResult() { Data = logGridViewList, Total = logDS.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+
+
         }
 
     }

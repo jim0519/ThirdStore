@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using ThirdStoreFramework.MVC;
 
-namespace ThirdStore.Models.GumtreeFeed
+namespace ThirdStore.Models.Misc
 {
     public class GumtreeFeedGridViewModel : BaseEntityViewModel
     {

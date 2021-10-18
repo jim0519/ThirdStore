@@ -31,7 +31,7 @@ namespace ThirdStoreBusiness.DSChannel
 
         IList<Tuple<string, IList<string>>> GetImagesPathsBySKUs(IList<string> skus);
 
-        IList<Tuple<string, int>> GetInventoryQtyBySKUs(IList<string> skus);
+        IList<Tuple<string, int,bool>> GetInventoryQtyBySKUs(IList<string> skus);
     }
 
     public class DSZChannel : IDSChannel
@@ -176,7 +176,8 @@ namespace ThirdStoreBusiness.DSChannel
                             dsData.WA_R.IsNumeric()? Convert.ToDecimal(dsData.WA_R):0
                             }.Max();
 
-                            newItem.Price = (newItem.Cost + postage) * _commonSetting.DropshipMarkupRate;
+                            //newItem.Price = (newItem.Cost + postage) * _commonSetting.DropshipMarkupRate;
+                            newItem.Price = newItem.Cost * _commonSetting.DropshipMarkupRate;
                             newItem.Type = ThirdStoreItemType.SINGLE.ToValue();
                             newItem.SupplierID = ThirdStoreSupplier.P.ToValue();
                             newItem.GrossWeight = (!string.IsNullOrWhiteSpace(dsData.Weight) ? Convert.ToDecimal(dsData.Weight) : 0);
@@ -251,7 +252,7 @@ namespace ThirdStoreBusiness.DSChannel
                 dsData.Height = dszProduct.height;
                 dsData.Description = dszProduct.desc;
                 dsData.Color = dszProduct.colour;
-                if(dszProduct.gallery!=null&&dszProduct.gallery.Count>0)
+                if (dszProduct.gallery!=null&&dszProduct.gallery.Count>0)
                 {
                     var imgIndex = 1;
                     foreach(var img in dszProduct.gallery)
@@ -354,11 +355,11 @@ namespace ThirdStoreBusiness.DSChannel
             }
         }
 
-        public IList<Tuple<string, int>> GetInventoryQtyBySKUs(IList<string> skus)
+        public IList<Tuple<string, int,bool>> GetInventoryQtyBySKUs(IList<string> skus)
         {
             try
             {
-                var retList = new List<Tuple<string, int>>();
+                var retList = new List<Tuple<string, int,bool>>();
                 var di = new DirectoryInfo(DSDataPath);
                 if (di.Exists)
                 {
@@ -369,6 +370,7 @@ namespace ThirdStoreBusiness.DSChannel
                         var dsDatas = _csvContext.Read<DSZModel>(dszDataFile.FullName, _csvFileDescription);
                         var dsDatasBySKUs = dsDatas.Where(d => skus.Select(s => s.ToLower()).Contains(d.SKU.ToLower()));
                         var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
+                        //var bulkyItemDropshipSKUs = new List<string>();
                         foreach(var data in dsDatasBySKUs)
                         {
                             var invQty = 0;
@@ -390,12 +392,35 @@ namespace ThirdStoreBusiness.DSChannel
                                     data.WA_M.IsNumeric()? Convert.ToDecimal(data.WA_M):0,
                                     data.WA_R.IsNumeric()? Convert.ToDecimal(data.WA_R):0
                                     }.Max();
-                            if (data.InventoryQty >= dsInventoryThredshold && data.Price <= Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow)&& postage==0)
+                            var bulkyItemPostage = new List<decimal>() {
+                                    //data.ACT.IsNumeric()? Convert.ToDecimal(data.ACT):0,
+                                    data.NSW_M.IsNumeric()? Convert.ToDecimal(data.NSW_M):0,
+                                    //data.NSW_R.IsNumeric()? Convert.ToDecimal(data.NSW_R):0,
+                                    //data.NT_M.IsNumeric()? Convert.ToDecimal(data.NT_M):0,
+                                    //data.NT_R.IsNumeric()? Convert.ToDecimal(data.NT_R):0,
+                                    data.QLD_M.IsNumeric()? Convert.ToDecimal(data.QLD_M):0,
+                                    //data.QLD_R.IsNumeric()? Convert.ToDecimal(data.QLD_R):0,
+                                    //data.REMOTE.IsNumeric()? Convert.ToDecimal(data.REMOTE):0,
+                                    data.SA_M.IsNumeric()? Convert.ToDecimal(data.SA_M):0,
+                                    //data.SA_R.IsNumeric()? Convert.ToDecimal(data.SA_R):0,
+                                    //data.TAS_M.IsNumeric()? Convert.ToDecimal(data.TAS_M):0,
+                                    //data.TAS_R.IsNumeric()? Convert.ToDecimal(data.TAS_R):0,
+                                    data.VIC_M.IsNumeric()? Convert.ToDecimal(data.VIC_M):0,
+                                    //data.VIC_R.IsNumeric()? Convert.ToDecimal(data.VIC_R):0,
+                                    data.WA_M.IsNumeric()? Convert.ToDecimal(data.WA_M):0,
+                                    //data.WA_R.IsNumeric()? Convert.ToDecimal(data.WA_R):0
+                                    }.Max();
+                            var needToLoginDB = false;
+                            if (data.InventoryQty >= dsInventoryThredshold && data.Price <= Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceBelow)&& bulkyItemPostage == 0)
                             {
                                 invQty = dsInventoryThredshold;
+                                if (postage > 0 && bulkyItemPostage == 0)
+                                    needToLoginDB = true;
                             }
-                            retList.Add(new Tuple<string, int>(data.SKU, invQty));
+                            retList.Add(new Tuple<string, int,bool>(data.SKU, invQty, needToLoginDB));
                         }
+                        //if(bulkyItemDropshipSKUs.Count>0)
+                        //    LogManager.DBLogInstance.Info(bulkyItemDropshipSKUs.Aggregate((current, next) => current + "," + next));
                     }
                 }
                 return retList;
@@ -509,7 +534,7 @@ namespace ThirdStoreBusiness.DSChannel
         }
     }
 
-    public class SelloDSChannel : IDSChannel
+    public class SelloDSChannel :IDSChannel
     {
         private readonly CsvContext _csvContext;
         private readonly CsvFileDescription _csvFileDescription;
@@ -753,11 +778,11 @@ namespace ThirdStoreBusiness.DSChannel
             }
         }
 
-        public IList<Tuple<string, int>> GetInventoryQtyBySKUs(IList<string> skus)
+        public IList<Tuple<string, int,bool>> GetInventoryQtyBySKUs(IList<string> skus)
         {
             try
             {
-                var retList = new List<Tuple<string, int>>();
+                var retList = new List<Tuple<string, int,bool>>();
                 var di = new DirectoryInfo(DSDataPath);
                 if (di.Exists)
                 {
@@ -776,7 +801,7 @@ namespace ThirdStoreBusiness.DSChannel
                             {
                                 invQty = dsInventoryThredshold;
                             }
-                            retList.Add(new Tuple<string, int>(data.sku, invQty));
+                            retList.Add(new Tuple<string, int,bool>(data.sku, invQty,false));
                         }
                     }
                 }

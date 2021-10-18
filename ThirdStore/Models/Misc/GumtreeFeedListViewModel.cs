@@ -5,7 +5,7 @@ using System.Web;
 using ThirdStoreFramework.MVC;
 using System.Web.Mvc;
 
-namespace ThirdStore.Models.GumtreeFeed
+namespace ThirdStore.Models.Misc
 {
     public class GumtreeFeedListViewModel : BaseViewModel
     {

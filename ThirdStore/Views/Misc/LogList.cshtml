@@ -1,0 +1,155 @@
+﻿@model LogListViewModel
+@{
+    ViewBag.Title = "Log List";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+
+
+@using (Html.BeginForm())
+{
+    <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
+        <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
+        
+    </div>
+
+    <table width="100%">
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.SearchMessage):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.SearchMessage)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.LogTimeFrom):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.LogTimeFrom)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.LogTimeTo):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.LogTimeTo)
+            </td>
+        </tr>
+       
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="button" id="btnSearch" class="k-button" value="Search" />
+                <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+            </td>
+        </tr>
+    </table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="log-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#log-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("LogList", "Misc"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "50",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["50", "100", "300"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                }, {
+                                    field: "Date",
+                                    title: "Log Time",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+                                }, {
+                                    field: "Level",
+                                    title: "Level"
+                                }, {
+                                    field: "Message",
+                                    title: "Message"
+                                }, {
+                                    field: "Exception",
+                                    title: "Exception"
+                                }
+                            ]
+                        });
+                    });
+                </script>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+    var selectedIds = [];
+    $(document).ready(function () {
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+
+            $('#@Html.FieldIdFor(model => model.SearchMessage)').val("");
+            $('#@Html.FieldIdFor(model => model.LogTimeFrom)').val("");
+            $('#@Html.FieldIdFor(model => model.LogTimeTo)').val("");
+
+            selectedIds = [];
+
+            RefreshGrid(false);
+
+            return false;
+        });
+
+    });
+    function additionalData() {
+        return {
+            SearchMessage: $('#@Html.FieldIdFor(model => model.SearchMessage)').val(),
+            LogTimeFrom: $('#@Html.FieldIdFor(model => model.LogTimeFrom)').val(),
+            LogTimeTo: $('#@Html.FieldIdFor(model => model.LogTimeTo)').val()
+        };
+    }
+    </script>
+
+}
+
+
+    

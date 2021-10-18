@@ -33,7 +33,7 @@
                         });
                         debugger;
 
-                        var link="@Html.Raw(Url.Action("DownloadImage", "GumtreeFeed"))"
+                        var link="@Html.Raw(Url.Action("DownloadImage", "Misc"))"
                         var ids = selectedIds.join(",");
                         var postData = JSON.stringify({
                             selectedLines: selectedDataItems
@@ -121,7 +121,7 @@
                                 type: "json",
                                 transport: {
                                     read: {
-                                        url: "@Html.Raw(Url.Action("List", "GumtreeFeed"))",
+                                        url: "@Html.Raw(Url.Action("GumtreeFeedList", "Misc"))",
                                         type: "POST",
                                         dataType: "json",
                                         data: additionalData
@@ -243,7 +243,7 @@
 
 
     <div id="uploadDSZFile-window" style="display:none;">
-        @using (Html.BeginForm("UploadDSZFile", "GumtreeFeed", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("UploadDSZFile", "Misc", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <table style="text-align:left;">
                 <tr>

@@ -124,7 +124,21 @@
 
                         </a>
                     </li>
-                    <li class="@Url.MakeNavBarActive("GumtreeFeed","List")">@Html.ActionLink("Gumtree Feed List", "List", "GumtreeFeed")</li>
+                    <li class="@Url.MakeNavBarActive("Misc")">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            Misc<span class="caret"></span>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    @Html.ActionLink("Gumtree Feed List", "GumtreeFeedList", "Misc")
+                                </li>
+                                <li>
+                                    @Html.ActionLink("Log List", "LogList", "Misc")
+                                </li>
+                            </ul>
+
+                        </a>
+                    </li>
+                    @*<li class="@Url.MakeNavBarActive("Misc","GumtreeFeedList")">@Html.ActionLink("Gumtree Feed List", "GumtreeFeedList", "Misc")</li>*@
                     <li class="@Url.MakeNavBarActive("Order","List")">@Html.ActionLink("Order List", "List", "Order")</li>
                     <li class="@Url.MakeNavBarActive("JobItem","ShipOut")">@Html.ActionLink("Ship Out", "ShipOut", "JobItem")</li>
                     <li class="@Url.MakeNavBarActive("JobItem","Stocktake")">@Html.ActionLink("Stocktake", "Stocktake", "JobItem")</li>

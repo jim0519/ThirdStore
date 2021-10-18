@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using Ionic.Zip;
 using ThirdStoreBusiness.Image;
 
-namespace ThirdStoreBusiness.GumtreeFeed
+namespace ThirdStoreBusiness.Misc
 {
     public class GumtreeFeedService : IGumtreeFeedService
     {

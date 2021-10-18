@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ThirdStoreCommon;
 using ThirdStoreBusiness.JobItem;
 
-namespace ThirdStoreBusiness.GumtreeFeed
+namespace ThirdStoreBusiness.Misc
 {
     public interface IGumtreeFeedService
     {

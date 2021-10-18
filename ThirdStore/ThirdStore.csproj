@@ -189,7 +189,7 @@
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\JobItemController.cs" />
     <Compile Include="Controllers\ItemController.cs" />
-    <Compile Include="Controllers\GumtreeFeedController.cs" />
+    <Compile Include="Controllers\MiscController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\ValidationController.cs" />
     <Compile Include="Extensions\Extensions.cs" />
@@ -205,9 +205,11 @@
     <Compile Include="Models\AccessControl\UserGridViewModel.cs" />
     <Compile Include="Models\AccessControl\UserListViewModel.cs" />
     <Compile Include="Models\AccessControl\LoginViewModel.cs" />
-    <Compile Include="Models\GumtreeFeed\GumtreeFeedViewModel.cs" />
-    <Compile Include="Models\GumtreeFeed\GumtreeFeedGridViewModel.cs" />
-    <Compile Include="Models\GumtreeFeed\GumtreeFeedListViewModel.cs" />
+    <Compile Include="Models\Misc\LogGridViewModel.cs" />
+    <Compile Include="Models\Misc\LogListViewModel.cs" />
+    <Compile Include="Models\Misc\GumtreeFeedViewModel.cs" />
+    <Compile Include="Models\Misc\GumtreeFeedGridViewModel.cs" />
+    <Compile Include="Models\Misc\GumtreeFeedListViewModel.cs" />
     <Compile Include="Models\Item\ItemGridViewModel.cs" />
     <Compile Include="Models\Item\ItemListViewModel.cs" />
     <Compile Include="Models\Item\ItemViewModel.cs" />
@@ -425,7 +427,8 @@
     <Content Include="Views\AccessControl\_CreateOrEditRole.cshtml" />
     <Content Include="Views\AccessControl\CreateRole.cshtml" />
     <Content Include="Views\AccessControl\EditRole.cshtml" />
-    <Content Include="Views\GumtreeFeed\List.cshtml" />
+    <Content Include="Views\Misc\GumtreeFeedList.cshtml" />
+    <Content Include="Views\Misc\LogList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -12,6 +12,8 @@ using ThirdStoreCommon.Models.JobItem;
 using ThirdStoreCommon.Models.Image;
 using ThirdStoreCommon.Models.Order;
 using ThirdStore.Models.Order;
+using ThirdStore.Models.Misc;
+using ThirdStoreCommon.Models.Misc;
 
 namespace ThirdStore.Extensions
 {
@@ -188,5 +190,13 @@ namespace ThirdStore.Extensions
 
         #endregion
 
+        #region Log
+
+        public static LogGridViewModel ToModel(this T_Log entity)
+        {
+            return entity.MapTo<T_Log, LogGridViewModel>();
+        }
+
+        #endregion
     }
 }

@@ -16,6 +16,8 @@ using ThirdStoreCommon.Models.Image;
 using ThirdStoreCommon.Models.Order;
 using ThirdStore.Models.Order;
 using ThirdStoreBusiness.Item;
+using ThirdStoreCommon.Models.Misc;
+using ThirdStore.Models.Misc;
 
 namespace ThirdStore.Infrastructure
 {
@@ -78,9 +80,10 @@ namespace ThirdStore.Infrastructure
 
             //Order
             Mapper.CreateMap<D_Order_Header, OrderGridViewModel>();
-                //.ForMember(dest => dest.StatusText, mce => mce.MapFrom(s => s.StatusID.ToEnumName<ThirdStoreOrderStatus>()));
+            //.ForMember(dest => dest.StatusText, mce => mce.MapFrom(s => s.StatusID.ToEnumName<ThirdStoreOrderStatus>()));
 
-
+            //Log
+            Mapper.CreateMap<T_Log, LogGridViewModel>();
 
         }
 
