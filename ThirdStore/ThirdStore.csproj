@@ -185,6 +185,7 @@
     <Compile Include="Controllers\AccessControlController.cs" />
     <Compile Include="Controllers\ApiCommonController.cs" />
     <Compile Include="Controllers\ApiJobItemController.cs" />
+    <Compile Include="Controllers\ReturnController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OrderController.cs" />
     <Compile Include="Controllers\JobItemController.cs" />
@@ -432,6 +433,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\Return\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

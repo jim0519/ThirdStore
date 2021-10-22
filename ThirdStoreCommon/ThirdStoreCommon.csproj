@@ -118,6 +118,7 @@
     <Compile Include="Models\Item\V_ItemRelationship.cs" />
     <Compile Include="Models\JobItem\D_JobItemLine.cs" />
     <Compile Include="Models\JobItem\D_JobItem.cs" />
+    <Compile Include="Models\Misc\D_NewAimSKUBarcode.cs" />
     <Compile Include="Models\Misc\T_Log.cs" />
     <Compile Include="Models\Order\D_Order_Header.cs" />
     <Compile Include="Models\Order\D_Order_Line.cs" />

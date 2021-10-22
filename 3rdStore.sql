@@ -1876,3 +1876,27 @@ CREATE TABLE [dbo].[T_Log](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+
+--New Aim SKU Barcode
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_NewAimSKUBarcode]') AND type in (N'U'))
+DROP TABLE [dbo].[D_NewAimSKUBarcode]
+GO
+CREATE TABLE [dbo].[D_NewAimSKUBarcode](
+	[ID] [int] IDENTITY (1, 1) NOT NULL,
+    [SKU] [varchar] (500) NOT NULL,
+    [AlternateSKU1] [varchar] (500) NOT NULL,
+    [AlternateSKU2] [varchar] (500) NOT NULL,
+    [CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null
+
+ CONSTRAINT [PK_D_NewAimSKUBarcode] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
