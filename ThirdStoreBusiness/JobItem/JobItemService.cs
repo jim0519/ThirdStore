@@ -1298,11 +1298,13 @@ namespace ThirdStoreBusiness.JobItem
                 strDesc.Append("<br />");
 
                 //check if there is shipping term
+                var shippingDescTemplate = _commonSetting.ShippingDescriptionTemplate;
                 if (onlineListing != null)
                 {
                     var htmlDoc = new HtmlDocument();
                     htmlDoc.LoadHtml(onlineListing.Description);
                     var shippingNode = htmlDoc.DocumentNode.SelectSingleNode("//u[.='Shipping']");
+                    
                     if (shippingNode != null)
                     {
                         var parentNode = (((shippingNode.ParentNode ?? null) != null ? shippingNode.ParentNode.ParentNode : null) != null ? shippingNode.ParentNode.ParentNode.ParentNode : null);
@@ -1311,14 +1313,18 @@ namespace ThirdStoreBusiness.JobItem
                             var fullDesc = htmlDoc.DocumentNode.OuterHtml;
                             var shippingNodeIndex = fullDesc.IndexOf(parentNode.OuterHtml);
                             var reserveDesc = fullDesc.Substring(shippingNodeIndex, fullDesc.Length - shippingNodeIndex);
-                            var shippingDescTemplate = _commonSetting.ShippingDescriptionTemplate;
+                            
                             if (string.IsNullOrWhiteSpace(shippingDescTemplate))
                                 strDesc.Append(reserveDesc);
                             else
                                 strDesc.Append(shippingDescTemplate);
                         }
                     }
+                    else
+                        strDesc.Append(shippingDescTemplate);
                 }
+                else
+                    strDesc.Append(shippingDescTemplate);
 
                 return strDesc.ToString();
             }
