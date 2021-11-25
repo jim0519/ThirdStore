@@ -138,6 +138,20 @@
 
                         </a>
                     </li>
+                    <li class="@Url.MakeNavBarActive("ReturnItem")">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" >
+                            Return Item<span class="caret"></span>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    @Html.ActionLink("Lodge Return Item", "Create", "ReturnItem")
+                                </li>
+                                <li>
+                                    @Html.ActionLink("Return Item List", "List", "ReturnItem")
+                                </li>
+                            </ul>
+
+                        </a>
+                    </li>
                     @*<li class="@Url.MakeNavBarActive("Misc","GumtreeFeedList")">@Html.ActionLink("Gumtree Feed List", "GumtreeFeedList", "Misc")</li>*@
                     <li class="@Url.MakeNavBarActive("Order","List")">@Html.ActionLink("Order List", "List", "Order")</li>
                     <li class="@Url.MakeNavBarActive("JobItem","ShipOut")">@Html.ActionLink("Ship Out", "ShipOut", "JobItem")</li>

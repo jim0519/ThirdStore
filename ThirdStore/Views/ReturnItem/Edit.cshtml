@@ -1,0 +1,14 @@
+﻿@model ReturnItemViewModel
+@section Scripts
+{
+}
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "opForm", name = "opForm" }))
+{
+    @Html.Partial("_CreateOrEdit", Model)
+}
+

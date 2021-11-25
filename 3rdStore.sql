@@ -1900,3 +1900,91 @@ CREATE TABLE [dbo].[D_NewAimSKUBarcode](
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_ReturnItem]') AND type in (N'U'))
+DROP TABLE [dbo].[D_ReturnItem]
+GO
+CREATE TABLE [dbo].[D_ReturnItem](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[StatusID] int NOT NULL,
+	[DesignatedSKU] [varchar](500) not null,
+	[TrackingNumber] [varchar](100) not null,
+	[Note] varchar(4000) NOT NULL,
+	[Ref1] [varchar](4000) NOT NULL,
+	[Ref2] [varchar](4000) NOT NULL,
+	[Ref3] [varchar](4000) NOT NULL,
+	[Ref4] [varchar](4000) NOT NULL,
+	[Ref5] [varchar](4000) NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_D_ReturnItem] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_ReturnItemLine]') AND type in (N'U'))
+DROP TABLE [dbo].[D_ReturnItemLine]
+GO
+CREATE TABLE [dbo].[D_ReturnItemLine](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[HeaderID] [int] NOT NULL,
+	[ItemID] [int] NOT NULL,
+	[SKU] [varchar](500) NOT NULL,
+	[Qty] [int] not null,
+	[Weight] decimal(18,8) NOT NULL,
+	[Length] decimal(18,8) NOT NULL,
+	[Width] decimal(18,8) NOT NULL,
+	[Height] decimal(18,8) NOT NULL,
+	[CubicWeight] decimal(18,8) NOT NULL,
+	[Location] [varchar](500) NOT NULL,
+	[Ref1] [varchar](4000) NOT NULL,
+	[Ref2] [varchar](4000) NOT NULL,
+	[Ref3] [varchar](4000) NOT NULL,
+	[Ref4] [varchar](4000) NOT NULL,
+	[Ref5] [varchar](4000) NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_D_ReturnItemLine] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_D_ReturnItemLine_D_ReturnItem]') AND parent_object_id = OBJECT_ID(N'[dbo].[D_ReturnItemLine]'))
+ALTER TABLE [dbo].[D_ReturnItemLine]  WITH CHECK ADD CONSTRAINT [FK_D_ReturnItemLine_D_ReturnItem] FOREIGN KEY([HeaderID])
+REFERENCES [dbo].[D_ReturnItem] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+
+
+
+
+--insert into D_NewAimSKUBarcode
+select 
+sku,
+[alternate sku1],
+[alternate sku2],
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+from NewaimSKUBarcodeRaw
+where sku is not null

@@ -1,0 +1,558 @@
+﻿@model ReturnItemViewModel
+
+@*<style>
+    /*Batch Edit Mode*/
+    .k-edit-cell input {
+        width: 100%;
+    }
+
+    /*InLine Edit Mode*/
+    .k-grid-edit-row input {
+        width: 100%;
+    }
+</style>*@
+
+@Html.HiddenFor(model => model.ID)
+@*<!-- The Templates plugin is included to render the upload/download listings -->
+    <script src="https://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
+    <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+    <script src="https://blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js"></script>
+    <!-- The Canvas to Blob plugin is included for image resizing functionality -->
+    <script src="https://blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js"></script>
+    <!-- blueimp Gallery script -->
+    <script src="https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+    <!-- The basic File Upload plugin -->
+    <script src="~/Scripts/FileUpload/jquery.fileupload.js"></script>
+    <!-- The File Upload processing plugin -->
+    <script src="~/Scripts/FileUpload/jquery.fileupload-process.js"></script>
+    <!-- The File Upload image preview & resize plugin -->
+    <script src="~/Scripts/FileUpload/jquery.fileupload-image.js"></script>
+    <!-- The File Upload validation plugin -->
+    <script src="~/Scripts/FileUpload/jquery.fileupload-validate.js"></script>
+    <!-- The File Upload user interface plugin -->
+    <script src="~/Scripts/FileUpload/jquery.fileupload-ui.js"></script>*@
+@Html.ValidationSummary()
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Basic Info</a></li>
+        <li><a href="#tabs-2">Misc</a></li>
+    </ul>
+
+    <div id="tabs-1">
+        @*@Html.ValidationSummary(false)*@
+        <div>
+            @BasicInfo()
+        </div>
+        <div>
+            @ChildItems()
+        </div>
+
+    </div>
+    <div id="tabs-2">
+        
+    </div>
+</div>
+<div>
+    <input type="submit" name="save-print" class="k-button" value="Save & Print" />
+    <input type="submit" name="save" class="k-button" value="Save" />
+    <a href="@Html.Raw(Url.Action("List", "ReturnItem"))"><input type="button" id="btnCancel" class="k-button" value="Cancel" /></a>
+</div>
+
+
+
+
+@helper BasicInfo()
+{
+<table style="width:100%;">
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.TrackingNumber)
+
+        </td>
+        <td>
+            @if (Model.ID == 0)
+            {@Html.EditorFor(model => model.TrackingNumber) <input type="button" id="btnFind" class="k-button" value="Find" />} 
+        else
+        { @Html.EditorFor(model => model.TrackingNumber, new { htmlAttributes = new { @readonly = "readonly" } })<input type="button" id="btnFind" class="k-button" value="Find" disabled />}
+            
+        </td>
+        <td>
+            @Html.LabelFor(m => m.StatusID)
+        </td>
+        <td>
+            @Html.DropDownListFor(model => model.StatusID, Model.ReturnItemStatuses)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.DesignatedSKU)
+
+        </td>
+        <td>
+            @Html.EditorFor(model => model.DesignatedSKU)
+            @if (!string.IsNullOrWhiteSpace(Model.DesignatedSKU))
+            {
+                <a href='@Url.Action("EditBySKU", "Item")?SKU=@Model.DesignatedSKU' target='_blank'>View</a>
+            }
+            @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
+        </td>
+        <td>
+            @Html.LabelFor(m => m.Note)
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.Note, 4, 30, null)
+        </td>
+    </tr>
+    
+</table>
+
+}
+
+@helper ChildItems()
+{
+    <div id="returnItemLine-grid"></div>
+    <script>
+        $(document).ready(function () {
+
+            $("#returnItemLine-grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "@Html.Raw(Url.Action("ReadReturnItemLines", "ReturnItem", new { returnItemID = Model.ID }))",
+                            type: "POST",
+                            dataType: "json"
+                        },
+                        update: function (e) { },
+                        create: function (e) { },
+                        destroy: {
+                            url: "@Html.Raw(Url.Action("ReturnItemLineDelete", "ReturnItem"))",
+                            type: "POST",
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            id: "ID",
+                            fields: {
+                                ID: { editable: false, type: "number" },
+                                ItemID: { editable: false, type: "number" },
+                                SKU: {
+                                    editable: true, type: "string"
+                                    , validation: {
+                                        required: true,
+                                        skuvalidation: function (input) {
+                                            //debugger;
+                                            var isValid = true;
+                                            if (input.is("[name='SKU']")) {
+
+                                                $.ajax({
+                                                    url: '@Url.Action("CheckInputSKU", "JobItem")',
+                                                    type: "POST",
+                                                    //contentType: "application/json; charset=utf-8",
+                                                    data: { inputSKU: input.val() },
+                                                    dataType: "json",
+                                                    async: false,
+                                                    success: function (data) {
+                                                        //debugger;
+                                                        if (data.Result) {
+                                                            isValid = true;
+                                                        }
+                                                        else {
+                                                            input.attr("data-skuvalidation-msg", data.ErrMessage);
+                                                            isValid = false;
+                                                        }
+                                                    },
+                                                    error: function (data) {
+                                                        //debugger;
+                                                        alert("sku check error");
+                                                        isValid = false;
+                                                    }
+                                                });
+                                            }
+                                            else
+                                                isValid = true;
+                                            return isValid;
+                                        }
+                                    }
+                                },
+                                Qty: { editable: false, type: "number", validation: { required: true, min: 1 }, defaultValue: 1 },
+
+                                IsOrginalPackage: { editable: true, type: "boolean" },
+                                Weight: { editable: true, type: "number" },
+                                Length: { editable: true, type: "number" },
+                                Width: { editable: true, type: "number" },
+                                Height: { editable: true, type: "number" },
+                                CubicWeight: { editable: true, type: "number" },
+                                Ref1: { editable: true, type: "number" },
+                                Location: { editable: true, type: "string" }
+                            }
+                        }
+                    },
+                    pageSize: "100",
+                    requestEnd: function (e) {
+                        //debugger;
+                        if (e.type == "create" || e.type == "update") {
+
+                            //this.read();
+                        }
+                    },
+                    error: function (e) {
+                        display_kendoui_grid_error(e);
+                        // Cancel the changes
+                        this.cancelChanges();
+                    },
+
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: ["100"]
+                },
+                editable: {
+                    confirmation: false,
+                    mode: "inline"
+                },
+                scrollable: false,
+                toolbar: ["create"],
+                edit: function (e) {
+                    //debugger;
+                    if (e.container.find('.k-grid-cancel') != "undefined") {
+                        e.container.find('.k-grid-cancel').hide();
+                    }
+                    if (e.model.isNew()) {
+                    }
+
+                    //debugger;
+                    $("[name='SKU']", e.container).change(function () {
+                        var skuValue = $(this).val();
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("GetItemInfo", "Item")',
+                            dataType: 'json',
+                            data: { sku: skuValue },
+                            success: function (response) {
+                                //debugger;
+                                if (response.Result) {
+                                    var lengthInput = e.container.find("[name='Length']");
+                                    var lengthWidget = lengthInput.data("kendoNumericTextBox");
+                                    var heightWidget = e.container.find("[name='Height']").data("kendoNumericTextBox");
+                                    var widthWidget = e.container.find("[name='Width']").data("kendoNumericTextBox");
+                                    var weightWidget = e.container.find("[name='Weight']").data("kendoNumericTextBox");
+                                    var cubicWeightWidget = e.container.find("[name='CubicWeight']").data("kendoNumericTextBox");
+                                    var cbmWidget = e.container.find("[name='Ref1']").data("kendoNumericTextBox");
+                                    lengthWidget.value(response.ItemLength);
+                                    lengthWidget.trigger("change");
+                                    heightWidget.value(response.ItemHeight);
+                                    heightWidget.trigger("change");
+                                    widthWidget.value(response.ItemWidth);
+                                    widthWidget.trigger("change");
+                                    weightWidget.value(response.ItemWeight);
+                                    weightWidget.trigger("change");
+                                    cubicWeightWidget.value(response.ItemCubicWeight);
+                                    cubicWeightWidget.trigger("change");
+                                    cbmWidget.value(response.ItemCubicMeter);
+                                    cbmWidget.trigger("change");
+                                    if (skuValue.toUpperCase() != response.SKU.toUpperCase()) {
+                                        $("[name='SKU']").val(response.SKU);
+                                        $("[name='SKU']").trigger("change");
+                                    }
+
+                                    //$("[name='Length']", e.container).val(response.ItemLength);
+                                }
+                                //change description column here?
+                            },
+                            error: function (response) {
+                                alert(response);
+                            }
+                        });
+                    });
+                },
+                columns: [{
+                    field: "ID",
+                    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].ID' value='#=ID#' />",
+                    hidden: true
+                }, {
+                    field: "ItemID",
+                    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].ItemID' value='#=ItemID#' />",
+                    hidden: true
+                }, {
+                    field: "SKU",
+                    template: "<a href='@Url.Action("EditBySKU", "Item")?SKU=#=SKU#' target='_blank' > #=SKU#</a>" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].SKU' value='#=SKU#' />",
+                        width: 200,
+                        editor: editSKU
+                }, {
+                    field: "Qty",
+                    title: "Qty",
+                    template: "#=Qty#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Qty' value='#=Qty#' />",
+                    width: 70,
+                    hidden: true
+                }, {
+                    field: "Weight",
+                    title: "Weight",
+                    template: "#=Weight#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Weight' value='#=Weight#' />",
+                    width: 100,
+                    format: "{0:n4}",
+                    editor: editNumber
+                }, {
+                    field: "Length",
+                    title: "Length",
+                    template: "#=Length#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Length' value='#=Length#' />",
+                    width: 100,
+                    format: "{0:n4}",
+                    editor: editNumber
+                }, {
+                    field: "Width",
+                    title: "Width",
+                    template: "#=Width#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Width' value='#=Width#' />",
+                    width: 100,
+                    format: "{0:n4}",
+                    editor: editNumber
+                }, {
+                    field: "Height",
+                    title: "Height",
+                    template: "#=Height#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Height' value='#=Height#' />",
+                    width: 100,
+                    format: "{0:n4}",
+                    editor: editNumber
+                }, {
+                    field: "CubicWeight",
+                    title: "CbcWgt",
+                    template: "#=CubicWeight#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].CubicWeight' value='#=CubicWeight#' />",
+                    width: 100,
+                    format: "{0:n4}",
+                    editor: editNumber
+                }, {
+                    field: "Ref1",
+                    title: "CBM",
+                    template: "#=Ref1#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Ref1' value='#=Ref1#' />",
+                    width: 100,
+                    format: "{0:n4}",
+                    editor: editNumber
+                },
+                {
+                    field: "Location",
+                    template: "#=Location#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Location' value='#=Location#' />",
+                    width: 100,
+                },
+                //    field: "CreateTime",
+                //    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].CreateTime' value='#=CreateTime#' />",
+                //    hidden: true
+                //}, {
+                //    field: "EditBy",
+                //    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].EditBy' value='#=EditBy#' />",
+                //    hidden: true
+                //}, {
+                //    field: "EditTime",
+                //    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].EditTime' value='#=EditTime#' />",
+                //    hidden: true
+                //},
+                {
+                    command: ["edit"
+                        @*@if(Model.ID==0)
+                    {
+                        <text>*@
+                        , { name: "destroy", text: "Del" }
+                        //    </text>
+                        //}
+                    ], title: "&nbsp;", width: "100px"
+                }]
+            });
+
+            $("#btnFind").click(function (e) {
+                if ($('#@Html.FieldIdFor(model => model.TrackingNumber)').val() == "") {
+                    alert("Please input a tracking number.");
+                    return false;
+                }
+
+                var link = "@Html.Raw(Url.Action("FindReturnItemByTrackingNumber", "ReturnItem"))"
+                var postData = {
+                    trackingNumber: $('#@Html.FieldIdFor(model => model.TrackingNumber)').val()
+                }
+                //debugger;
+                $.ajax({
+                    url: link,
+                    type: "POST",
+                    //contentType: "application/json; charset=utf-8",
+                    data: postData,
+                    dataType: "json",
+                    beforeSend: function () {
+                        $("#imgLoading").show();
+                    },
+                    complete: function () {
+                        $("#imgLoading").hide();
+                    },
+                    success: function (data) {
+                        if (data.Result) {
+                            alert("Existing return item found.");
+                            window.location.href = data.RedirectToUrl;
+                            //$.get(data.RedirectToUrl);
+                        }
+                        else {
+                            if (data.ErrMessage != "")
+                                alert(data.ErrMessage);
+                            else
+                                alert("Unknown error occurred.");
+                        }
+                    },
+                    error: function (data) {
+                        //debugger;
+                        alert("error");
+                    }
+                });
+                return false;
+            });
+
+            $(this).scannerDetection({
+                timeBeforeScanTest: 200, // wait for the next character for upto 200ms
+                avgTimeByChar: 100, // it's not a barcode if a character takes longer than 40ms
+                onComplete: function (barcode, qty) {
+                    //var e = $.Event("keypress");
+                    //e.which = 9; //enter keycode
+                    //e.keyCode = 9;
+                    //$(document).trigger(e);
+                    //debugger;
+                    //jQuery.event.trigger({ type: 'keypress', which: character.charCodeAt(9) });
+                    //RefreshGrid(false);
+                    $.tabNext();
+                    //alert(barcode);
+                } // main callback function
+            });
+
+            $('#@Html.FieldIdFor(model => model.TrackingNumber)').scannerDetection({
+                timeBeforeScanTest: 200, // wait for the next character for upto 200ms
+                avgTimeByChar: 100, // it's not a barcode if a character takes longer than 40ms
+                onComplete: function (barcode, qty) {
+                    //debugger;
+                    $("#btnFind").click();
+                } // main callback function
+            });
+
+        });
+
+
+    function index(dataItem) {
+        var data = $("#returnItemLine-grid").data("kendoGrid").dataSource.data();
+        //debugger;
+        return data.indexOf(dataItem);
+        }
+
+        function editNumber(container, options) {
+            let placeHolder = "";
+            if (options.field == "Weight") { placeHolder = "kg"; } else if (options.field == "CubicWeight" || options.field == "Ref1") { placeHolder = "m3"; } else { placeHolder = "m"; }
+            $('<input data-bind="value:' + options.field + '" name="' + options.field + '" placeholder="' + placeHolder + '" />' + placeHolder )
+                .appendTo(container)
+                .kendoNumericTextBox({
+                    spinners: false,
+                    format: "#.00" + placeHolder,
+                    decimals: 4
+                });
+        }
+
+        function editSKU(container, options) {
+            $('<input data-bind="value:' + options.field + '" name="' + options.field + '" placeholder="' + options.field + '" />')
+                .appendTo(container);
+        }
+
+    </script>
+}
+
+
+
+<script>
+        $(document).ready(function () {
+            $("#tabs").tabs();
+
+            $("input[type=submit]").click(function () {
+                //debugger;
+                var isValid = true;
+                var isPrintLabel = ($(this).attr('name').includes("print") ? true : false);
+                $.ajax({
+                    //url: '@Url.Action("ValidateInput", "ReturnItem",new { IsPrintLabel= "_isPrintLabel_" })'.replace('_isPrintLabel_', isPrintLabel),
+                    url: '@Url.Action("ValidateInput", "ReturnItem")',
+                    type: "POST",
+                    async: false,
+                    data: $("#opForm").serialize() + '&IsPrintLabel=' + isPrintLabel,
+                    success: function (response) {
+                        //debugger;
+                        if (response.Result)
+                            //$(form).submit();
+                            isValid = true;
+                        else {
+                            if (response.Message != undefined) {
+                                appendValidateSummary(response.Message);
+                            }
+                            isValid = false;
+                        }
+                    },
+                    error: function (response) {
+                        //form.submit();
+                        isValid = true;
+                    }
+                });
+                return isValid;
+            });
+
+            @*$("#opForm").validate({
+                rules: {},
+                highlight: {},
+                messages: {},
+                submitHandler: function (form) {
+                    $.ajax({
+                        url:'@Url.Action("ValidateInput", "ReturnItem")',
+                        type: "POST",
+                        data: $(form).serialize(),
+                        success: function (response) {
+                            debugger;
+                            if (response.Result)
+                                $(form).submit();
+                                //return true;
+                            else
+                                return false;
+                        },
+                        error: function (response) {
+                            form.submit();
+                        }
+                    });
+                }
+            });*@
+
+            
+
+        });
+
+
+    function appendValidateSummary(appendMessage) {
+        var formValidator = $("#opForm").validate({});
+        var errorList = [];
+
+        // get existing summary errors from jQuery validate
+        $.each(formValidator.errorList, function (index, errorListItem) {
+            errorList.push(errorListItem.message);
+        });
+        errorList.push(appendMessage);
+
+        if (errorList.length > 0) {
+            // find summary div
+            var $summary = $("#opForm").find("[data-valmsg-summary=true]");
+
+            // find the unordered list
+            var $ul = $summary.find("ul");
+
+            // Clear existing errors from DOM by removing all element from the list
+            $ul.empty();
+            // Add all errors to the list
+            $.each(errorList, function (index, message) {
+                $("<li />").html(message).appendTo($ul);
+            });
+
+            // Add the appropriate class to the summary div
+            $summary.removeClass("validation-summary-valid")
+                .addClass("validation-summary-errors");
+        }
+    }
+
+</script>
+

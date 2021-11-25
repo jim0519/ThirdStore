@@ -123,6 +123,8 @@
     <Compile Include="Models\Order\D_Order_Header.cs" />
     <Compile Include="Models\Order\D_Order_Line.cs" />
     <Compile Include="Models\Report\KPIReport.cs" />
+    <Compile Include="Models\ReturnItem\D_ReturnItem.cs" />
+    <Compile Include="Models\ReturnItem\D_ReturnItemLine.cs" />
     <Compile Include="Models\ScheduleTask\T_ScheduleRuleLine.cs" />
     <Compile Include="Models\ScheduleTask\T_ScheduleRule.cs" />
     <Compile Include="Models\ScheduleTask\T_ScheduleTask.cs" />

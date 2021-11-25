@@ -14,6 +14,7 @@ using ThirdStoreBusiness.Image;
 using ThirdStoreCommon.Models.Image;
 using ThirdStoreBusiness.API.Neto;
 using ThirdStoreBusiness.DSChannel;
+using ThirdStoreCommon.Models.Misc;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -23,6 +24,7 @@ namespace ThirdStoreBusiness.Item
         private readonly IRepository<D_Item_Relationship> _itemRelationshipRepository;
         private readonly IRepository<M_ItemImage> _itemImageRepository;
         private readonly IRepository<NetoProducts> _netoProductsRepository;
+        private readonly IRepository<D_NewAimSKUBarcode> _newAimSKUBarcodeRepository;
         private readonly IDbContext _dbContext;
         private readonly IWorkContext _workContext;
         private readonly IImageService _imageService;
@@ -35,6 +37,7 @@ namespace ThirdStoreBusiness.Item
             IRepository<D_Item_Relationship> itemRelationshipRepository,
             IRepository<M_ItemImage> itemImageRepository,
             IRepository<NetoProducts> netoProductsRepository,
+            IRepository<D_NewAimSKUBarcode> newAimSKUBarcodeRepository,
             IWorkContext workContext,
             IDbContext dbContext,
             IImageService imageService,
@@ -46,6 +49,7 @@ namespace ThirdStoreBusiness.Item
             _itemRepository = itemRepository;
             _itemRelationshipRepository = itemRelationshipRepository;
             _itemImageRepository = itemImageRepository;
+            _newAimSKUBarcodeRepository = newAimSKUBarcodeRepository;
             _dbContext = dbContext;
             _workContext = workContext;
             _imageService = imageService;
@@ -66,8 +70,20 @@ namespace ThirdStoreBusiness.Item
         {
             if (string.IsNullOrWhiteSpace(sku))
                 return default(D_Item);
-            var item = _itemRepository.Table.Where(i => i.SKU.ToLower().Equals(sku.ToLower())&&i.IsActive).FirstOrDefault();
+            var item = _itemRepository.Table.Where(i => i.SKU.ToUpper().Equals(sku.ToUpper())&&i.IsActive).FirstOrDefault();
             return item;
+
+        }
+
+        public D_Item GetItemBySKUorBarcode(string skubarcode)
+        {
+            if (string.IsNullOrWhiteSpace(skubarcode))
+                return default(D_Item);
+            var newaimSKU = _newAimSKUBarcodeRepository.Table.Where(i => i.AlternateSKU2.ToUpper().Equals(skubarcode.ToUpper())).FirstOrDefault();
+            if (newaimSKU != null)
+                return this.GetItemBySKU(newaimSKU.SKU);
+            else
+                return this.GetItemBySKU(skubarcode);
 
         }
 

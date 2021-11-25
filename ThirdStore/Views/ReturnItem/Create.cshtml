@@ -1,0 +1,16 @@
+﻿@model ReturnItemViewModel
+@section Scripts
+{
+    <script src="@Url.Content("~/Scripts/jquery.scannerdetection.js")"></script>
+    <script src="@Url.Content("~/Scripts/jquery.tabbable.min.js")"></script>
+}
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/FormPage.cshtml";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "opForm", name = "opForm" }))
+{
+    @Html.Partial("_CreateOrEdit", Model)
+
+}

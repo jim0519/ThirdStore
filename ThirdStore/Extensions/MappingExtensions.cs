@@ -14,6 +14,8 @@ using ThirdStoreCommon.Models.Order;
 using ThirdStore.Models.Order;
 using ThirdStore.Models.Misc;
 using ThirdStoreCommon.Models.Misc;
+using ThirdStore.Models.ReturnItem;
+using ThirdStoreCommon.Models.ReturnItem;
 
 namespace ThirdStore.Extensions
 {
@@ -196,6 +198,47 @@ namespace ThirdStore.Extensions
         {
             return entity.MapTo<T_Log, LogGridViewModel>();
         }
+
+        #endregion
+
+
+        #region Return Item
+
+        public static ReturnItemGridViewModel ToModel(this D_ReturnItem entity)
+        {
+            return entity.MapTo<D_ReturnItem, ReturnItemGridViewModel>();
+        }
+
+        public static ReturnItemViewModel ToCreateNewModel(this D_ReturnItem entity)
+        {
+            return entity.MapTo<D_ReturnItem, ReturnItemViewModel>();
+        }
+
+        public static ReturnItemViewModel.ReturnItemLineViewModel ToModel(this D_ReturnItemLine entity)
+        {
+            return entity.MapTo<D_ReturnItemLine, ReturnItemViewModel.ReturnItemLineViewModel>();
+        }
+
+        public static D_ReturnItem ToCreateNewEntity(this ReturnItemViewModel model)
+        {
+            return model.MapTo<ReturnItemViewModel, D_ReturnItem>();
+        }
+
+        public static D_ReturnItem ToCreateNewEntity(this ReturnItemViewModel model, D_ReturnItem destination)
+        {
+            return model.MapTo(destination);
+        }
+
+        public static D_ReturnItemLine ToEntity(this ReturnItemViewModel.ReturnItemLineViewModel model)
+        {
+            return model.MapTo<ReturnItemViewModel.ReturnItemLineViewModel, D_ReturnItemLine>();
+        }
+
+        public static D_ReturnItemLine ToEntity(this ReturnItemViewModel.ReturnItemLineViewModel model, D_ReturnItemLine destination)
+        {
+            return model.MapTo(destination);
+        }
+        
 
         #endregion
     }

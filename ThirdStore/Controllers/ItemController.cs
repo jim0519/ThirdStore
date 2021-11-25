@@ -381,7 +381,7 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult CheckInputSKU(string inputSKU)
         {
-            var item = _itemService.GetItemBySKU(inputSKU);
+            var item = _itemService.GetItemBySKUorBarcode(inputSKU);
             if (item == null)
             {
                 return Json(new { Result = false, ErrMessage = "SKU Not Exists" });
@@ -409,12 +409,12 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult GetItemInfo(string sku)
         {
-            var item = _itemService.GetItemBySKU(sku);
+            var item = _itemService.GetItemBySKUorBarcode(sku);
             if (item == null)
             {
                 return Json(new { Result = false });
             }
-            return Json(new { Result = true,ItemID=item.ID, ItemLength= item.Length, ItemHeight=item.Height, ItemWidth=item.Width, ItemWeight=item.GrossWeight,ItemCubicWeight=item.Length*item.Width*item.Height*250, ItemCubicMeter= item.Length * item.Width * item.Height });
+            return Json(new { Result = true,ItemID=item.ID, SKU=item.SKU, ItemLength= item.Length, ItemHeight=item.Height, ItemWidth=item.Width, ItemWeight=item.GrossWeight,ItemCubicWeight=item.Length*item.Width*item.Height*250, ItemCubicMeter= item.Length * item.Width * item.Height });
         }
 
         [HttpPost]

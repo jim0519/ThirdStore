@@ -50,6 +50,8 @@
   <ItemGroup>
     <Compile Include="IDbContext.cs" />
     <Compile Include="IRepository.cs" />
+    <Compile Include="Mapping\D_ReturnItemLineMap.cs" />
+    <Compile Include="Mapping\D_ReturnItemMap.cs" />
     <Compile Include="Mapping\M_RolePermissionMap.cs" />
     <Compile Include="Mapping\M_UserRoleMap.cs" />
     <Compile Include="Mapping\NetoProductsMap.cs" />

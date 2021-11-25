@@ -17,6 +17,8 @@ namespace ThirdStoreBusiness.Item
 
         D_Item GetItemBySKU(string sku);
 
+        D_Item GetItemBySKUorBarcode(string skubarcode);
+
         IList<D_Item> GetItemsBySKUs(IList<string> skus);
 
         IList<D_Item> GetItemsByIDs(IList<int> ids);

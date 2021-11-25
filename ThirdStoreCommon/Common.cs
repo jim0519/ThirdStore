@@ -116,6 +116,12 @@ namespace ThirdStoreCommon
         UserAccessControl=6
     }
 
+    public enum ThirdStoreReturnItemStatus
+    {
+        PARTIAL = 1,
+        FULL = 2
+    }
+
 
     public sealed class ThirdStoreCacheKey
     {

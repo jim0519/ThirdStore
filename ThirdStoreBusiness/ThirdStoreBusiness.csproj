@@ -120,6 +120,7 @@
     <Compile Include="API\Neto\NetoAPI.cs" />
     <Compile Include="DSChannel\DSModel.cs" />
     <Compile Include="DSChannel\IDSChannel.cs" />
+    <Compile Include="Misc\INewAimSKUBarcodeService.cs" />
     <Compile Include="Misc\ILogService.cs" />
     <Compile Include="Misc\IGumtreeFeedService.cs" />
     <Compile Include="Misc\GumtreeFeedService.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="ReportPrint\ReportPrintService.cs" />
     <Compile Include="Report\IReportService.cs" />
     <Compile Include="Report\ReportService.cs" />
+    <Compile Include="ReturnItem\IReturnItemService.cs" />
     <Compile Include="ScheduleTask\IScheduleRuleService.cs" />
     <Compile Include="ScheduleTask\UpdateDSZDataAndSync.cs" />
     <Compile Include="ScheduleTask\SyncInventoryForLastDayTask.cs" />

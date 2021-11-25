@@ -29,6 +29,7 @@ using ThirdStoreBusiness.Report;
 using ThirdStoreBusiness.Setting;
 using ThirdStoreBusiness.Misc;
 using ThirdStoreBusiness.API.Dropshipzone;
+using ThirdStoreBusiness.ReturnItem;
 
 namespace ThirdStoreFramework
 {
@@ -127,6 +128,12 @@ namespace ThirdStoreFramework
 
             //Log
             builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
+
+            //Return Item
+            builder.RegisterType<ReturnItemService>().As<IReturnItemService>().InstancePerLifetimeScope();
+
+            //Misc
+            builder.RegisterType<NewAimSKUBarcodeService>().As<INewAimSKUBarcodeService>().InstancePerLifetimeScope();
         }
 
         public int Order

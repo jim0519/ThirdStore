@@ -18,6 +18,8 @@ using ThirdStore.Models.Order;
 using ThirdStoreBusiness.Item;
 using ThirdStoreCommon.Models.Misc;
 using ThirdStore.Models.Misc;
+using ThirdStoreCommon.Models.ReturnItem;
+using ThirdStore.Models.ReturnItem;
 
 namespace ThirdStore.Infrastructure
 {
@@ -84,6 +86,16 @@ namespace ThirdStore.Infrastructure
 
             //Log
             Mapper.CreateMap<T_Log, LogGridViewModel>();
+
+            //Return Item
+            Mapper.CreateMap<D_ReturnItem, ReturnItemGridViewModel>()
+               .ForMember(dest => dest.Status, mce => mce.MapFrom(s => s.StatusID.ToEnumName<ThirdStoreReturnItemStatus>()));
+            Mapper.CreateMap<D_ReturnItem, ReturnItemViewModel>();
+            Mapper.CreateMap<D_ReturnItemLine, ReturnItemViewModel.ReturnItemLineViewModel>();
+
+
+            Mapper.CreateMap<ReturnItemViewModel, D_ReturnItem>();
+            Mapper.CreateMap<ReturnItemViewModel.ReturnItemLineViewModel, D_ReturnItemLine>();
 
         }
 
