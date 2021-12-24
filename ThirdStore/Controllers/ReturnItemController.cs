@@ -345,10 +345,10 @@ namespace ThirdStore.Controllers
                     return Json(new { Result = false, Message = "Return item can only contain one item." });
                 }
 
-                //if(model.StatusID == ThirdStoreReturnItemStatus.PARTIAL.ToValue())
-                //{
-                //    return Json(new { Result = false, Message = "The status should be FULL as the item structure is completed." });
-                //}
+                if (model.StatusID == ThirdStoreReturnItemStatus.PARTIAL.ToValue())
+                {
+                    return Json(new { Result = false, Message = "The status should be FULL as the item structure is completed." });
+                }
             }
 
             if (model.ReturnItemViewLines.Count > 0 )

@@ -13,6 +13,7 @@
     {
         <div id="divOperationBtn" style="float:right; margin-bottom:5px;">
             <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+            <input type="button" id="btnRedownloadImage" class="k-button" value="Redownload Images" />
             <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
         </div>
         <div style="clear:both"></div>
@@ -58,6 +59,48 @@
 
                 return false;
             });
+
+            $('#btnRedownloadImage').click(function (e) {
+                        e.preventDefault();
+
+                        var link="@Html.Raw(Url.Action("RedownloadImage", "Item"))"
+                        var id = @Model.ID;
+                        var postData = {
+                            selectedIDs: id
+                        };
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            data: postData,
+                            dataType: "json",
+                            beforeSend: function () {
+                                $("#imgLoading").show();
+                            },
+                            complete: function () {
+                                $("#imgLoading").hide();
+                            },
+                            success: function (data) {
+                                if (data.Result) {
+                                    alert("Redownload Images Success");
+                                    window.location.reload();
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+            });
+
         });
     </script>
     @Html.Partial("_CreateOrEdit", Model)

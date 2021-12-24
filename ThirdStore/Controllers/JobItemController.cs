@@ -26,6 +26,7 @@ using ThirdStoreCommon.Infrastructure;
 using ThirdStoreCommon.Models;
 using System.Text.RegularExpressions;
 using ThirdStoreBusiness.AccessControl;
+using ThirdStoreBusiness.ReturnItem;
 
 namespace ThirdStore.Controllers
 {
@@ -40,6 +41,7 @@ namespace ThirdStore.Controllers
         private readonly ICacheManager _cacheManager;
         private readonly IUserService _userService;
         private readonly IPermissionService _permissionService;
+        private readonly IReturnItemService _returnItemService;
 
         public JobItemController(IJobItemService jobItemService,
             IItemService itemService,
@@ -49,7 +51,8 @@ namespace ThirdStore.Controllers
             IWorkContext workContext,
             ICacheManager cacheManager,
             IPermissionService permissionService,
-            IUserService userService)
+            IUserService userService,
+            IReturnItemService returnItemService)
         {
             _jobItemService = jobItemService;
             _itemService = itemService;
@@ -60,6 +63,7 @@ namespace ThirdStore.Controllers
             _cacheManager = cacheManager;
             _userService = userService;
             _permissionService = permissionService;
+            _returnItemService = returnItemService;
         }
 
         public ActionResult List()
@@ -141,7 +145,7 @@ namespace ThirdStore.Controllers
             };
         }
 
-        public ActionResult Create(int fromJobItemID = 0)
+        public ActionResult Create(int fromJobItemID = 0,int fromReturnItemID=0)
         {
             var newJobItemViewModel = new JobItemViewModel();
 
@@ -156,13 +160,44 @@ namespace ThirdStore.Controllers
                     newJobItemViewModel.ShipTime = null;
                     newJobItemViewModel.TrackingNumber = string.Empty;
                     newJobItemViewModel.StatusID = ThirdStoreJobItemStatus.PENDING.ToValue();
-
+                    newJobItemViewModel.Note += " From job item id " + fromJobItemID;
                     //newJobItemViewModel.JobItemViewImages.Clear();
                     //foreach (var oriImg in jobItem.JobItemImages)
                     //{
                     //    var img = _imageService.DuplicateImageByID(oriImg.ImageID);
                     //    var imgViewModel = new JobItemViewModel.JobItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID) };
                     //    newJobItemViewModel.JobItemViewImages.Add(imgViewModel);
+                    //}
+                }
+            }
+            else if(fromReturnItemID!=0)
+            {
+                var returnItem = _returnItemService.GetReturnItemByID(fromReturnItemID);
+                if (returnItem != null)
+                {
+                    //newJobItemViewModel.Reference = string.Empty;
+                    //newJobItemViewModel.ShipTime = null;
+                    //newJobItemViewModel.TrackingNumber = string.Empty;
+                    newJobItemViewModel.Type = ThirdStoreJobItemType.SELFSTORED.ToValue();
+                    newJobItemViewModel.ConditionID = ThirdStoreJobItemCondition.NEW.ToValue();
+                    newJobItemViewModel.StatusID = ThirdStoreJobItemStatus.PENDING.ToValue();
+                    newJobItemViewModel.DesignatedSKU = returnItem.DesignatedSKU;
+                    newJobItemViewModel.Note = "From return item id " + fromReturnItemID;
+                    //newJobItemViewModel.JobItemViewImages.Clear();
+                    //foreach (var returnItemLine in returnItem.ReturnItemLines)
+                    //{
+                    //    var jobItemLineViewModel = new JobItemViewModel.JobItemLineViewModel();
+                    //    jobItemLineViewModel.ItemID = returnItemLine.ItemID;
+                    //    jobItemLineViewModel.SKU = returnItemLine.SKU;
+                    //    jobItemLineViewModel.Qty = returnItemLine.Qty;
+                    //    jobItemLineViewModel.Weight = returnItemLine.Weight;
+                    //    jobItemLineViewModel.Length = returnItemLine.Length;
+                    //    jobItemLineViewModel.Width = returnItemLine.Width;
+                    //    jobItemLineViewModel.Height = returnItemLine.Height;
+                    //    jobItemLineViewModel.CubicWeight = returnItemLine.CubicWeight;
+                    //    jobItemLineViewModel.Ref1 = returnItemLine.Ref1;
+
+                    //    newJobItemViewModel.JobItemViewLines.Add(jobItemLineViewModel);
                     //}
                 }
             }
@@ -445,11 +480,12 @@ namespace ThirdStore.Controllers
 
 
         [HttpPost]
-        public ActionResult ReadJobItemLines(DataSourceRequest command, int jobItemID)
+        public ActionResult ReadJobItemLines(DataSourceRequest command, int jobItemID, int fromReturnItemID=0)
         {
+            var jobItemLines = new List<JobItemViewModel.JobItemLineViewModel>();
             if (jobItemID > 0)
             {
-                IList<JobItemViewModel.JobItemLineViewModel> jobItemLines = null;
+                
                 var jobItem = _jobItemService.GetJobItemByID(jobItemID);
                 if (jobItem != null)
                 {
@@ -457,6 +493,36 @@ namespace ThirdStore.Controllers
                 }
 
 
+                var gridModel = new DataSourceResult() { Data = jobItemLines, Total = jobItemLines.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else if(fromReturnItemID>0)
+            {
+                var returnItem = _returnItemService.GetReturnItemByID(fromReturnItemID);
+                if (returnItem != null)
+                {
+                    foreach (var returnItemLine in returnItem.ReturnItemLines)
+                    {
+                        var jobItemLineViewModel = new JobItemViewModel.JobItemLineViewModel();
+                        jobItemLineViewModel.ItemID = returnItemLine.ItemID;
+                        jobItemLineViewModel.SKU = returnItemLine.SKU;
+                        jobItemLineViewModel.Qty = returnItemLine.Qty;
+                        jobItemLineViewModel.Weight = returnItemLine.Weight;
+                        jobItemLineViewModel.Length = returnItemLine.Length;
+                        jobItemLineViewModel.Width = returnItemLine.Width;
+                        jobItemLineViewModel.Height = returnItemLine.Height;
+                        jobItemLineViewModel.CubicWeight = returnItemLine.CubicWeight;
+                        jobItemLineViewModel.Ref1 = returnItemLine.Ref1;
+
+                        jobItemLines.Add(jobItemLineViewModel);
+                    }
+                }
                 var gridModel = new DataSourceResult() { Data = jobItemLines, Total = jobItemLines.Count };
 
 

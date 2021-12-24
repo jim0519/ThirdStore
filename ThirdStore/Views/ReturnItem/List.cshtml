@@ -10,9 +10,25 @@
 {
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
-        
-    </div>
+        <div id="divOperationBtn" style="float:right;margin-top:5px;">
+            @*<input type="button" id="btnConvertJobItem" class="k-button" value="Convert Job Item" />*@
+        </div>
 
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#btnConvertJobItem").click(function (e) {
+                if (selectedIds.length != 1) {
+                    alert("Please select one return item to convert.");
+                    return false;
+                }
+
+                var selectedReturnItemID = selectedIds[0];
+                var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromReturnItemID = "_selectedReturnItemID_" }))'.replace('_selectedReturnItemID_', selectedReturnItemID);
+                location.href = link;
+            });
+        });
+    </script>
     <table width="100%">
         <tr>
             <td>
@@ -30,8 +46,8 @@
                 @Html.EditorFor(model => model.SearchSKU)
             </td>
         </tr>
-        
-       
+
+
         <tr>
             <td class="adminTitle" colspan="2">
                 <input type="button" id="btnSearch" class="k-button" value="Search" />
@@ -155,4 +171,3 @@
 }
 
 
-    

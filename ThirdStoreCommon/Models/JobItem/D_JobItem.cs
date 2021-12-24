@@ -23,9 +23,9 @@ namespace ThirdStoreCommon.Models.JobItem
         public string DesignatedSKU { get; set; }
         public DateTime? ShipTime { get; set; }
         public string TrackingNumber { get; set; }
-        public string Ref1 { get; set; }
-        public string Ref2 { get; set; }
-        public string Ref3 { get; set; }
+        public string Ref1 { get; set; }//JobItemReference
+        public string Ref2 { get; set; }//Inspectors
+        public string Ref3 { get; set; }//From Return Item ID
         public string Ref4 { get; set; }
         public string Ref5 { get; set; }
         public string Note { get; set; }

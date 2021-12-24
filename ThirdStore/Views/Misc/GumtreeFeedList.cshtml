@@ -31,7 +31,7 @@
                             var di = grid.dataItem($(this));
                             selectedDataItems.push(di);
                         });
-                        debugger;
+                        //debugger;
 
                         var link="@Html.Raw(Url.Action("DownloadImage", "Misc"))"
                         var ids = selectedIds.join(",");
@@ -73,6 +73,7 @@
 
 
                     $('#btnUploadDSZFile').click(function (e) {
+
                         e.preventDefault();
                         var window = $("#uploadDSZFile-window");
                         if (!window.data("kendoWindow")) {
