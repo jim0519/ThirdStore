@@ -220,7 +220,7 @@ namespace ThirdStoreBusiness.API.Dropshipzone
                 {
                     if(pageNum/60!=exceedLimit)
                     {
-                        Thread.Sleep(1000 * 61);
+                        Thread.Sleep(1000 * 90);
                         exceedLimit = pageNum / 60;
                     }
                     //var getProductsRequest = new RestRequest("/products?limit={limit}&page_no={pageNum}");
@@ -244,7 +244,7 @@ namespace ThirdStoreBusiness.API.Dropshipzone
                     }
                     else
                     {
-                        throw new Exception(getProductsResponse.Content);
+                        throw new Exception($"Status code:{getProductsResponse.StatusCode}. Content: {getProductsResponse.Content}");
                     }
 
 

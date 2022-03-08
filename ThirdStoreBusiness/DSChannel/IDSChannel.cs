@@ -373,7 +373,7 @@ namespace ThirdStoreBusiness.DSChannel
                     {
                         var dszDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
                         var dsDatas = _csvContext.Read<DSZModel>(dszDataFile.FullName, _csvFileDescription);
-                        var dsDatasBySKUs = dsDatas.Where(d => skus.Select(s => s.ToLower()).Contains(d.SKU.ToLower()));
+                        var dsDatasBySKUs = dsDatas.Where(d =>!string.IsNullOrWhiteSpace( d.SKU)&& skus.Select(s => s.ToLower()).Contains(d.SKU.ToLower()));
                         var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
                         //var bulkyItemDropshipSKUs = new List<string>();
                         foreach(var data in dsDatasBySKUs)
