@@ -87,8 +87,10 @@ namespace ThirdStoreBusiness.DSChannel
         public string Image14 { get; set; }
         [CsvColumn(Name = "Image 15")]
         public string Image15 { get; set; }
-
-
+        [CsvColumn(Name = "Special Price")]
+        public decimal SpecialPrice { get; set; }
+        [CsvColumn(Name = "Special Price End Date")]
+        public DateTime? SpecialPriceEndDate { get; set; }
 
 
 
@@ -179,6 +181,30 @@ namespace ThirdStoreBusiness.DSChannel
         public string shipping_operation { get; set; }
         public string UPC { get; set; }
         public string Brand { get; set; }
+        public string NSW { get; set; }
+        public string WA { get; set; }
+        public string VIC { get; set; }
+        public string TAS { get; set; }
+        public string NT { get; set; }
+        public string QLD { get; set; }
+        public string ACT { get; set; }
+        public string SA { get; set; }
+        [CsvColumn(Name = "NSW - Regional/Remote")]
+        public string NSW_R { get; set; }
+        [CsvColumn(Name = "VIC - Regional/Remote")]
+        public string VIC_R { get; set; }
+        [CsvColumn(Name = "QLD - Regional/Remote")]
+        public string QLD_R { get; set; }
+        [CsvColumn(Name = "SA - Regional/Remote")]
+        public string SA_R { get; set; }
+        [CsvColumn(Name = "WA - Regional/Remote")]
+        public string WA_R { get; set; }
+        [CsvColumn(Name = "TAS - Regional/Remote")]
+        public string TAS_R { get; set; }
+        [CsvColumn(Name = "NT- All")]
+        public string NT_ALL { get; set; }
+
+
     }
 
     public class DSZImportLine

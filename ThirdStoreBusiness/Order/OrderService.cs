@@ -657,6 +657,7 @@ namespace ThirdStoreBusiness.Order
             try
             {
                 var dszTrackings = _csvContext.Read<DSZTrackingFile>(trackingStreamReader, _csvFileDesc);
+                dszTrackings = dszTrackings.Where(t=>!string.IsNullOrWhiteSpace(t.DSZOrderID)&& !string.IsNullOrWhiteSpace(t.NetoOrderLineID) && !string.IsNullOrWhiteSpace(t.Carrier));
                 //check file
                 //if(dszTrackings.Any(t=>!Regex.IsMatch( t.NetoOrderID,"")))
                 foreach (var tracking in dszTrackings)

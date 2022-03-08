@@ -143,6 +143,7 @@ namespace ThirdStoreBusiness.DSChannel
                         if (!Directory.Exists(this.DSDataPath))
                             Directory.CreateDirectory(this.DSDataPath);
                         var fileName = this.DSDataPath + "\\" + CommonFunc.ToCSVFileName("DSZData");
+                        dsDatas = dsDatas.Where(d=>!string.IsNullOrWhiteSpace(d.SKU)).ToList();
                         _csvContext.Write(dsDatas, fileName, _csvFileDescription);
 
                         dsDatas = dsDatas.Where(s => !s.SKU.Contains("*") && !Regex.IsMatch(s.SKU, @"^V\d+")).ToList();
@@ -155,7 +156,7 @@ namespace ThirdStoreBusiness.DSChannel
                             newItem.SKU = dsData.SKU;
                             newItem.Name = dsData.Title;
                             newItem.Description = dsData.Description;
-                            newItem.Cost = dsData.Price;
+                            newItem.Cost =(dsData.SpecialPrice!=0?dsData.SpecialPrice: dsData.Price);
 
                             var postage = new List<decimal>() {
                             dsData.ACT.IsNumeric()? Convert.ToDecimal(dsData.ACT):0,
@@ -252,6 +253,10 @@ namespace ThirdStoreBusiness.DSChannel
                 dsData.Height = dszProduct.height;
                 dsData.Description = dszProduct.desc;
                 dsData.Color = dszProduct.colour;
+                if(!string.IsNullOrWhiteSpace(dszProduct.special_price))
+                    dsData.SpecialPrice = Convert.ToDecimal(dszProduct.special_price);
+                if (!string.IsNullOrWhiteSpace(dszProduct.special_price_end_date))
+                    dsData.SpecialPriceEndDate = Convert.ToDateTime(dszProduct.special_price_end_date);
                 if (dszProduct.gallery!=null&&dszProduct.gallery.Count>0)
                 {
                     var imgIndex = 1;
@@ -459,8 +464,10 @@ namespace ThirdStoreBusiness.DSChannel
                                                  from lj in leftJoin.DefaultIfEmpty()
                                                  where lj == null
                                                  ||
-                                                 ((((ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty < dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold))
-                                                 || (ld.Price != lj.Price)) && (ld.Price <= syncDSPriceBelow || lj.Price <= syncDSPriceBelow))
+                                                 (
+                                                 (
+                                                    (ld.InventoryQty >= dsInventoryThredshold && lj.InventoryQty < dsInventoryThredshold) || (ld.InventoryQty < dsInventoryThredshold && lj.InventoryQty >= dsInventoryThredshold)|| (ld.Price != lj.Price)||(ld.SpecialPrice!=lj.SpecialPrice)
+                                                 ) && (ld.Price <= syncDSPriceBelow || lj.Price <= syncDSPriceBelow))
                                                  select ld.SKU;
 
                             var rightJoinResult = from sld in secondLatestData
@@ -468,8 +475,8 @@ namespace ThirdStoreBusiness.DSChannel
                                                   from rj in rightJoin.DefaultIfEmpty()
                                                   where rj == null
                                                   ||
-                                                  ((((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold))
-                                                  || (sld.Price != rj.Price)) && (sld.Price <= syncDSPriceBelow || rj.Price <= syncDSPriceBelow))
+                                                  (((sld.InventoryQty >= dsInventoryThredshold && rj.InventoryQty < dsInventoryThredshold) || (sld.InventoryQty < dsInventoryThredshold && rj.InventoryQty >= dsInventoryThredshold)
+                                                  || (sld.Price != rj.Price)||(sld.SpecialPrice!=rj.SpecialPrice)) && (sld.Price <= syncDSPriceBelow || rj.Price <= syncDSPriceBelow))
                                                   select sld.SKU;
 
                             syncSKUs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
@@ -635,7 +642,7 @@ namespace ThirdStoreBusiness.DSChannel
                             newItem.SKU = dsData.sku;
                             newItem.Name = dsData.name;
                             newItem.Description = dsData.description;
-                            newItem.Cost = dsData.special_price;
+                            newItem.Cost = dsData.special_price+(!string.IsNullOrEmpty(dsData.NSW_R)?Convert.ToDecimal(dsData.NSW_R):0);
                             newItem.Price = (newItem.Cost) * _commonSetting.DropshipMarkupRate;
                             newItem.Type= ThirdStoreItemType.SINGLE.ToValue();
                             newItem.SupplierID = ThirdStoreSupplier.S.ToValue();
@@ -797,7 +804,8 @@ namespace ThirdStoreBusiness.DSChannel
                         {
                             var invQty = 0;
                             if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove)
-                                &&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "0")
+                                //&&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "0"
+                                )
                             {
                                 invQty = dsInventoryThredshold;
                             }

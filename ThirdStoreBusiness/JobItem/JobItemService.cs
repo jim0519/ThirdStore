@@ -387,7 +387,7 @@ namespace ThirdStoreBusiness.JobItem
                 #endregion
 
                 #region Get Online Products from Neto
-                var syncSKUs = lstExportProductListing.Select(epl => epl.SKUWSuffix).ToArray();
+                var syncSKUs = lstExportProductListing.Select(epl => CommonFunc.SanitizeSKU(epl.SKUWSuffix)).ToArray();
                 //var onlineListings = _netoAPIManager.GetNetoProducts(true);
                 var onlineListings = _netoAPIManager.GetNetoProductBySKUs(syncSKUs,true);
                 //var onlineListings = _netoAPIManager.GetNetoProductBySKUs(new string[] 
@@ -479,13 +479,13 @@ namespace ThirdStoreBusiness.JobItem
 
                 var updates = (from record in queryBase
                               //where onlineListings.Any(ol => ol.SKU.ToLower().Equals(record.localListing.SKUWSuffix.ToLower()))
-                              join ol in onlineListings on record.localListing.SKUWSuffix.ToLower() equals ol.SKU.ToLower()
+                              join ol in onlineListings on CommonFunc.SanitizeSKU(record.localListing.SKUWSuffix).ToLower() equals ol.SKU.ToLower()
                                group new { record.localListing, record.jobItem, record.item,onlineListing=ol } by new { record.localListing.SKUWSuffix } into grpUpdates
                                //where grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName())
                                //|| grpUpdates.FirstOrDefault().jobItem != null//no need to sync if condition is used and do not have first job item inv
                                select new
                               {
-                                  SKU = grpUpdates.Key.SKUWSuffix,
+                                  SKU = CommonFunc.SanitizeSKU(grpUpdates.Key.SKUWSuffix),
                                   Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix)+(grpUpdates.FirstOrDefault().jobItem!=null&& !string.IsNullOrWhiteSpace( grpUpdates.FirstOrDefault().jobItem.ItemName)? grpUpdates.FirstOrDefault().jobItem.ItemName: grpUpdates.FirstOrDefault().item.Name),
                                   DefaultPrice = (grpUpdates.FirstOrDefault().jobItem!=null? grpUpdates.Sum(ji => ji.jobItem.ItemPrice*(ji.jobItem.PricePercentage>0?ji.jobItem.PricePercentage:1)):grpUpdates.FirstOrDefault().item.Price),
                                   Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, grpUpdates.FirstOrDefault().onlineListing),//TODO: Add first quantity job item ids and rest ids
@@ -524,11 +524,11 @@ namespace ThirdStoreBusiness.JobItem
 
                 #region Add Listings
                 var adds = (from record in queryBase
-                            where !onlineListings.Any(ol => ol.SKU.ToLower().Equals(record.localListing.SKUWSuffix.ToLower()))
+                            where !onlineListings.Any(ol => ol.SKU.ToLower().Equals(CommonFunc.SanitizeSKU( record.localListing.SKUWSuffix).ToLower()))
                             group new { record.localListing, record.jobItem, record.item } by new { record.localListing.SKUWSuffix } into grpUpdates
                             select new
                             {
-                                SKU = grpUpdates.Key.SKUWSuffix,
+                                SKU = CommonFunc.SanitizeSKU(grpUpdates.Key.SKUWSuffix),
                                 Name = (grpUpdates.FirstOrDefault().localListing.Condition.Equals(ThirdStoreJobItemCondition.NEW.ToName()) ? string.Empty : Constants.UsedNameSuffix) + (grpUpdates.FirstOrDefault().jobItem != null && !string.IsNullOrWhiteSpace(grpUpdates.FirstOrDefault().jobItem.ItemName) ? grpUpdates.FirstOrDefault().jobItem.ItemName : grpUpdates.FirstOrDefault().item.Name),
                                 DefaultPrice = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Sum(ji => ji.jobItem.ItemPrice * (ji.jobItem.PricePercentage > 0 ? ji.jobItem.PricePercentage : 1)) : grpUpdates.FirstOrDefault().item.Price),
                                 Description = GenerateProductDesc(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item),//TODO: Add first quantity job item ids and rest ids

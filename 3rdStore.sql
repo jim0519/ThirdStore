@@ -1988,3 +1988,10 @@ GETDATE(),
 'System'
 from NewaimSKUBarcodeRaw
 where sku is not null
+
+
+
+update T_Setting
+set
+Value='1.3'
+where id=2

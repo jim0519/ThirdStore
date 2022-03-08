@@ -1263,7 +1263,17 @@ namespace ThirdStoreCommon
             }
         }
 
+        public static string SanitizeSKU(string sku)
+        {
+            if (string.IsNullOrWhiteSpace(sku))
+                return default(string);
+
+            return sku.Replace("(", "").Replace(")", "");
+        }
+
     }
+
+    
 
     #endregion
 
