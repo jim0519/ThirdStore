@@ -13,6 +13,7 @@ namespace ThirdStore.Models.Item
         public string Name { get; set; }
         public string Supplier { get; set; }
         public bool IsReadyForList { get; set; }
+        public bool DisableDropship { get; set; }
         public decimal Price { get; set; }
         public DateTime EditTime { get; set; }
         public string EditBy { get; set; }

@@ -51,14 +51,16 @@ namespace ThirdStore.Infrastructure
                 .ForMember(dest => dest.Supplier, mce => mce.MapFrom(s => s.SupplierID.ToEnumName<ThirdStoreSupplier>()));
             Mapper.CreateMap<D_Item, ItemViewModel>()
                 .ForMember(dest => dest.IsActive, mce => mce.MapFrom(s => Convert.ToInt32(s.IsActive)))
-                .ForMember(dest => dest.IsReadyForList, mce => mce.MapFrom(s => Convert.ToInt32(s.IsReadyForList)));
+                .ForMember(dest => dest.IsReadyForList, mce => mce.MapFrom(s => Convert.ToInt32(s.IsReadyForList)))
+            .ForMember(dest => dest.DisableDropship, mce => mce.MapFrom(s => Convert.ToInt32(s.DisableDropship)));
             Mapper.CreateMap<D_Item_Relationship, ItemViewModel.ChildItemLineViewModel>()
                 .ForMember(dest => dest.ChildItemSKU, mce => mce.MapFrom<string>(r => r.ChildItem.SKU));
             Mapper.CreateMap<M_ItemImage, ItemViewModel.ItemImageViewModel>();
 
             Mapper.CreateMap<ItemViewModel, D_Item>()
                 .ForMember(dest => dest.IsActive, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsActive)))
-                .ForMember(dest => dest.IsReadyForList, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsReadyForList)));
+                .ForMember(dest => dest.IsReadyForList, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsReadyForList)))
+                .ForMember(dest => dest.DisableDropship, mce => mce.MapFrom(s => Convert.ToBoolean(s.DisableDropship)));
             Mapper.CreateMap<ItemViewModel.ChildItemLineViewModel, D_Item_Relationship>();
             Mapper.CreateMap<ItemViewModel.ItemImageViewModel, M_ItemImage>();
 

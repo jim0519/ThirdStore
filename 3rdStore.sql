@@ -1995,3 +1995,33 @@ update T_Setting
 set
 Value='1.3'
 where id=2
+
+
+
+
+
+
+insert into T_Setting
+select
+'commonsettings.jobitemnoteautofilltemplates',
+'',
+'Item is return stock due to broken package. Please refer to photo for more detail|-|Item is returned stock due to change of mind, please refer to photo for more detail|-|Item is returned stock due to unsuccessful delivery, please refer to photo for more detail|-|Item is returned stock due to wrong item purchased. Please refer to photo for more detail|-|Item is returned stock as late shipping. Please refer to photo for more detail|-|Item is returned stock as incorrect item posted. Please refer to photo for more detail',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+
+
+-- Add DisableDropship in D_Item
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_Item' AND C.Name='DisableDropship')
+	ALTER TABLE dbo.D_Item ADD
+		DisableDropship bit NOT NULL CONSTRAINT DF_D_Item_DisableDropship DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_DisableDropship')
+	ALTER TABLE dbo.D_Item
+		DROP CONSTRAINT DF_D_Item_DisableDropship
+GO

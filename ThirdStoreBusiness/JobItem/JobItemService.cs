@@ -432,7 +432,7 @@ namespace ThirdStoreBusiness.JobItem
                 //    }
                 //}
 
-                var grpListingItems = listingItems.GroupBy(l=>l.SupplierID);
+                var grpListingItems = listingItems.Where(i=>!i.DisableDropship).GroupBy(l=>l.SupplierID);
                 var lstDSInventory = new List<Tuple<string, int,bool>>();
                 foreach(var grp in grpListingItems)
                 {

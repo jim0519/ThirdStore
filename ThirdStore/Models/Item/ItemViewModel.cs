@@ -51,6 +51,7 @@ namespace ThirdStore.Models.Item
         public string Ref4 { get; set; }
         [Display(Name = "Notes")]
         public string Ref6 { get; set; }
+        public int DisableDropship { get; set; }
 
         public bool ShowSyncInventory { get; set; }
 

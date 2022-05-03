@@ -35,6 +35,7 @@ namespace ThirdStoreCommon.Models.Item
         public string Ref4 { get; set; }//Link
         public string Ref5 { get; set; }//For supplier P and S, Image URLs; For supplier A, Categories
         public string Ref6 { get; set; }//Notes
+        public bool DisableDropship { get; set; }
 
         public System.DateTime CreateTime { get; set; }
         public string CreateBy { get; set; }

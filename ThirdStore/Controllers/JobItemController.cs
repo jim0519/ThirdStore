@@ -27,6 +27,7 @@ using ThirdStoreCommon.Models;
 using System.Text.RegularExpressions;
 using ThirdStoreBusiness.AccessControl;
 using ThirdStoreBusiness.ReturnItem;
+using ThirdStoreBusiness.Setting;
 
 namespace ThirdStore.Controllers
 {
@@ -42,6 +43,8 @@ namespace ThirdStore.Controllers
         private readonly IUserService _userService;
         private readonly IPermissionService _permissionService;
         private readonly IReturnItemService _returnItemService;
+        private readonly ISettingService _settingService;
+        private readonly CommonSettings _commonSetting;
 
         public JobItemController(IJobItemService jobItemService,
             IItemService itemService,
@@ -52,7 +55,8 @@ namespace ThirdStore.Controllers
             ICacheManager cacheManager,
             IPermissionService permissionService,
             IUserService userService,
-            IReturnItemService returnItemService)
+            IReturnItemService returnItemService,
+            ISettingService settingService)
         {
             _jobItemService = jobItemService;
             _itemService = itemService;
@@ -64,6 +68,8 @@ namespace ThirdStore.Controllers
             _userService = userService;
             _permissionService = permissionService;
             _returnItemService = returnItemService;
+            _settingService = settingService;
+            _commonSetting = _settingService.LoadSetting<CommonSettings>();
         }
 
         public ActionResult List()
@@ -201,6 +207,18 @@ namespace ThirdStore.Controllers
                     //}
                 }
             }
+            //else
+            //{
+
+            //    var templates = _commonSetting.JobItemNoteAutoFillTemplates.Split(new[] { "|-|" }, StringSplitOptions.None);
+            //    if (templates.Length > 0)
+            //    {
+            //        var rnd = new Random();
+            //        var prefillNote = templates[rnd.Next(0, templates.Length - 1)];
+            //        newJobItemViewModel.Note = prefillNote;
+            //    }
+            //}
+           
 
             FillDropDownDS(newJobItemViewModel);
             //newJobItemViewModel.JobItemCreateTime = DateTime.Now;
@@ -999,6 +1017,46 @@ namespace ThirdStore.Controllers
                     return Json(new { Result = true, Message=result.Mesage, LocatedJobItemID = result.Entity.ID });
                 else
                     return Json(new { Result = false, Message = result.Mesage, LocatedJobItemID = 0 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = false, ErrMsg = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult Prefill(string selectedIDs)
+        {
+            try
+            {
+                var ids = selectedIDs
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => Convert.ToInt32(x))
+                    .ToList();
+
+                var jobitems = _jobItemService.GetJobItemsByIDs(ids);
+                var templates = _commonSetting.JobItemNoteAutoFillTemplates.Split(new[] { "|-|" }, StringSplitOptions.None);
+                var rnd = new Random();
+                foreach (var jobitem in jobitems)
+                {
+                    var sku = (!string.IsNullOrEmpty(jobitem.DesignatedSKU) ? jobitem.DesignatedSKU : jobitem.JobItemLines.FirstOrDefault().SKU);
+                    var item = _itemService.GetItemBySKU(sku);
+                    if (item.Cost != 0&& jobitem.ItemPrice==0)
+                        jobitem.ItemPrice =Math.Round( item.Cost * 11 / 9,2);
+                    
+                    if (templates.Length > 0&& string.IsNullOrEmpty( jobitem.Note))
+                    {
+                        var prefillNote = templates[rnd.Next(0, templates.Length - 1)];
+                        jobitem.Note = prefillNote;
+                    }
+
+                    _jobItemService.UpdateJobItem(jobitem);
+                }
+
+
+                return Json(new { Result = true });
+                
             }
             catch (Exception ex)
             {

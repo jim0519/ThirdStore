@@ -183,8 +183,14 @@
         <td>
             @Html.LabelFor(m => m.Ref6)
         </td>
-        <td colspan="3">
+        <td>
             @Html.TextAreaFor(model => model.Ref6, 4, 30, null)
+        </td>
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.DisableDropship)
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.DisableDropship, Model.YesOrNo)
         </td>
     </tr>
 </table>

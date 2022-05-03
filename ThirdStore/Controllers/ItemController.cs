@@ -72,6 +72,7 @@ namespace ThirdStore.Controllers
 
             model.BulkUpdate.IsReadyForList = -1;
             model.BulkUpdate.IsActive = -1;
+            model.BulkUpdate.DisableDropship = -1;
 
             //var showSyncInvUsers = new int[] { 1,4 ,10, 14,16,17 };
             //if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
@@ -118,7 +119,7 @@ namespace ThirdStore.Controllers
                 ErrorNotification("You do not have permission to process this page.");
             }
 
-            var newItemViewModel = new ItemViewModel() { IsActive=1,Type=ThirdStoreItemType.SINGLE.ToValue(),IsReadyForList=0};
+            var newItemViewModel = new ItemViewModel() { IsActive=1,Type=ThirdStoreItemType.SINGLE.ToValue(),IsReadyForList=0, DisableDropship=0};
 
             FillDropDownDS(newItemViewModel);
 
@@ -1239,6 +1240,11 @@ namespace ThirdStore.Controllers
                         if (bulkUpdate.IsReadyForList != -1)
                         {
                             item.IsReadyForList = Convert.ToBoolean(bulkUpdate.IsReadyForList);
+                        }
+
+                        if (bulkUpdate.DisableDropship!= -1)
+                        {
+                            item.DisableDropship = Convert.ToBoolean(bulkUpdate.DisableDropship);
                         }
 
                         _itemService.UpdateItem(item);

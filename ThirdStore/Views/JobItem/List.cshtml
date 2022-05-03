@@ -87,6 +87,7 @@
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
             @*<input type="button" id="btnImportData" class="k-button" value="Import Data" />*@
+            <input type="button" id="btnPrefill" class="k-button" value="Prefill" />
             @if (Model.ShowSyncInventory)
             {
                 <img id="imgLoadingJobItem" src="~/Content/images/loading.gif" style="display:none;" />
@@ -336,6 +337,54 @@
                             }
                         });
                         return isValid;
+                    });
+
+                    $('#btnPrefill').click(function () {
+                        //debugger;
+                        if (selectedIds.length == 0) {
+                            alert("Please select more than one job item to prefill price");
+                            return false;
+                        }
+
+                        if (selectedIds.length > 0) {
+                            //e.preventDefault();
+                            var ids = selectedIds.join(",");
+                            var postData = {
+                                selectedIDs: ids
+                            };
+                            var link = '@Url.Action("Prefill", "JobItem")';
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                //contentType: "application/json; charset=utf-8",
+                                data: postData,
+                                dataType: "json",
+                                beforeSend: function () {
+                                    $("#imgLoadingJobItem").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoadingJobItem").hide();
+                                },
+                                success: function (data) {
+                                    if (data.Result) {
+                                        alert("Prefill Job Item Finished");
+                                    }
+                                    else {
+                                        if (data.Message != "")
+                                            alert(data.Message);
+                                        else
+                                            alert("Unknown error occurred.");
+                                    }
+                                    RefreshGrid(true);
+                                },
+                                error: function (data) {
+                                    //debugger;
+                                    alert("error");
+                                }
+                            });
+                        }
+
+                        return false;
                     });
 
                 });

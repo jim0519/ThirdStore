@@ -35,6 +35,7 @@ namespace ThirdStore.Models.Item
         {
             public int IsActive { get; set; }
             public int IsReadyForList { get; set; }
+            public int DisableDropship { get; set; }
         }
     }
 }

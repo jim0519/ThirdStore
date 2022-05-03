@@ -428,6 +428,15 @@
                         @Html.DropDownListFor(model => model.BulkUpdate.IsReadyForList, Model.YesOrNo)
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.BulkUpdate.DisableDropship):
+                    </td>
+                    <td colspan="3">
+                        @Html.DropDownListFor(model => model.BulkUpdate.DisableDropship, Model.YesOrNo)
+                    </td>
+                    
+                </tr>
 
                 <tr>
                     <td>
