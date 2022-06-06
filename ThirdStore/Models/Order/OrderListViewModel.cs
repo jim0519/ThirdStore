@@ -41,7 +41,10 @@ namespace ThirdStore.Models.Order
         public IList<SelectListItem> OrderStatuses { get; set; }
 
         public bool CanEditOrder { get; set; }
-
-
+        public BulkUpdateOrderModel BulkUpdate { get; set; }
+        public class BulkUpdateOrderModel
+        {
+            public int StatusID { get; set; }
+        }
     }
 }

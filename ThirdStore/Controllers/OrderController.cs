@@ -247,5 +247,40 @@ namespace ThirdStore.Controllers
             
         }
 
+        [HttpPost]
+        public ActionResult BulkUpdateOrder(OrderListViewModel.BulkUpdateOrderModel bulkUpdate, string orderIdsBulkUpdate)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(orderIdsBulkUpdate))
+                {
+                    var ids = orderIdsBulkUpdate
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => Convert.ToInt32(x))
+                    .ToList();
+
+                    var orders = _orderService.GetOrdersByIDs(ids);
+                    foreach (var order in orders)
+                    {
+                        if (bulkUpdate.StatusID != 0)
+                        {
+                            order.StatusID = bulkUpdate.StatusID;
+                        }
+
+                        _orderService.UpdateOrder(order);
+                    }
+                }
+
+                SuccessNotification("Bulk Update Order Success.");
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Bulk Update Order Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
     }
 }

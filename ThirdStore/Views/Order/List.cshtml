@@ -136,6 +136,31 @@
 
                         });
 
+                        $('#btnEdit').click(function (e) {
+                            //debugger;
+
+                            if (selectedIds.length == 0) {
+                                alert("Please select more than one order to edit");
+                                return false;
+                            }
+
+                            e.preventDefault();
+                            var ids = selectedIds.join(",");
+                            //debugger;
+                            $('#bulk-update-order-form #orderIdsBulkUpdate').val(ids);
+                            var window = $("#bulkUpdateOrder-window");
+                            if (!window.data("kendoWindow")) {
+                                window.kendoWindow({
+                                    modal: true,
+                                    width: "400px",
+                                    title: "Bulk Update Order",
+                                    actions: ["Close"]
+                                });
+                            }
+                            window.data('kendoWindow').center().open();
+                            return;
+                        });
+
                     });
 
                 </script>
@@ -148,6 +173,7 @@
         <div id="divOperationBtn" style="float:right">
             <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
             <input type="button" id="btnUploadTracking" class="k-button" value="Upload Tracking" />
+            <input type="button" id="btnEdit" class="k-button" value="Edit" />
         </div>
     </div>
 
@@ -284,10 +310,11 @@
                                             ConsigneeName: { editable: false, type: "string" },
                                             TotalAmount: { editable: false, type: "number" },
                                             //StatusText: { editable: true, type: "string" },
-                                            StatusID:{ editable: @if (Model.CanEditOrder)
+                                            StatusID: { editable: @if (Model.CanEditOrder)
                                             {<text>true </text> }
-                                            else { <text> false </text>}, type: "number" }
-                                            
+                                            else { <text> false </text>}, type: "number" },
+                                            EditBy: { editable: false, type: "string" },
+                                            EditTime: { editable: false, type: "date" },
                                         }
                                     }
                                 },
@@ -425,6 +452,17 @@
                                     type: "date",
                                     format: "{0:dd/MM/yyyy HH:mm:ss}"
 
+                                }, {
+                                    field: "EditBy",
+                                    title: "Last Update By",
+                                    width: 100
+                                }, {
+                                    field: "EditTime",
+                                    title: "Last Update Time",
+                                    width: 100,
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+
                                 }
                             ]
                         });
@@ -551,6 +589,30 @@
                 <tr>
                     <td>
                         <input type="submit" class="k-button" value="Submit" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>
+
+    <div id="bulkUpdateOrder-window" style="display:none;">
+        @using (Html.BeginForm("BulkUpdateOrder", "Order", FormMethod.Post, new { id = "bulk-update-order-form" }))
+        {
+            @Html.ValidationSummary()
+            <input type="hidden" id="orderIdsBulkUpdate" name="orderIdsBulkUpdate" value="" />
+            <table style="text-align:left;">
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.BulkUpdate.StatusID):
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(model => model.BulkUpdate.StatusID, Model.OrderStatuses)
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <input type="submit" class="k-button" value="Submit" id="btnBulkEditSubmit" />
                     </td>
                 </tr>
             </table>
