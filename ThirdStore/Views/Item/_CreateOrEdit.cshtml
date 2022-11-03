@@ -382,7 +382,7 @@
                             $.each(response.ImageList, function (i, item) {
                                 //debugger;
                                 //alert(key + ": " + value);
-                                var newImage = { ID: 0, ImageID: item['ImageID'], ImageName: item['ImageName'], ImageURL: item['ImageURL'],DisplayOrder: newRowIndex, StatusID: 0};
+                                var newImage = { ID: 0, ImageID: item['ImageID'], ImageName: item['ImageName'], ImageURL: item['ImageURL'], DisplayOrder: newRowIndex, StatusID: true};
                                 data.push(newImage);
                                 newRowIndex++;
                             });
@@ -432,7 +432,7 @@
                                 DisplayOrder: {
                                     editable: true, type: "number"
                                 },
-                                StatusID: { editable: true, type: "number" }
+                                StatusID: { editable: true, type: "boolean" }
                             }
                         }
                     },
@@ -494,8 +494,10 @@
                         template: "#=DisplayOrder#" + "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].DisplayOrder' value='#=DisplayOrder#' />"
                 }, {
                         field: "StatusID",
-                        title: "Status",
-                        template: "#=StatusID#" + "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />",
+                        title: "Keep",
+                        headerAttributes: { style: "text-align:center" },
+                        attributes: { style: "text-align:center" },
+                        template: '<img src="@Url.Content("~/Content/images/")active-#=StatusID#.gif" />' + "<input type='hidden' name='ItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />"
                     }, {
                         command: ["edit", "destroy"],
                         title: "&nbsp;", width: "150px"

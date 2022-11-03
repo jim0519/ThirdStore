@@ -95,6 +95,7 @@ namespace ThirdStore.Controllers
             model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
             model.HasStocktakeTime = -1;
+            model.NeedReview = -1;
 
             //var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
             //if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
@@ -129,6 +130,7 @@ namespace ThirdStore.Controllers
                 shipTimeFrom:model.ShipTimeFrom,
                 shipTimeTo:model.ShipTimeTo,
                 hasStocktakeTime:model.HasStocktakeTime,
+                needReview:model.NeedReview,
                 isExcludeShippedStatus:model.IsExcludeShippedStatus,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
@@ -313,11 +315,15 @@ namespace ThirdStore.Controllers
             var editBy = Constants.SystemUser;
 
             var editEntityModel = _jobItemService.GetJobItemByID(model.ID);
+            var preLocation = editEntityModel.Location;
             editEntityModel = model.ToCreateNewEntity(editEntityModel).FillOutNull();
             if (!string.IsNullOrEmpty(editEntityModel.DesignatedSKU))
                 editEntityModel.DesignatedSKU = editEntityModel.DesignatedSKU.Trim().ToUpper();
             if (!string.IsNullOrEmpty(editEntityModel.Location))
+            {
+                editEntityModel.Ref4 = preLocation;
                 editEntityModel.Location = editEntityModel.Location.Trim().ToUpper();
+            }
             //editEntityModel.D_Order_Line.Remove(editEntityModel.D_Order_Line.FirstOrDefault());
             //editEntityModel.D_Order_Line.Clear();
             //foreach (var removeLine in editEntityModel.D_Order_Line)

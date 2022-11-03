@@ -12,6 +12,7 @@ namespace ThirdStore.Models.JobItem
         public string JobItemLineID { get; set; }
         public string JobItemLineReference { get; set; }
         public string Location { get; set; }
+        public string Ref4 { get; set; }
         [UIHint("DateNullable"), Display(Name = "Stocktake Time From")]
         public DateTime? StocktakeTimeFrom { get; set; }
         [Display(Name = "Stocktake Time To"), UIHint("DateNullable")]

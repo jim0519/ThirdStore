@@ -95,6 +95,7 @@ namespace ThirdStoreBusiness.JobItem
             string trackingNumber = null,
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus=false,
+            int needReview = -1,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -190,7 +191,20 @@ namespace ThirdStoreBusiness.JobItem
                 }
             }
 
-            if(reference!=null&&reference.Length>4)
+            if (needReview != -1)
+            {
+                var blNeedReview = Convert.ToBoolean(needReview);
+                if (blNeedReview)
+                {
+                    query = query.Where(i => i.NeedReview);
+                }
+                else
+                {
+                    query = query.Where(i => !i.NeedReview);
+                }
+            }
+
+            if (reference!=null&&reference.Length>4)
             {
                 var datePart = reference.Substring(0, 4);
                 var numPart = reference.Substring(datePart.Length, reference.Length - datePart.Length);
@@ -1784,6 +1798,7 @@ namespace ThirdStoreBusiness.JobItem
                     foreach(var ji in jobItems)
                     {
                         ji.StocktakeTime = DateTime.Now;
+                        ji.Ref4 = ji.Location;
                         ji.Location = (!string.IsNullOrWhiteSpace(location) ? location.Trim() : ji.Location);
                         this.UpdateJobItem(ji);
                         returnMessage.Mesage += $"Job item { GetJobItemReference(ji)} confirmed, ";

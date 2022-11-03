@@ -21,6 +21,7 @@ namespace ThirdStore.Models.JobItem
         public string Location { get; set; }
         public string ItemDetail { get; set; }
         public string Ref2 { get; set; }
+        public string Ref4 { get; set; }
         public DateTime? StocktakeTime { get; set; }
         public decimal CBM { get; set; }
         public System.DateTime EditTime { get; set; }

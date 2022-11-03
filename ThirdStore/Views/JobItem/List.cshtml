@@ -516,6 +516,14 @@
             </td>
         </tr>
         <tr>
+            <td>
+                @Html.LabelFor(model => model.NeedReview):
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.NeedReview, Model.YesOrNo)
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <input type="button" id="btnSearch" class="k-button" value="Search" />
                 <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
@@ -592,6 +600,9 @@
                                 }, {
                                     field: "Location",
                                     title: "Location"
+                                }, {
+                                    field: "Ref4",
+                                    title: "Pre Location"
                                 }, {
                                     field: "Condition",
                                     title: "Condition"
@@ -672,6 +683,7 @@
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
             $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
             $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').prop('checked', false);
+            $('#@Html.FieldIdFor(model => model.NeedReview)').val("-1");
             var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
             inspectorMultiselect.value("");
             inspectorMultiselect.trigger("change");
@@ -701,6 +713,7 @@
             ShipTimeTo: $('#@Html.FieldIdFor(model => model.ShipTimeTo)').val(),
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
             HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val(),
+            NeedReview: $('#@Html.FieldIdFor(model => model.NeedReview)').val(),
             IsExcludeShippedStatus: $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').is(':checked')
         };
     }

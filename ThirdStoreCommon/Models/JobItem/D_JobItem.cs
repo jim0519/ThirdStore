@@ -26,11 +26,12 @@ namespace ThirdStoreCommon.Models.JobItem
         public string Ref1 { get; set; }//JobItemReference
         public string Ref2 { get; set; }//Inspectors
         public string Ref3 { get; set; }//From Return Item ID
-        public string Ref4 { get; set; }
-        public string Ref5 { get; set; }
+        public string Ref4 { get; set; }//Previous Location
+        public string Ref5 { get; set; }//Review Comments
         public string Note { get; set; }
         public decimal PricePercentage { get; set; } = 1;
         public DateTime? StocktakeTime { get; set; }
+        public bool NeedReview { get; set; }
 
 
         public System.DateTime CreateTime { get; set; }

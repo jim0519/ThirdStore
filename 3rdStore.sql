@@ -2025,3 +2025,18 @@ IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_DisableDropsh
 	ALTER TABLE dbo.D_Item
 		DROP CONSTRAINT DF_D_Item_DisableDropship
 GO
+
+
+
+
+--Add NeedReview
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_JobItem' AND C.Name='NeedReview')
+	ALTER TABLE dbo.D_JobItem ADD
+		NeedReview bit NOT NULL CONSTRAINT DF_D_JobItem_NeedReview DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_NeedReview')
+	ALTER TABLE dbo.D_JobItem
+		DROP CONSTRAINT DF_D_JobItem_NeedReview
+GO

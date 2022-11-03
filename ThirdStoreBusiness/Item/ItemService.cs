@@ -426,6 +426,7 @@ namespace ThirdStoreBusiness.Item
             if (item.ItemImages.Count > 0)
             {
                 var itemImages = GetItemImagesByItemID(item.ID);
+                itemImages = itemImages.Where(ii => ii.StatusID == 0).ToList();
                 foreach (var existPic in itemImages)
                     DeleteItemImage(existPic);
             }
@@ -433,6 +434,12 @@ namespace ThirdStoreBusiness.Item
             int i = 0;
             using (var wc = new ThirdStoreWebClient())
             {
+                foreach(var existPic in item.ItemImages)
+                {
+                    existPic.DisplayOrder = i;
+                    i++;
+                }
+
                 foreach (var imageURL in imageURLs)
                 {
                     try

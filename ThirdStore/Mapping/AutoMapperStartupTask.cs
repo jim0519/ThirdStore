@@ -33,7 +33,8 @@ namespace ThirdStore.Infrastructure
 
             Mapper.CreateMap<T_User, UserViewModel>()
                 .ForMember((dest => dest.Roles), mce => mce.MapFrom(s => s.UserRoles.Select(ur => ur.RoleID).ToList())); ;
-            Mapper.CreateMap<UserViewModel, T_User>().ForAllMembers(opts => opts.Condition(vm =>!vm.IsSourceValueNull));
+            //Mapper.CreateMap<UserViewModel, T_User>().ForAllMembers(opts => opts.Condition(vm =>!vm.IsSourceValueNull));
+            Mapper.CreateMap<UserViewModel, T_User>().ForMember(dest=>dest.Password,mce=>mce.Condition(src=>!src.IsSourceValueNull));
 
             Mapper.CreateMap<T_Role, RoleGridViewModel>();
 
@@ -55,14 +56,16 @@ namespace ThirdStore.Infrastructure
             .ForMember(dest => dest.DisableDropship, mce => mce.MapFrom(s => Convert.ToInt32(s.DisableDropship)));
             Mapper.CreateMap<D_Item_Relationship, ItemViewModel.ChildItemLineViewModel>()
                 .ForMember(dest => dest.ChildItemSKU, mce => mce.MapFrom<string>(r => r.ChildItem.SKU));
-            Mapper.CreateMap<M_ItemImage, ItemViewModel.ItemImageViewModel>();
+            Mapper.CreateMap<M_ItemImage, ItemViewModel.ItemImageViewModel>()
+                .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToBoolean(s.StatusID)));
 
             Mapper.CreateMap<ItemViewModel, D_Item>()
                 .ForMember(dest => dest.IsActive, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsActive)))
                 .ForMember(dest => dest.IsReadyForList, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsReadyForList)))
                 .ForMember(dest => dest.DisableDropship, mce => mce.MapFrom(s => Convert.ToBoolean(s.DisableDropship)));
             Mapper.CreateMap<ItemViewModel.ChildItemLineViewModel, D_Item_Relationship>();
-            Mapper.CreateMap<ItemViewModel.ItemImageViewModel, M_ItemImage>();
+            Mapper.CreateMap<ItemViewModel.ItemImageViewModel, M_ItemImage>()
+                .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));
 
             //Job Item
             Mapper.CreateMap<D_JobItem, JobItemGridViewModel>()
@@ -71,13 +74,15 @@ namespace ThirdStore.Infrastructure
                 .ForMember(dest => dest.Condition, mce => mce.MapFrom(s => s.ConditionID.ToEnumName<ThirdStoreJobItemCondition>()));
                 //.ForMember(dest => dest.Supplier, mce => mce.MapFrom(s => s.SupplierID.ToEnumName<ThirdStoreSupplier>()))
             Mapper.CreateMap<D_JobItem, JobItemViewModel>()
-                .ForMember((dest => dest.Ref2), mce => mce.MapFrom(s => s.Ref2.ToCharArray().Select(c => c.ToString()).ToList()));
+                .ForMember((dest => dest.Ref2), mce => mce.MapFrom(s => s.Ref2.ToCharArray().Select(c => c.ToString()).ToList()))
+                .ForMember(dest => dest.ReviewComments, mce => mce.MapFrom(s => s.Ref5));
             Mapper.CreateMap<D_JobItemLine, JobItemViewModel.JobItemLineViewModel>();
             Mapper.CreateMap<M_JobItemImage, JobItemViewModel.JobItemImageViewModel>()
                 .ForMember(dest=>dest.StatusID,mce=>mce.MapFrom(s=>Convert.ToBoolean( s.StatusID)));
 
-            Mapper.CreateMap<JobItemViewModel,D_JobItem>()
-                .ForMember(dest => dest.Ref2, mce => mce.MapFrom(s =>(s.Ref2!=null&&s.Ref2.Count>0 ? string.Join("", s.Ref2) :string.Empty)));
+            Mapper.CreateMap<JobItemViewModel, D_JobItem>()
+                .ForMember(dest => dest.Ref2, mce => mce.MapFrom(s => (s.Ref2 != null && s.Ref2.Count > 0 ? string.Join("", s.Ref2) : string.Empty)))
+            .ForMember(dest => dest.Ref5, mce => mce.MapFrom(s =>s.ReviewComments));
             Mapper.CreateMap<JobItemViewModel.JobItemLineViewModel, D_JobItemLine>();
             Mapper.CreateMap<JobItemViewModel.JobItemImageViewModel, M_JobItemImage>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));

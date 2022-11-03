@@ -11,7 +11,7 @@ namespace ThirdStore.Models.AccessControl
         [Display(Name = "User Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Abbr.")]
+        //[Display(Name = "Abbr.")]
         public string Description { get; set; }
 
         [Required]
