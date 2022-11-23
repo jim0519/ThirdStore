@@ -45,7 +45,8 @@ namespace ThirdStore.Models.JobItem
         [DisplayFormat(DataFormatString = "{0:0.00}", ApplyFormatInEditMode = true)]
         public decimal PricePercentage { get; set; } = 1;
         public string ReviewComments { get; set; }
-        public bool NeedReview { get; set; }
+        //public bool NeedReview { get; set; }
+        public int ReviewStatus { get; set; }
 
 
         public IList<SelectListItem> JobItemTypes { get; set; }
@@ -54,6 +55,7 @@ namespace ThirdStore.Models.JobItem
         public IList<SelectListItem> InspectorList { get; set; }
         public IList<JobItemLineViewModel> JobItemViewLines { get; set; }
         public IList<JobItemImageViewModel> JobItemViewImages { get; set; }
+        public IList<SelectListItem> ReviewStatuses { get; set; }
 
         public class JobItemLineViewModel : BaseEntityViewModel
         {

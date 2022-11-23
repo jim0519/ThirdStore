@@ -95,7 +95,7 @@ namespace ThirdStoreBusiness.JobItem
             string trackingNumber = null,
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus=false,
-            int needReview = -1,
+            ThirdStoreReviewStatus? reviewStatus = null,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -191,17 +191,23 @@ namespace ThirdStoreBusiness.JobItem
                 }
             }
 
-            if (needReview != -1)
+            //if (needReview != -1)
+            //{
+            //    var blNeedReview = Convert.ToBoolean(needReview);
+            //    if (blNeedReview)
+            //    {
+            //        query = query.Where(i => i.NeedReview);
+            //    }
+            //    else
+            //    {
+            //        query = query.Where(i => !i.NeedReview);
+            //    }
+            //}
+
+            if (reviewStatus.HasValue)
             {
-                var blNeedReview = Convert.ToBoolean(needReview);
-                if (blNeedReview)
-                {
-                    query = query.Where(i => i.NeedReview);
-                }
-                else
-                {
-                    query = query.Where(i => !i.NeedReview);
-                }
+                var reviewStatusID = reviewStatus.Value.ToValue();
+                query = query.Where(i => i.ReviewStatus.Equals(reviewStatusID));
             }
 
             if (reference!=null&&reference.Length>4)

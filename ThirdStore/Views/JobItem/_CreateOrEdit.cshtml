@@ -132,20 +132,16 @@
     <tr>
         <td>
             @Html.LabelFor(m => m.ReviewComments)
-
-        </td>
-        <td colspan="3">
-
-            @Html.TextAreaFor(model => model.ReviewComments, 4, 30, null)
-            @Html.CheckBoxFor(model => model.NeedReview)
-            @Html.LabelFor(m => m.NeedReview)
-        </td>
-        @*<td>
-            @Html.LabelFor(m => m.NeedReview)
         </td>
         <td>
-            @Html.CheckBoxFor(model => model.NeedReview)
-        </td>*@
+            @Html.TextAreaFor(model => model.ReviewComments, 4, 30, null)
+        </td>
+        <td>
+            @Html.LabelFor(m => m.ReviewStatus)
+        </td>
+        <td>
+            @Html.DropDownListFor(model => model.ReviewStatus,Model.ReviewStatuses)
+        </td>
     </tr>
     <tr>
         <td>

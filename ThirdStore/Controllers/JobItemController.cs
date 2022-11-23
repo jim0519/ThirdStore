@@ -95,7 +95,9 @@ namespace ThirdStore.Controllers
             model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
             model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
             model.HasStocktakeTime = -1;
-            model.NeedReview = -1;
+            
+            model.ReviewStatuses=ThirdStoreReviewStatus.PendingReview.ToSelectList(false).ToList();
+            model.ReviewStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
             //var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };
             //if (showSyncInvUsers.Contains(_workContext.CurrentUser.ID))
@@ -112,6 +114,7 @@ namespace ThirdStore.Controllers
             ThirdStoreJobItemCondition? jobItemCondition = model.SearchCondition > 0 ? (ThirdStoreJobItemCondition?)(model.SearchCondition) : null;
             ThirdStoreJobItemType? jobItemType = model.SearchType > 0 ? (ThirdStoreJobItemType?)(model.SearchType) : null;
             ThirdStoreSupplier? supplier = model.SearchSupplier > 0 ? (ThirdStoreSupplier?)(model.SearchSupplier) : null;
+            ThirdStoreReviewStatus? reviewStatus = model.ReviewStatus > 0 ? (ThirdStoreReviewStatus?)(model.ReviewStatus) : null;
             var inspector = model.SearchInspector!=null&& !model.SearchInspector.Contains("") ? model.SearchInspector : null;
 
             var jobItems = _jobItemService.SearchJobItems(
@@ -130,7 +133,7 @@ namespace ThirdStore.Controllers
                 shipTimeFrom:model.ShipTimeFrom,
                 shipTimeTo:model.ShipTimeTo,
                 hasStocktakeTime:model.HasStocktakeTime,
-                needReview:model.NeedReview,
+                reviewStatus: reviewStatus,
                 isExcludeShippedStatus:model.IsExcludeShippedStatus,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
@@ -1084,6 +1087,8 @@ namespace ThirdStore.Controllers
             //var userList = _userService.GetAllUsers().Where(u => !string.IsNullOrWhiteSpace(u.Description)).Select(d=>d.Description);
             //var jobItemsInspectors = _jobItemService.GetAllJobItems().Select(ji=>ji.Ref2.ToUpper()).Where(r=>!string.IsNullOrWhiteSpace( r)).SelectMany(r=>r.ToCharArray().Select(c => c.ToString())).Distinct();
             //var result = jobItemsInspectors.Where(ins=>!userList.Contains(ins));
+            model.ReviewStatuses = ThirdStoreReviewStatus.PendingReview.ToSelectList(false).ToList();
+            model.ReviewStatuses.Insert(0, new SelectListItem { Text = "", Value = "0" });
         }
 
         private string GetSKUsDetails(D_JobItem jobItem)

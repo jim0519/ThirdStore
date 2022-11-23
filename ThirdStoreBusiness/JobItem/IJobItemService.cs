@@ -34,7 +34,7 @@ namespace ThirdStoreBusiness.JobItem
             string trackingNumber = null,
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus = false,
-            int needReview=-1,
+            ThirdStoreReviewStatus? reviewStatus=null,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 

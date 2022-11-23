@@ -46,7 +46,7 @@ namespace ThirdStore.Models.JobItem
         public List<string> SearchInspector { get; set; }
         public int HasStocktakeTime { get; set; }
         public bool ShowSyncInventory { get; set; }
-        public int NeedReview { get; set; }
+        public int ReviewStatus { get; set; }
 
         public IList<SelectListItem> Suppliers { get; set; }
         public IList<SelectListItem> JobItemTypes { get; set; }
@@ -54,6 +54,7 @@ namespace ThirdStore.Models.JobItem
         public IList<SelectListItem> JobItemStatuses { get; set; }
         public IList<SelectListItem> InspectorList { get; set; }
         public IList<SelectListItem> YesOrNo { get; set; }
+        public IList<SelectListItem> ReviewStatuses { get; set; }
 
         public BulkUpdateJobItemModel BulkUpdate { get; set; }
         public class BulkUpdateJobItemModel

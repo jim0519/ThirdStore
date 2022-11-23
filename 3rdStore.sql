@@ -2040,3 +2040,98 @@ IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_NeedReview
 	ALTER TABLE dbo.D_JobItem
 		DROP CONSTRAINT DF_D_JobItem_NeedReview
 GO
+
+
+
+
+--Add ReviewStatus
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_JobItem' AND C.Name='ReviewStatus')
+	ALTER TABLE dbo.D_JobItem ADD
+		ReviewStatus int NOT NULL CONSTRAINT DF_D_JobItem_ReviewStatus DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_ReviewStatus')
+	ALTER TABLE dbo.D_JobItem
+		DROP CONSTRAINT DF_D_JobItem_ReviewStatus
+GO
+
+update D_JobItem
+set
+ReviewStatus=1
+where NeedReview=1
+
+
+ALTER TABLE D_JobItem
+DROP COLUMN NeedReview
+
+
+
+
+
+
+
+
+
+--Attachment
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_Attachment]') AND type in (N'U'))
+DROP TABLE [dbo].[D_Attachment]
+GO
+CREATE TABLE [dbo].[D_Attachment](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Name][varchar](500) NOT NULL,
+	--[ImageOnlinePath] [varchar](max) NOT NULL,
+	[LocalPath] [nvarchar](max) NOT NULL,
+	--[DisplayOrder] [int] NOT NULL,
+	--[Status][varchar](20) NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_D_Attachment] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[M_ItemAttachment]') AND type in (N'U'))
+DROP TABLE [dbo].[M_ItemAttachment]
+GO
+CREATE TABLE [dbo].[M_ItemAttachment](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ItemID] [int] NOT NULL,
+	[AttachmentID] [int] NOT NULL,
+	[DisplayOrder] [int] NOT NULL,
+	[StatusID] [int] NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_M_ItemAttachment] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_M_ItemAttachment_D_Attachment]') AND parent_object_id = OBJECT_ID(N'[dbo].[M_ItemAttachment]'))
+ALTER TABLE [dbo].[M_ItemAttachment]  WITH CHECK ADD CONSTRAINT [FK_M_ItemAttachment_D_Attachment] FOREIGN KEY([AttachmentID])
+REFERENCES [dbo].[D_Attachment] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_M_ItemAttachment_D_Item]') AND parent_object_id = OBJECT_ID(N'[dbo].[M_ItemAttachment]'))
+ALTER TABLE [dbo].[M_ItemAttachment]  WITH CHECK ADD CONSTRAINT [FK_M_ItemAttachment_D_Item] FOREIGN KEY([ItemID])
+REFERENCES [dbo].[D_Item] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO

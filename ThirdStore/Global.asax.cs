@@ -3,6 +3,7 @@ using FluentValidation.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -19,6 +20,11 @@ namespace ThirdStore
     {
         protected void Application_Start()
         {
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+       | SecurityProtocolType.Tls11
+       | SecurityProtocolType.Tls12
+       | SecurityProtocolType.Ssl3;
             ThirdStoreWebContext.Instance.Initialize();
 
             AreaRegistration.RegisterAllAreas();

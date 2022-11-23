@@ -122,6 +122,12 @@ namespace ThirdStoreCommon
         FULL = 2
     }
 
+    public enum ThirdStoreReviewStatus
+    {
+        PendingReview=1,
+        ReviewComplete=2
+    }
+
 
     public sealed class ThirdStoreCacheKey
     {

@@ -89,7 +89,8 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Note).HasColumnName("Note");
             this.Property(t => t.PricePercentage).HasColumnName("PricePercentage");
             this.Property(t => t.StocktakeTime).HasColumnName("StocktakeTime");
-            this.Property(t => t.NeedReview).HasColumnName("NeedReview");
+            //this.Property(t => t.NeedReview).HasColumnName("NeedReview");
+            this.Property(t => t.ReviewStatus).HasColumnName("ReviewStatus");
         }
     }
 }

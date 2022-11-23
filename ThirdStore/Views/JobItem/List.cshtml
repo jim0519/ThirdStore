@@ -517,10 +517,10 @@
         </tr>
         <tr>
             <td>
-                @Html.LabelFor(model => model.NeedReview):
+                @Html.LabelFor(model => model.ReviewStatus):
             </td>
             <td>
-                @Html.DropDownListFor(model => model.NeedReview, Model.YesOrNo)
+                @Html.DropDownListFor(model => model.ReviewStatus, Model.ReviewStatuses)
             </td>
         </tr>
         <tr>
@@ -683,7 +683,7 @@
             $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val("");
             $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
             $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').prop('checked', false);
-            $('#@Html.FieldIdFor(model => model.NeedReview)').val("-1");
+            $('#@Html.FieldIdFor(model => model.ReviewStatus)').val("0");
             var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
             inspectorMultiselect.value("");
             inspectorMultiselect.trigger("change");
@@ -713,7 +713,7 @@
             ShipTimeTo: $('#@Html.FieldIdFor(model => model.ShipTimeTo)').val(),
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
             HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val(),
-            NeedReview: $('#@Html.FieldIdFor(model => model.NeedReview)').val(),
+            ReviewStatus: $('#@Html.FieldIdFor(model => model.ReviewStatus)').val(),
             IsExcludeShippedStatus: $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').is(':checked')
         };
     }

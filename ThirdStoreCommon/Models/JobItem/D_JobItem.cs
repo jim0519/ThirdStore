@@ -31,7 +31,8 @@ namespace ThirdStoreCommon.Models.JobItem
         public string Note { get; set; }
         public decimal PricePercentage { get; set; } = 1;
         public DateTime? StocktakeTime { get; set; }
-        public bool NeedReview { get; set; }
+        //public bool NeedReview { get; set; }
+        public int ReviewStatus { get; set; }
 
 
         public System.DateTime CreateTime { get; set; }
