@@ -118,6 +118,7 @@
     <Compile Include="API\Neto\UpdateItemResponse.cs" />
     <Compile Include="API\Neto\UpdateItem.cs" />
     <Compile Include="API\Neto\NetoAPI.cs" />
+    <Compile Include="Attachment\AttachmentService.cs" />
     <Compile Include="DSChannel\DSModel.cs" />
     <Compile Include="DSChannel\IDSChannel.cs" />
     <Compile Include="Misc\INewAimSKUBarcodeService.cs" />

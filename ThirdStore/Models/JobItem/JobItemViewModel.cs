@@ -47,6 +47,7 @@ namespace ThirdStore.Models.JobItem
         public string ReviewComments { get; set; }
         //public bool NeedReview { get; set; }
         public int ReviewStatus { get; set; }
+        public DateTime EditTime { get; set; }
 
 
         public IList<SelectListItem> JobItemTypes { get; set; }

@@ -30,6 +30,7 @@ using ThirdStoreBusiness.Setting;
 using ThirdStoreBusiness.Misc;
 using ThirdStoreBusiness.API.Dropshipzone;
 using ThirdStoreBusiness.ReturnItem;
+using ThirdStoreBusiness.Attachment;
 
 namespace ThirdStoreFramework
 {
@@ -85,6 +86,9 @@ namespace ThirdStoreFramework
 
             //Image
             builder.RegisterType<ImageService>().As<IImageService>().InstancePerLifetimeScope();
+
+            //Attachment
+            builder.RegisterType<AttachmentService>().As<IAttachmentService>().InstancePerLifetimeScope();
 
             //Order
             builder.RegisterType<OrderService>().As<IOrderService>().InstancePerLifetimeScope();

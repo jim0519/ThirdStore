@@ -5,6 +5,7 @@
     <ul>
         <li><a href="#tabs-1">Basic Info</a></li>
         <li><a href="#tabs-2">Images</a></li>
+        <li><a href="#tabs-3">Attachments</a></li>
     </ul>
 
     <div id="tabs-1">
@@ -19,6 +20,9 @@
     </div>
     <div id="tabs-2">
         @Images()
+    </div>
+    <div id="tabs-3">
+        @Attachments()
     </div>
 </div>
 <div>
@@ -47,153 +51,153 @@
 
 @helper BasicInfo()
 {
-<table style="width:100%;">
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.SKU)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.SKU)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Type)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.Type, Model.ItemTypes)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Name)
-        </td>
-        <td class="adminData">
-            @Html.TextAreaFor(model => model.Name, 4, 30, null)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Description)
-        </td>
-        <td class="adminData">
-            @Html.TextAreaFor(model => model.Description, 4, 30, null)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Cost)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Cost)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.GrossWeight)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.GrossWeight) kg
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.NetWeight)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.NetWeight) kg
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Price)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Price)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Length)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Length) m
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Width)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Width) m
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Height)
-        </td>
-        <td class="adminData">
-            @Html.EditorFor(model => model.Height) m
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.SupplierID)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.SupplierID, Model.Suppliers)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.IsActive)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.IsActive, Model.YesOrNo)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.IsReadyForList)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.IsReadyForList, Model.YesOrNo)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Ref1)
-        </td>
-        <td>
-            @Html.EditorFor(model => model.Ref1)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Ref2)
-        </td>
-        <td>
-            @Html.EditorFor(model => model.Ref2)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.Ref3)
-        </td>
-        <td>
-            @Html.EditorFor(model => model.Ref3)
-        </td>
-        <td>
-            @Html.LabelFor(m => m.Ref4)
-        </td>
-        <td>
-            @Html.EditorFor(model => model.Ref4)
-            @if(!string.IsNullOrWhiteSpace( Model.Ref4))
-            {
-                <text><a href="@Model.Ref4" target="_blank" style="display: inline-block;width: 50px;">Link</a></text>
-            }
-            
-        </td>
-    </tr>
-    <tr>
-        <td>
-            @Html.LabelFor(m => m.Ref6)
-        </td>
-        <td>
-            @Html.TextAreaFor(model => model.Ref6, 4, 30, null)
-        </td>
-        <td class="adminTitle">
-            @Html.LabelFor(m => m.DisableDropship)
-        </td>
-        <td class="adminData">
-            @Html.DropDownListFor(model => model.DisableDropship, Model.YesOrNo)
-        </td>
-    </tr>
-</table>
+    <table style="width:100%;">
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.SKU)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.SKU)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Type)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.Type, Model.ItemTypes)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Name)
+            </td>
+            <td class="adminData">
+                @Html.TextAreaFor(model => model.Name, 4, 30, null)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Description)
+            </td>
+            <td class="adminData">
+                @Html.TextAreaFor(model => model.Description, 4, 30, null)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Cost)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Cost)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.GrossWeight)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.GrossWeight) kg
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.NetWeight)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.NetWeight) kg
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Price)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Price)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Length)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Length) m
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Width)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Width) m
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Height)
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Height) m
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.SupplierID)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.SupplierID, Model.Suppliers)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.IsActive)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.IsActive, Model.YesOrNo)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.IsReadyForList)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.IsReadyForList, Model.YesOrNo)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Ref1)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Ref1)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Ref2)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Ref2)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Ref3)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Ref3)
+            </td>
+            <td>
+                @Html.LabelFor(m => m.Ref4)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Ref4)
+                @if (!string.IsNullOrWhiteSpace(Model.Ref4))
+                {
+                    <text><a href="@Model.Ref4" target="_blank" style="display: inline-block;width: 50px;">Link</a></text>
+                }
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.Ref6)
+            </td>
+            <td>
+                @Html.TextAreaFor(model => model.Ref6, 4, 30, null)
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.DisableDropship)
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.DisableDropship, Model.YesOrNo)
+            </td>
+        </tr>
+    </table>
 
 }
 
@@ -351,9 +355,10 @@
 
     <script>
         $(document).ready(function () {
-            
+
 
             $('#btnUpload').click(function () {
+                debugger;
                 var data = new FormData();
                 var files = $("#uploadImages").get(0).files;
                 if (files.length > 0) {
@@ -361,7 +366,7 @@
                         data.append("ItemImages",files[x]);
                     }
                 }
-                debugger;
+
                 var link = '@Html.Raw(@Url.Action("UploadImages","Item"))';
                 //debugger;
                 $.ajax({
@@ -372,7 +377,6 @@
                     data: data,
                     success: function (response) {
                         //code after success
-                        debugger;
 
                         if (response.ImageList != undefined) {
                             var grid = $("#itemImage-grid").data("kendoGrid");
@@ -393,7 +397,6 @@
                         alert("Images upload success.")
                     },
                     error: function (er) {
-                        debugger;
                         alert(er);
                     }
 
@@ -511,7 +514,215 @@
             return data.indexOf(dataItem);
         }
 
-</script>
+    </script>
+}
+
+@helper Attachments()
+{
+    <table style="width:100%;">
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="file" id="uploadAttachments" multiple name="uploadAttachments" />
+            </td>
+            <td class="adminTitle">
+                @Html.LabelFor(m => m.Notes)
+            </td>
+            <td class="adminTitle" colspan="3">
+                @Html.TextAreaFor(model => model.Notes, 4, 30, null)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle" colspan="4">
+               <input type="button" id="btnUploadAttachment" value="Upload" />
+            </td>
+
+
+        </tr>
+    </table>
+    
+    
+    <div id="itemAttachment-grid"></div>
+
+    <script>
+        $(document).ready(function () {
+
+
+            $('#btnUploadAttachment').click(function () {
+                //debugger;
+                var data = new FormData();
+                var files = $("#uploadAttachments").get(0).files;
+                if (files.length > 0) {
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("Attachments",files[x]);
+                    }
+                }
+                data.append("Notes", $('#@Html.FieldIdFor(model => model.Notes)').val());
+                var link = '@Html.Raw(@Url.Action("UploadAttachments","Item"))';
+                @*var postData = {
+                    attachments: data,
+                    notes:$('#@Html.FieldIdFor(model => model.Notes)').val()
+                };*@
+                //debugger;
+                $.ajax({
+                    url: link,
+                    type: "POST",
+                    //dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    data: data,
+                    success: function (response) {
+                        //code after success
+                        //debugger;
+
+                        if (response.AttachmentList != undefined) {
+                            var grid = $("#itemAttachment-grid").data("kendoGrid");
+                            var data = grid.dataSource.data().toJSON(); //the data of the DataSource
+                            var newRowIndex = data.length;
+                            //var res = Math.max.apply(Math, array.map(function (o) { return o.y; }))
+                            $.each(response.AttachmentList, function (i, item) {
+                                //debugger;
+                                //alert(key + ": " + value);
+                                var newAttachment = { ID: 0, AttachmentID: item['AttachmentID'], AttachmentName: item['AttachmentName'], AttachmentURL: item['AttachmentURL'], DisplayOrder: newRowIndex, Notes: item['Notes']};
+                                data.push(newAttachment);
+                                newRowIndex++;
+                            });
+
+                            grid.dataSource.data(data);
+
+                        }
+                        alert("Attachment upload success.")
+                    },
+                    error: function (er) {
+                        debugger;
+                        alert(er);
+                    }
+
+                });
+            });
+
+            $("#itemAttachment-grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "@Html.Raw(Url.Action("ReadItemAttachments", "Item", new { itemID = Model.ID }))",
+                            type: "POST",
+                            dataType: "json"
+                        },
+                        update: function (e) { },
+                        create: function (e) { },
+                        destroy: {
+                            url: "@Html.Raw(Url.Action("ItemAttachmentDelete", "Item"))",
+                            type: "POST",
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            id: "ID",
+                            fields: {
+                                ID: { editable: false, type: "number" },
+                                AttachmentID: { editable: false, type: "number" },
+                                AttachmentURL: { editable: false, type: "string" },
+                                AttachmentName: { editable: false, type: "string" },
+                                DisplayOrder: {
+                                    editable: true, type: "number"
+                                },
+                                Notes: { editable: true, type: "string" }
+                            }
+                        }
+                    },
+                    pageSize: "100",
+                    requestEnd: function (e) {
+                        //debugger;
+                        if (e.type == "create" || e.type == "update") {
+
+                            //this.read();
+                        }
+                    },
+                    error: function (e) {
+                        display_kendoui_grid_error(e);
+                        // Cancel the changes
+                        this.cancelChanges();
+                    },
+
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: ["100"]
+                },
+                editable: {
+                    confirmation: false,
+                    mode: "inline"
+                },
+                scrollable: false,
+                edit: function (e) {
+                    //debugger;
+                    if (e.container.find('.k-grid-cancel') != "undefined") {
+                        e.container.find('.k-grid-cancel').hide();
+                    }
+                    if (e.model.isNew()) {
+                    }
+                },
+                columns: [{
+                    field: "ID",
+                    template: "<input type='hidden' name='ItemViewAttachments[#= attchmentIndex(data)#].ID' value='#=ID#' />",
+                    hidden: true
+                }, {
+                        field: "AttachmentID",
+                        template: "<input type='hidden' name='ItemViewAttachments[#= attchmentIndex(data)#].AttachmentID' value='#=AttachmentID#' />",
+                    hidden: true
+                    },
+                    {
+                        field: "AttachmentURL",
+                        title: "Attachment",
+                        //template: '<a href="#=AttachmentURL#" target="_blank"><img alt="#=AttachmentID#" src="#=AttachmentURL#" width="150" /></a>',
+                        template:"#=AttachmentColumnTemplate(data.AttachmentURL,data.AttachmentName)#",
+                        width: 200
+                    },
+                    //{
+                    //    field: "AttachmentName",
+                    //    title: "Attachment Name",
+                    //    template: '<a href="#=AttachmentURL#" target="_blank">#=AttachmentName#</a>',
+                    //    width: 200
+                    //},
+                    {
+                        field: "DisplayOrder",
+                        template: "#=DisplayOrder#" + "<input type='hidden' name='ItemViewAttachments[#= attchmentIndex(data)#].DisplayOrder' value='#=DisplayOrder#' />",
+                        hidden: true
+                    },
+                    {
+                        field: "Notes",
+                        template: "#=Notes#" + "<input type='hidden' name='ItemViewAttachments[#= attchmentIndex(data)#].Notes' value='#=Notes#' />"
+                    }, {
+                        command: ["edit", "destroy"],
+                        title: "&nbsp;", width: "150px"
+                }]
+            });
+
+        });
+
+        function attchmentIndex(dataItem) {
+            var data = $("#itemAttachment-grid").data("kendoGrid").dataSource.data();
+            return data.indexOf(dataItem);
+        }
+
+        function isImage(url) {
+            return /\.(jpg|jpeg|png|webp|avif|gif|svg|tiff|bmp)$/.test(url);
+        }
+
+        function AttachmentColumnTemplate(url,name) {
+            if (isImage(url))
+                return "<a href=" + url + " target='_blank'><img src=" + url + " width='150' /></a>";
+            else
+                return "<a href=" + url + " target='_blank' download="+name+">"+name+"</a>";
+        }
+
+    </script>
 }
 
 

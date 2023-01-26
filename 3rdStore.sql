@@ -2107,6 +2107,7 @@ CREATE TABLE [dbo].[M_ItemAttachment](
 	[ItemID] [int] NOT NULL,
 	[AttachmentID] [int] NOT NULL,
 	[DisplayOrder] [int] NOT NULL,
+	[Notes] varchar(4000) NOT NULL,
 	[StatusID] [int] NOT NULL,
 	[CreateTime] datetime not null,
 	[CreateBy] [varchar](100) not null,

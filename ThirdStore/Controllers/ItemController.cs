@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using ThirdStoreBusiness.AccessControl;
+using ThirdStoreBusiness.Attachment;
 
 namespace ThirdStore.Controllers
 {
@@ -34,13 +35,15 @@ namespace ThirdStore.Controllers
         private readonly IWorkContext _workContext;
         private readonly IJobItemService _jobItemService;
         private readonly IPermissionService _permissionService;
+        private readonly IAttachmentService _attachmentService;
 
         public ItemController(IItemService itemService,
             IImageService imageService,
             IDbContext dbContext,
             IWorkContext workContext,
             IPermissionService permissionService,
-            IJobItemService jobItemService)
+            IJobItemService jobItemService,
+            IAttachmentService attachmentService)
         {
             _itemService = itemService;
             _imageService = imageService;
@@ -48,6 +51,7 @@ namespace ThirdStore.Controllers
             _workContext = workContext;
             _jobItemService = jobItemService;
             _permissionService = permissionService;
+            _attachmentService = attachmentService;
         }
 
         // GET: Item
@@ -321,6 +325,32 @@ namespace ThirdStore.Controllers
                 }
             }
 
+            if (model.ItemViewAttachments != null && model.ItemViewAttachments.Count > 0)
+            {
+                foreach (var lModel in model.ItemViewAttachments)
+                {
+                    if (lModel.ID > 0)
+                    {
+                        var originLine = editEntityModel.ItemAttachments.Where(l => l.ID == lModel.ID).FirstOrDefault();
+                        if (originLine != null)
+                        {
+                            originLine = lModel.ToEntity(originLine).FillOutNull();
+                            originLine.EditTime = editTime;
+                            originLine.EditBy = editBy;
+                        }
+                    }
+                    else
+                    {
+                        var editEntityLine = lModel.ToEntity().FillOutNull();
+                        editEntityLine.CreateTime = editTime;
+                        editEntityLine.CreateBy = editBy;
+                        editEntityLine.EditTime = editTime;
+                        editEntityLine.EditBy = editBy;
+                        editEntityModel.ItemAttachments.Add(editEntityLine);
+                    }
+                }
+            }
+
             _itemService.UpdateItem(editEntityModel);
 
             return RedirectToAction("Edit", new { itemID = editEntityModel.ID });
@@ -436,6 +466,71 @@ namespace ThirdStore.Controllers
             return Json(new { ImageList = lstSavedImages });
         }
 
+        [HttpPost]
+        public ActionResult UploadAttachments(HttpPostedFileBase[] attachments,string notes)
+        {
+
+            var lstSavedAttachments = new List<ItemViewModel.ItemAttachmentViewModel>();
+            if (attachments != null)
+            {
+                foreach (var attachment in attachments)
+                {
+                    var savedAttachment = _attachmentService.SaveAttachment(attachment.InputStream, attachment.FileName);
+                    var itemAttachmentViewModel = new ItemViewModel.ItemAttachmentViewModel() { AttachmentID = savedAttachment.ID, AttachmentName = savedAttachment.Name,  AttachmentURL = _attachmentService.GetAttachmentURL(savedAttachment.ID), Notes=notes };
+                    lstSavedAttachments.Add(itemAttachmentViewModel);
+                }
+            }
+
+            return Json(new { AttachmentList = lstSavedAttachments });
+        }
+
+
+        [HttpPost]
+        public ActionResult ReadItemAttachments(DataSourceRequest command, int itemID)
+        {
+            if (itemID > 0)
+            {
+                IList<ItemViewModel.ItemAttachmentViewModel> itemAttachments = null;
+                var item = _itemService.GetItemByID(itemID);
+                if (item != null)
+                {
+                    itemAttachments = item.ItemAttachments.Select(r =>
+                    {
+                        var viewModel = r.ToModel();
+                        viewModel.AttachmentURL = _attachmentService.GetAttachmentURL(r.AttachmentID);
+                        viewModel.AttachmentName = r.Attachment.Name;
+                        return viewModel;
+                    }).ToList();
+                }
+
+
+                var gridModel = new DataSourceResult() { Data = itemAttachments, Total = itemAttachments.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else
+                return Json(new object { });
+        }
+
+
+        [HttpPost]
+        public ActionResult ItemAttachmentDelete(ItemViewModel.ItemAttachmentViewModel model)
+        {
+            if (model.ID > 0)
+            {
+                var attachment = _attachmentService.GetAttachmentByID(model.AttachmentID);
+                if (attachment != null)
+                    _attachmentService.DeleteAttachment(attachment);
+            }
+
+            return new NullJsonResult();
+        }
+
 
         [HttpPost]
         public ActionResult ReadItemImages(DataSourceRequest command, int itemID)
@@ -482,6 +577,8 @@ namespace ThirdStore.Controllers
 
             return new NullJsonResult();
         }
+
+
 
         [HttpPost]
         public ActionResult FetchNetoProducts()

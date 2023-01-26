@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ThirdStoreCommon.Models.Attachment;
 using ThirdStoreCommon.Models.Image;
 
 namespace ThirdStoreCommon.Models.Item
@@ -45,5 +46,6 @@ namespace ThirdStoreCommon.Models.Item
         public virtual ICollection<D_Item_Relationship> ParentItems { get; set; }
         public virtual ICollection<D_Item_Relationship> ChildItems { get; set; }
         public virtual ICollection<M_ItemImage> ItemImages { get; set; }
+        public virtual ICollection<M_ItemAttachment> ItemAttachments { get; set; }
     }
 }

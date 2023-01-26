@@ -16,6 +16,7 @@ using ThirdStore.Models.Misc;
 using ThirdStoreCommon.Models.Misc;
 using ThirdStore.Models.ReturnItem;
 using ThirdStoreCommon.Models.ReturnItem;
+using ThirdStoreCommon.Models.Attachment;
 
 namespace ThirdStore.Extensions
 {
@@ -127,6 +128,21 @@ namespace ThirdStore.Extensions
             return model.MapTo(destination);
         }
 
+        public static ItemViewModel.ItemAttachmentViewModel ToModel(this M_ItemAttachment entity)
+        {
+            return entity.MapTo<M_ItemAttachment, ItemViewModel.ItemAttachmentViewModel>();
+        }
+
+        public static M_ItemAttachment ToEntity(this ItemViewModel.ItemAttachmentViewModel model)
+        {
+            return model.MapTo<ItemViewModel.ItemAttachmentViewModel, M_ItemAttachment>();
+        }
+
+        public static M_ItemAttachment ToEntity(this ItemViewModel.ItemAttachmentViewModel model, M_ItemAttachment destination)
+        {
+            return model.MapTo(destination);
+        }
+
         #endregion
 
         #region Job Item
@@ -200,7 +216,6 @@ namespace ThirdStore.Extensions
         }
 
         #endregion
-
 
         #region Return Item
 

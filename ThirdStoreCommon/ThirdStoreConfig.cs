@@ -55,6 +55,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string ThirdStoreAttachmentsPath
+        {
+            get
+            {
+                return AppDomain.CurrentDomain.BaseDirectory + "\\ThirdStoreAttachmentsPath";
+            }
+        }
+
         public string ThirdStorePrinterName
         {
             get

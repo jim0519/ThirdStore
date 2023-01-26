@@ -61,6 +61,9 @@ namespace ThirdStore.Models.Item
         public IList<ChildItemLineViewModel> ChildItemLines { get; set; }
         public IList<ItemImageViewModel> ItemViewImages { get; set; }
 
+        public IList<ItemAttachmentViewModel> ItemViewAttachments { get; set; }
+        public string Notes { get; set; }
+
         public class ChildItemLineViewModel : BaseEntityViewModel
         {
             public int ChildItemID { get; set; }
@@ -75,6 +78,15 @@ namespace ThirdStore.Models.Item
             public string ImageName { get; set; }
             public int DisplayOrder { get; set; }
             public bool StatusID { get; set; }
+        }
+
+        public class ItemAttachmentViewModel : BaseEntityViewModel
+        {
+            public int AttachmentID { get; set; }
+            public string AttachmentURL { get; set; }
+            public string AttachmentName { get; set; }
+            public int DisplayOrder { get; set; }
+            public string Notes { get; set; }
         }
     }
 }

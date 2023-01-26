@@ -108,6 +108,8 @@
     <Compile Include="Models\AccessControl\T_Permission.cs" />
     <Compile Include="Models\AccessControl\T_Role.cs" />
     <Compile Include="Models\AccessControl\T_User.cs" />
+    <Compile Include="Models\Attachment\D_Attachment.cs" />
+    <Compile Include="Models\Attachment\M_ItemAttachment.cs" />
     <Compile Include="Models\BaseEntity.cs" />
     <Compile Include="Models\Image\D_Image.cs" />
     <Compile Include="Models\Image\M_JobItemImage.cs" />

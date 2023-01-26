@@ -20,6 +20,7 @@ using ThirdStoreCommon.Models.Misc;
 using ThirdStore.Models.Misc;
 using ThirdStoreCommon.Models.ReturnItem;
 using ThirdStore.Models.ReturnItem;
+using ThirdStoreCommon.Models.Attachment;
 
 namespace ThirdStore.Infrastructure
 {
@@ -58,6 +59,7 @@ namespace ThirdStore.Infrastructure
                 .ForMember(dest => dest.ChildItemSKU, mce => mce.MapFrom<string>(r => r.ChildItem.SKU));
             Mapper.CreateMap<M_ItemImage, ItemViewModel.ItemImageViewModel>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToBoolean(s.StatusID)));
+            Mapper.CreateMap<M_ItemAttachment, ItemViewModel.ItemAttachmentViewModel>();
 
             Mapper.CreateMap<ItemViewModel, D_Item>()
                 .ForMember(dest => dest.IsActive, mce => mce.MapFrom(s => Convert.ToBoolean(s.IsActive)))
@@ -66,6 +68,7 @@ namespace ThirdStore.Infrastructure
             Mapper.CreateMap<ItemViewModel.ChildItemLineViewModel, D_Item_Relationship>();
             Mapper.CreateMap<ItemViewModel.ItemImageViewModel, M_ItemImage>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));
+            Mapper.CreateMap<ItemViewModel.ItemAttachmentViewModel, M_ItemAttachment>();
 
             //Job Item
             Mapper.CreateMap<D_JobItem, JobItemGridViewModel>()

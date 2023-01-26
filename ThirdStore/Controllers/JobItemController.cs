@@ -318,6 +318,14 @@ namespace ThirdStore.Controllers
             var editBy = Constants.SystemUser;
 
             var editEntityModel = _jobItemService.GetJobItemByID(model.ID);
+            //checking
+            if(!editEntityModel.EditTime.TrimMilliseconds().Equals(model.EditTime.TrimMilliseconds()))
+            {
+                var errMsg = "Job item was edited by someone else, please try again.";
+                ErrorNotification(errMsg);
+                return RedirectToAction("Edit", new { jobItemID=editEntityModel.ID });
+            }
+            
             var preLocation = editEntityModel.Location;
             editEntityModel = model.ToCreateNewEntity(editEntityModel).FillOutNull();
             if (!string.IsNullOrEmpty(editEntityModel.DesignatedSKU))
