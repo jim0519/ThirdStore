@@ -13,6 +13,7 @@ using ThirdStoreFramework.MVC;
 using ThirdStoreCommon.Infrastructure;
 using System.IO;
 using ThirdStoreBusiness.AccessControl;
+using ThirdStoreBusiness.JobItem;
 
 namespace ThirdStore.Controllers
 {
@@ -21,8 +22,10 @@ namespace ThirdStore.Controllers
         private readonly IOrderService _orderService;
         private readonly IWorkContext _workContext;
         private readonly IPermissionService _permissionService;
+        private readonly IJobItemService _jobItemService;
 
         public OrderController(IOrderService orderService,
+            IJobItemService jobItemService,
             IPermissionService permissionService,
             IWorkContext workContext
             )
@@ -30,6 +33,7 @@ namespace ThirdStore.Controllers
             _orderService = orderService;
             _workContext = workContext;
             _permissionService = permissionService;
+            _jobItemService = jobItemService;
         }
 
         // GET: Item
@@ -86,7 +90,7 @@ namespace ThirdStore.Controllers
                 if (i.OrderLines.Count > 0)
                 { 
                     viewModel.OrderTransactions = i.OrderLines.Select(l => l.Ref2.ToString()).Aggregate((current, next) => current + ";" + next);
-                    viewModel.SKUs=i.OrderLines.Select(l=>l.SKU+":"+l.Qty+(!string.IsNullOrWhiteSpace(l.Ref5)?"("+l.Ref5+")":string.Empty)).Aggregate((current, next) => current + ";" + next);
+                    viewModel.SKUs=i.OrderLines.Select(l=>l.SKU+":"+l.Qty+(!string.IsNullOrWhiteSpace(l.Ref5)?"("+l.Ref5.Split(',').Select((r,j)=>r+" "+ _jobItemService.GetJobItemByID(Convert.ToInt32( l.Ref6.Split(',')[j]) ).Ref2).Aggregate((current, next) => current + "," + next) +")":string.Empty)).Aggregate((current, next) => current + ";" + next);
                 }
                 return viewModel;
             });

@@ -18,5 +18,10 @@ namespace ThirdStoreBusiness.Report
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
+
+        IPagedList<LocationRanking> GetLocationRanking(
+            int pageIndex = 0,
+            int pageSize = int.MaxValue);
+
     }
 }

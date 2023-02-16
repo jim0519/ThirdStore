@@ -1,0 +1,83 @@
+﻿@model LocationRankingViewModel
+@{
+    ViewBag.Title = "Location Ranking";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+<h2>Location Ranking</h2>
+@using (Html.BeginForm())
+{
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="locRank-grid"></div>
+
+                <script>
+    $(document).ready(function () {
+        $("#locRank-grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Html.Raw(Url.Action("LocationRanking", "Report"))",
+                                        type: "POST",
+                                        dataType: "json"
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "300",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["300", "600", "1000"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            toolbar: ["excel"],
+                            excel: {
+                                allPages: true,
+                                fileName: "LocationRanking.xlsx"
+                            },
+                            dataBound: onDataBound,
+                            columns: [
+                                 {
+                                    field: "CMB",
+                                    title: "CMB"
+                                }, {
+                                    field: "Location",
+                                    title: "Location"
+                                }
+                            ]
+                        });
+    });
+
+
+                </script>
+            </td>
+        </tr>
+    </table>
+    <script>
+        $(document).ready(function () {
+
+
+
+        });
+
+    </script>
+}

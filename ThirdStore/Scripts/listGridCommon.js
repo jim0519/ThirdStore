@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    $("<div id='selectedNum'>0 selected</div>").insertBefore('#mastercheckbox');
     $('#mastercheckbox').click(function () {
         //$('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
         $('.checkboxGroups').each(function () {
@@ -32,6 +33,7 @@
                 });
             }
         }
+        $('#selectedNum').text(selectedIds.length + ' selected');
         //updateMasterCheckbox();
     });
     

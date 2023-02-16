@@ -350,7 +350,7 @@
 {
 
     <input type="file" id="uploadImages" name="uploadImages" multiple accept="image/*" />
-    <input type="button" id="btnUpload" value="Upload" />
+    <input type="button" id="btnUpload" value="Upload" /><img name="imgUploadLoading" src="~/Content/images/loading.gif" style="display:none;" />
     <div id="itemImage-grid"></div>
 
     <script>
@@ -375,6 +375,12 @@
                     processData: false,
                     contentType: false,
                     data: data,
+                    beforeSend: function () {
+                        $("[name='imgUploadLoading']").show();
+                    },
+                    complete: function () {
+                        $("[name='imgUploadLoading']").hide();
+                    },
                     success: function (response) {
                         //code after success
 
@@ -534,7 +540,7 @@
 
         <tr>
             <td class="adminTitle" colspan="4">
-               <input type="button" id="btnUploadAttachment" value="Upload" />
+               <input type="button" id="btnUploadAttachment" value="Upload" /><img name="imgUploadLoading" src="~/Content/images/loading.gif" style="display:none;" />
             </td>
 
 
@@ -571,6 +577,12 @@
                     processData: false,
                     contentType: false,
                     data: data,
+                    beforeSend: function () {
+                        $("[name='imgUploadLoading']").show();
+                    },
+                    complete: function () {
+                        $("[name='imgUploadLoading']").hide();
+                    },
                     success: function (response) {
                         //code after success
                         //debugger;

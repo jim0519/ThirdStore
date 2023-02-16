@@ -109,7 +109,20 @@
             </div>
             <div class="pull-right" style="clear:both;">
                 <ul id="menu" class="nav nav-pills">
-                    <li class="@Url.MakeNavBarActive("Report", "KPIReport")">@Html.ActionLink("KPI Report", "KPIReport", "Report")</li>
+                    <li class="@Url.MakeNavBarActive("Report")">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            Reports<span class="caret"></span>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    @Html.ActionLink("KPI Report", "KPIReport", "Report")
+                                </li>
+                                <li>
+                                    @Html.ActionLink("Location Ranking", "LocationRanking", "Report")
+                                </li>
+                            </ul>
+
+                        </a>
+                    </li>
                     <li class="@Url.MakeNavBarActive("AccessControl")">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                             Access Control<span class="caret"></span>
@@ -139,7 +152,7 @@
                         </a>
                     </li>
                     <li class="@Url.MakeNavBarActive("ReturnItem")">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" >
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                             Return Item<span class="caret"></span>
                             <ul class="dropdown-menu">
                                 <li>

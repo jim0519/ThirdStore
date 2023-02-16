@@ -81,6 +81,35 @@ namespace ThirdStore.Controllers
             };
         }
 
+        public ActionResult LocationRanking()
+        {
+
+            if (!_permissionService.Authorize(ThirdStorePermission.KPIReport.ToName()))
+            {
+                ErrorNotification("You do not have permission to process this page.");
+                return Redirect("~/");
+            }
+
+
+            var model = new LocationRankingViewModel();
+
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult LocationRanking(DataSourceRequest command, KPIReportViewModel model)
+        {
+            var locRankRptDS = _reportService.GetLocationRanking();
+
+            var gridModel = new DataSourceResult() { Data = locRankRptDS, Total = locRankRptDS.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
         [HttpPost]
         public ActionResult InventoryExcelExport(string contentType, string base64, string fileName)
         {

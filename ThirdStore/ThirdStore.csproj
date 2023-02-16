@@ -221,6 +221,7 @@
     <Compile Include="Models\JobItem\JobItemViewModel.cs" />
     <Compile Include="Models\Order\OrderGridViewModel.cs" />
     <Compile Include="Models\Order\OrderListViewModel.cs" />
+    <Compile Include="Models\Report\LocationRankingViewModel.cs" />
     <Compile Include="Models\Report\KPIReportViewModel.cs" />
     <Compile Include="Models\ReturnItem\ReturnItemViewModel.cs" />
     <Compile Include="Models\ReturnItem\ReturnItemGridViewModel.cs" />
@@ -437,6 +438,7 @@
     <Content Include="Views\ReturnItem\_CreateOrEdit.cshtml" />
     <Content Include="Views\ReturnItem\Edit.cshtml" />
     <Content Include="Views\ReturnItem\Create.cshtml" />
+    <Content Include="Views\Report\LocationRanking.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

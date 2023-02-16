@@ -48,5 +48,21 @@ namespace ThirdStoreBusiness.Report
 
             return new PagedList<KPIReport>(query.ToList(), pageIndex, pageSize);
         }
+
+
+        public IPagedList<LocationRanking> GetLocationRanking(
+            int pageIndex = 0,
+            int pageSize = int.MaxValue)
+        {
+            var sqlStr = new StringBuilder();
+            sqlStr.Append("select * from V_LocationRanking ");
+
+
+            var query = _dbContext.SqlQuery<LocationRanking>(sqlStr.ToString());
+
+            query = query.OrderByDescending(i => i.CMB);
+
+            return new PagedList<LocationRanking>(query.ToList(), pageIndex, pageSize);
+        }
     }
 }

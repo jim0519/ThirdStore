@@ -1,16 +1,19 @@
 ﻿@model JobItemViewModel
 
-@*<style>
+<style>
         /*Batch Edit Mode*/
-        .k-edit-cell input {
+        /*.k-edit-cell input {
             width: 100%;
-        }
+        }*/
 
         /*InLine Edit Mode*/
-        .k-grid-edit-row input {
+        /*.k-grid-edit-row input {
             width: 100%;
-        }
-    </style>*@
+        }*/
+    #jobItemLine-grid {
+        min-width: 800px;
+    }
+    </style>
 
 @Html.HiddenFor(model => model.ID)
 @*<!-- The Templates plugin is included to render the upload/download listings -->
@@ -317,6 +320,11 @@
                     if (e.model.isNew()) {
                     }
 
+                    $('.k-input').on('focus', function () {
+                        var input = $(this);
+                        setTimeout(function () { input.select(); });
+                    });
+
                     //debugger;
                     $("[name='SKU']", e.container).change(function () {
                         var skuValue = $(this).val();
@@ -479,7 +487,7 @@
 {
 
     <input type="file" id="uploadImages" name="uploadImages" multiple accept="image/*" />
-    <input type="button" id="btnUpload" value="Upload" />
+    <input type="button" id="btnUpload" value="Upload" /><img name="imgUploadLoading" src="~/Content/images/loading.gif" style="display:none;" />
     <div id="jobItemImage-grid"></div>
 }
 
@@ -563,6 +571,12 @@
                     processData: false,
                     contentType: false,
                     data: data,
+                    beforeSend: function () {
+                        $("[name='imgUploadLoading']").show();
+                    },
+                    complete: function () {
+                        $("[name='imgUploadLoading']").hide();
+                    },
                     success: function (response) {
                         //code after success
                         //debugger;
