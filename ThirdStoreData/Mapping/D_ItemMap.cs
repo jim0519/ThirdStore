@@ -48,6 +48,30 @@ namespace ThirdStoreData.Mapping
                 .IsRequired()
                 .HasMaxLength(4000);
 
+            this.Property(t => t.Ref5)
+                .IsRequired()
+                .HasMaxLength(4000);
+
+            this.Property(t => t.Ref6)
+                .IsRequired()
+                .HasMaxLength(4000);
+
+            this.Property(t => t.Ref7)
+                .IsRequired()
+                .HasMaxLength(4000);
+
+            this.Property(t => t.Ref8)
+                .IsRequired()
+                .HasMaxLength(4000);
+
+            this.Property(t => t.Ref9)
+                .IsRequired()
+                .HasMaxLength(4000);
+
+            this.Property(t => t.Ref10)
+                .IsRequired()
+                .HasMaxLength(4000);
+
             this.Property(t => t.GrossWeight).HasPrecision(18, 8);
             this.Property(t => t.NetWeight).HasPrecision(18, 8);
             this.Property(t => t.CubicWeight).HasPrecision(18, 8);
@@ -83,6 +107,10 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Ref4).HasColumnName("Ref4");
             this.Property(t => t.Ref5).HasColumnName("Ref5");
             this.Property(t => t.Ref6).HasColumnName("Ref6");
+            this.Property(t => t.Ref7).HasColumnName("Ref7");
+            this.Property(t => t.Ref8).HasColumnName("Ref8");
+            this.Property(t => t.Ref9).HasColumnName("Ref9");
+            this.Property(t => t.Ref10).HasColumnName("Ref10");
             this.Property(t => t.DisableDropship).HasColumnName("DisableDropship");
         }
     }

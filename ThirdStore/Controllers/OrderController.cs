@@ -90,7 +90,7 @@ namespace ThirdStore.Controllers
                 if (i.OrderLines.Count > 0)
                 { 
                     viewModel.OrderTransactions = i.OrderLines.Select(l => l.Ref2.ToString()).Aggregate((current, next) => current + ";" + next);
-                    viewModel.SKUs=i.OrderLines.Select(l=>l.SKU+":"+l.Qty+(!string.IsNullOrWhiteSpace(l.Ref5)?"("+l.Ref5.Split(',').Select((r,j)=>r+" "+ _jobItemService.GetJobItemByID(Convert.ToInt32( l.Ref6.Split(',')[j]) ).Ref2).Aggregate((current, next) => current + "," + next) +")":string.Empty)).Aggregate((current, next) => current + ";" + next);
+                    viewModel.SKUs=i.OrderLines.Select(l=>l.SKU+":"+l.Qty+(!string.IsNullOrWhiteSpace(l.Ref5)?"("+l.Ref5.Split(',').Select((r,j)=>r+ (!string.IsNullOrWhiteSpace(l.Ref6) && l.Ref6.Split(',').Count() > j ? " " + _jobItemService.GetJobItemByID(Convert.ToInt32(l.Ref6.Split(',')[j])).Ref2:string.Empty) ).Aggregate((current, next) => current + "," + next) +")":string.Empty)).Aggregate((current, next) => current + ";" + next);
                 }
                 return viewModel;
             });

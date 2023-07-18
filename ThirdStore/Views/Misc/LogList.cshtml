@@ -133,7 +133,7 @@
             $('#@Html.FieldIdFor(model => model.LogTimeTo)').val("");
 
             selectedIds = [];
-
+            $('#selectedNum').text(selectedIds.length + ' selected');
             RefreshGrid(false);
 
             return false;

@@ -271,7 +271,7 @@ namespace ThirdStoreBusiness.Order
                 throw new ArgumentNullException("order");
 
             //Order Status Automatically Update
-            if (!string.IsNullOrWhiteSpace(order.Ref2) && order.StatusID.Equals(ThirdStoreOrderStatus.AllGood.ToValue()))
+            if ((!string.IsNullOrWhiteSpace(order.Ref2)||!string.IsNullOrWhiteSpace(order.Ref3) || !string.IsNullOrWhiteSpace(order.Ref4) || !string.IsNullOrWhiteSpace(order.Ref5)) && order.StatusID.Equals(ThirdStoreOrderStatus.AllGood.ToValue()))
                 order.StatusID = ThirdStoreOrderStatus.Investigating.ToValue();
 
             var currentTime = DateTime.Now;

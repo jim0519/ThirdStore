@@ -17,7 +17,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <Use64BitIISExpress />
+    <Use64BitIISExpress>true</Use64BitIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -439,6 +439,7 @@
     <Content Include="Views\ReturnItem\Edit.cshtml" />
     <Content Include="Views\ReturnItem\Create.cshtml" />
     <Content Include="Views\Report\LocationRanking.cshtml" />
+    <Content Include="Views\Report\PriceCompareReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

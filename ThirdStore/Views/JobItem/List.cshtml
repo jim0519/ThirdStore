@@ -616,7 +616,14 @@
                                 }, {
                                     field: "ItemPrice",
                                     title: "Price"
-                                }, {
+                                },
+                                @*{
+                                    title: "SameSKUJobItems",
+                                    //template: "<a href='@Url.Action("List", "JobItem",new { SearchSKU= "#if(SKUs!=''&&SKUs!=null&&SKUs!=undefined ){var skuInfos=SKUs.split(';'); for(var i = 0; i < skuInfos.length; i = i+1){var skuInfo=skuInfos[i].split(','); var sku=skuInfo[0]; var itemId=skuInfo[1]; #=sku# }#" })'  target='_blank' > View</a>",
+                                    template: "#if(SKUs!=''&&SKUs!=null&&SKUs!=undefined ){var skuInfos=SKUs.split(';'); for(var i = 0; i < skuInfos.length; i = i+1){var skuInfo=skuInfos[i].split(','); var sku=skuInfo[0]; var itemId=skuInfo[1];  # <a href='@Server.UrlDecode(Url.Action("List", "JobItem", new { SearchSKU = "#=sku#" }))' target='_blank'>View</a><br /> #} }#",
+                                    width: 50
+                                },*@
+                                {
                                     field: "ShipTime",
                                     title: "Ship Time",
                                     type: "date",
@@ -689,7 +696,7 @@
             inspectorMultiselect.trigger("change");
 
             selectedIds = [];
-
+            $('#selectedNum').text(selectedIds.length + ' selected');
             RefreshGrid(false);
 
             return false;

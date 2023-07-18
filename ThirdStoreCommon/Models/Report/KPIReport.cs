@@ -23,6 +23,6 @@ namespace ThirdStoreCommon.Models.Report
         public decimal QMW { get; set; }
         public decimal QMWD { get; set; }
         public decimal AVGQMW { get; set; }
-        
+        public decimal FaultyRate { get; set; }
     }
 }

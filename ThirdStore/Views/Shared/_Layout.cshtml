@@ -112,14 +112,18 @@
                     <li class="@Url.MakeNavBarActive("Report")">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                             Reports<span class="caret"></span>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    @Html.ActionLink("KPI Report", "KPIReport", "Report")
-                                </li>
-                                <li>
-                                    @Html.ActionLink("Location Ranking", "LocationRanking", "Report")
-                                </li>
-                            </ul>
+                                   <ul class="dropdown-menu">
+                                       <li>
+                                           @Html.ActionLink("KPI Report", "KPIReport", "Report")
+                                       </li>
+                                       <li>
+                                           @Html.ActionLink("Location Ranking", "LocationRanking", "Report")
+                                       </li>
+
+                                       <li>
+                                           @Html.ActionLink("Price Compare", "PriceCompareReport", "Report")
+                                       </li>
+                                   </ul>
 
                         </a>
                     </li>

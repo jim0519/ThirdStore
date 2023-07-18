@@ -387,7 +387,7 @@
             $('#@Html.FieldIdFor(model => model.SearchReadyForList)').val("-1");
 
             selectedIds = [];
-
+            $('#selectedNum').text(selectedIds.length + ' selected');
             RefreshGrid(false);
 
             return false;

@@ -60,9 +60,24 @@ namespace ThirdStoreBusiness.Report
 
             var query = _dbContext.SqlQuery<LocationRanking>(sqlStr.ToString());
 
-            query = query.OrderByDescending(i => i.CMB);
+            query = query.OrderBy(i => i.CMB);
 
             return new PagedList<LocationRanking>(query.ToList(), pageIndex, pageSize);
+        }
+
+        public IPagedList<PriceCompareReport> GetPriceCompareReport(
+            int pageIndex = 0,
+            int pageSize = int.MaxValue)
+        {
+            var sqlStr = new StringBuilder();
+            sqlStr.Append("select * from V_PriceCompareReport ");
+
+
+            var query = _dbContext.SqlQuery<PriceCompareReport>(sqlStr.ToString());
+
+            query = query.OrderBy(i => i.CreateTime);
+
+            return new PagedList<PriceCompareReport>(query.ToList(), pageIndex, pageSize);
         }
     }
 }

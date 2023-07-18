@@ -1264,7 +1264,7 @@ select SUBSTRING(@tmp, 0, LEN(@tmp))
 
 
 
---neto上的active listing但是没有我们系统上job item，也不是ds的
+
 
 select * from ThirdStore.dbo.NetoProducts
 where SKU not in 
@@ -2135,4 +2135,94 @@ ALTER TABLE [dbo].[M_ItemAttachment]  WITH CHECK ADD CONSTRAINT [FK_M_ItemAttach
 REFERENCES [dbo].[D_Item] ([ID])
 ON UPDATE CASCADE
 ON DELETE CASCADE
+GO
+
+
+
+
+--PriceCompareReport
+
+CREATE 
+VIEW [dbo].[V_JobItemWithSKU] AS
+	select 
+	distinct
+	case when H.DesignatedSKU<>'' then H.DesignatedSKU else L.SKU end HSKU,
+	H.*
+	from D_JobItem H
+	inner join D_JobItemLine L on H.ID=L.HeaderID
+
+
+GO
+
+
+CREATE 
+VIEW [dbo].[V_PriceCompareReport] AS
+
+select
+JI.ID,
+JI.CreateTime,
+Round(JI.PricePercentage *ji.ItemPrice,2) as ListedPrice,
+I.Cost as DSPrice,
+JI.HSKU SKU,
+JI.Ref1,
+JI.Ref2 as Inspectors,
+Location
+--* 
+from V_JobItemWithSKU JI
+inner join D_Item I on JI.HSKU=I.SKU
+where JI.StatusID=2 and JI.Type=1
+and JI.PricePercentage *ji.ItemPrice>I.Cost
+and I.Cost>0
+
+Go
+
+
+
+
+
+
+
+-- Add Ref in D_Item
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_Item' AND C.Name='Ref7')
+	ALTER TABLE dbo.D_Item ADD
+		Ref7 varchar(4000) NOT NULL CONSTRAINT DF_D_Item_Ref7 DEFAULT ''
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_Ref7')
+	ALTER TABLE dbo.D_Item
+		DROP CONSTRAINT DF_D_Item_Ref7
+GO
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_Item' AND C.Name='Ref8')
+	ALTER TABLE dbo.D_Item ADD
+		Ref8 varchar(4000) NOT NULL CONSTRAINT DF_D_Item_Ref8 DEFAULT ''
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_Ref8')
+	ALTER TABLE dbo.D_Item
+		DROP CONSTRAINT DF_D_Item_Ref8
+GO
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_Item' AND C.Name='Ref9')
+	ALTER TABLE dbo.D_Item ADD
+		Ref9 varchar(4000) NOT NULL CONSTRAINT DF_D_Item_Ref9 DEFAULT ''
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_Ref9')
+	ALTER TABLE dbo.D_Item
+		DROP CONSTRAINT DF_D_Item_Ref9
+GO
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_Item' AND C.Name='Ref10')
+	ALTER TABLE dbo.D_Item ADD
+		Ref10 varchar(4000) NOT NULL CONSTRAINT DF_D_Item_Ref10 DEFAULT ''
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_Ref10')
+	ALTER TABLE dbo.D_Item
+		DROP CONSTRAINT DF_D_Item_Ref10
 GO

@@ -118,5 +118,34 @@ namespace ThirdStore.Controllers
             return File(fileContents, contentType, fileName);
         }
 
+
+
+        public ActionResult PriceCompareReport()
+        {
+
+            //if (!_permissionService.Authorize(ThirdStorePermission.KPIReport.ToName()))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/");
+            //}
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult PriceCompareReport(DataSourceRequest command)
+        {
+            var priceCompareRptDS = _reportService.GetPriceCompareReport(
+                pageIndex: command.Page - 1,
+                pageSize: command.PageSize);
+
+            var gridModel = new DataSourceResult() { Data = priceCompareRptDS, Total = priceCompareRptDS.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
     }
 }

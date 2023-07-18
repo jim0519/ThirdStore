@@ -1,26 +1,25 @@
-﻿@model LocationRankingViewModel
-@{
-    ViewBag.Title = "Location Ranking";
+﻿@{
+    ViewBag.Title = "Price Compare Report";
     Layout = "~/Views/Shared/CommonList.cshtml";
 }
 
-<h2>Location Ranking</h2>
+<h2>Price Compare Report</h2>
 @using (Html.BeginForm())
 {
 
     <table class="adminContent">
         <tr>
             <td>
-                <div id="locRank-grid"></div>
+                <div id="priceCompareRpt-grid"></div>
 
                 <script>
-    $(document).ready(function () {
-        $("#locRank-grid").kendoGrid({
+   $(document).ready(function () {
+        $("#priceCompareRpt-grid").kendoGrid({
             dataSource: {
                 type: "json",
                 transport: {
                     read: {
-                        url: "@Html.Raw(Url.Action("LocationRanking", "Report"))",
+                        url: "@Html.Raw(Url.Action("PriceCompareReport", "Report"))",
                                         type: "POST",
                                         dataType: "json"
                                     }
@@ -46,7 +45,7 @@
                             },
                             pageable: {
                                 refresh: true,
-                                pageSizes: ["300", "600", "1000"]
+                                pageSizes: ["300", "1000", "2000"]
                             },
                             editable: {
                                 confirmation: false,
@@ -56,13 +55,31 @@
                             toolbar: ["excel"],
                             excel: {
                                 allPages: true,
-                                fileName: "LocationRanking.xlsx"
+                                fileName: "PriceCompare.xlsx"
                             },
                             dataBound: onDataBound,
                             columns: [
                                  {
-                                    field: "CMB",
-                                    title: "CMB"
+                                    field: "ID",
+                                    template: "<a href='@Url.Action("Edit","JobItem")?JobItemID=#=ID#' target='_blank' > #=ID#</a>",
+                                    title: "JobItemID"
+                                }, {
+                                    field: "CreateTime",
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}",
+                                    title: "Create Time"
+                                }, {
+                                    field: "ListedPrice",
+                                    title: "ListedPrice"
+                                }, {
+                                    field: "DSPrice",
+                                    title: "DSPrice"
+                                }, {
+                                    field: "SKU",
+                                    title: "SKU"
+                                }, {
+                                    field: "Inspectors",
+                                    title: "Inspectors"
                                 }, {
                                     field: "Location",
                                     title: "Location"
@@ -71,17 +88,16 @@
                         });
     });
 
-
+                    
                 </script>
             </td>
         </tr>
     </table>
     <script>
-        $(document).ready(function () {
+    $(document).ready(function () {
 
+        
 
-
-        });
-
+    });
     </script>
 }

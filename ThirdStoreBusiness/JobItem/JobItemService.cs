@@ -1094,7 +1094,7 @@ namespace ThirdStoreBusiness.JobItem
             //var inProcess = new List<JobItemInv>();
             var grpJobItemInvs = grpRelatedInv.Where(grp => (grp.Count() > 1)).SelectMany(grp => grp);
             var notDesignatedJobItemInvs = grpRelatedInv.SelectMany(grp => grp).Where(ji=> !grpJobItemInvs.Contains(ji));
-            if (grpRelatedInv.FirstOrDefault().Count()>1)
+            if (grpRelatedInv.FirstOrDefault().Count()>1&& (!string.IsNullOrWhiteSpace( grpRelatedInv.FirstOrDefault().FirstOrDefault().DesignatedSKU)))
             {
                 //grpRelatedInv.Where(grp => !grp.Equals(grp.FirstOrDefault()));
                 var firstGrpJobItems = grpRelatedInv.FirstOrDefault().Select(grp => grp);

@@ -225,7 +225,7 @@
             $('#@Html.FieldIdFor(model => model.SearchSKU)').val("");
 
             selectedIds = [];
-
+            $('#selectedNum').text(selectedIds.length + ' selected');
             RefreshGrid(false);
 
             return false;

@@ -23,5 +23,9 @@ namespace ThirdStoreBusiness.Report
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
+        IPagedList<PriceCompareReport> GetPriceCompareReport(
+            int pageIndex = 0,
+            int pageSize = int.MaxValue);
+
     }
 }

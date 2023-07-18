@@ -72,10 +72,14 @@ namespace ThirdStore.Controllers
             _commonSetting = _settingService.LoadSetting<CommonSettings>();
         }
 
-        public ActionResult List()
+        public ActionResult List(JobItemListViewModel model)
         {
             //_jobItemService.GenerateProductFeed();
-            var model = new JobItemListViewModel();
+            //JobItemListViewModel model;
+            //if (m == null||string.IsNullOrWhiteSpace( m.SearchSKU))
+            //    model = new JobItemListViewModel();
+            //else
+            //    model = m;
             model.JobItemTypes = ThirdStoreJobItemType.SELFSTORED.ToSelectList(false).ToList();
             model.JobItemTypes.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
