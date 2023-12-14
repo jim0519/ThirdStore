@@ -313,7 +313,7 @@
                             },
                             pageable: {
                                 refresh: true,
-                                pageSizes: ["20", "50", "100"]
+                                pageSizes: ["50", "300", "1000"]
                             },
                             editable: {
                                 confirmation: false,
@@ -351,6 +351,9 @@
                                     field: "IsReadyForList",
                                     title: "Is Ready For List",
                                     template: "#= !!IsReadyForList#"
+                                }, {
+                                    field: "Cost",
+                                    title: "Cost"
                                 }, {
                                     field: "Price",
                                     title: "Price"

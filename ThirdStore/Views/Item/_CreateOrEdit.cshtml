@@ -203,12 +203,21 @@
     </tr>
     <tr>
         <td>
-             @Html.LabelFor(m => m.DisableDropship)
+            @Html.LabelFor(m => m.DisableDropship)
         </td>
-        <td colspan="3">
+        <td>
             @Html.DropDownListFor(model => model.DisableDropship, Model.YesOrNo)
         </td>
-        
+        <td class="adminTitle">
+            @Html.LabelFor(m => m.WebsiteLink)
+        </td>
+        <td class="adminData">
+            @*@Html.EditorFor(model => model.Ref8)*@
+            @if (!string.IsNullOrWhiteSpace(Model.WebsiteLink))
+            {
+                <text><a href="@Model.WebsiteLink" target="_blank" style="display: inline-block;width: 50px;">Link</a></text>
+            }
+        </td>
     </tr>
 </table>
 

@@ -60,6 +60,7 @@ namespace ThirdStore.Models.JobItem
         public class BulkUpdateJobItemModel
         {
             public int StatusID { get; set; }
+            public int Type { get; set; }
             public string Location { get; set; }
             public decimal ItemPrice { get; set; }
             [RegularExpression(@"^[0-1]\.\d{1,2}$", ErrorMessage = "Percentage only can be decimal and 2 decimal places")]

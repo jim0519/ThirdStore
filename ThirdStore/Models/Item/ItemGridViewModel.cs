@@ -15,6 +15,7 @@ namespace ThirdStore.Models.Item
         public bool IsReadyForList { get; set; }
         public bool DisableDropship { get; set; }
         public decimal Price { get; set; }
+        public decimal Cost { get; set; }
         public DateTime EditTime { get; set; }
         public string EditBy { get; set; }
     }

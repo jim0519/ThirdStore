@@ -745,6 +745,14 @@
             </tr>
             <tr>
                 <td>
+                    @Html.LabelFor(model => model.BulkUpdate.Type):
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.BulkUpdate.Type, Model.JobItemTypes)
+                </td>
+            </tr>
+            <tr>
+                <td>
                     @Html.LabelFor(model => model.BulkUpdate.Location):
                 </td>
                 <td>

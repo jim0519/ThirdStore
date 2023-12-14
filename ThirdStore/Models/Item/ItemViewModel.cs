@@ -53,6 +53,10 @@ namespace ThirdStore.Models.Item
         public string Ref6 { get; set; }
         [Display(Name = "Product Link")]
         public string Ref7 { get; set; }
+        [Display(Name = "Website Link")]
+        public string Ref8 { get; set; }
+
+        public string WebsiteLink { get; set; }
         public int DisableDropship { get; set; }
 
         public bool ShowSyncInventory { get; set; }

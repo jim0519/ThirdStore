@@ -129,6 +129,7 @@ namespace ThirdStoreBusiness.ScheduleTask
                 }
 
                 _itemService.AddOrUpdateItem(allDSItems);
+                LogManager.Instance.Info("Update or add item succeed.");
 
                 var allSyncSKUs = new List<string>();
                 foreach(var dsChannel in _dsChannels)

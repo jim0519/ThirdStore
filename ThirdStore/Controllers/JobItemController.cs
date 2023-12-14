@@ -998,6 +998,11 @@ namespace ThirdStore.Controllers
                             jobItem.StatusID = bulkUpdate.StatusID;
                         }
 
+                        if (bulkUpdate.Type != 0)
+                        {
+                            jobItem.Type = bulkUpdate.Type;
+                        }
+
                         if (!string.IsNullOrEmpty(bulkUpdate.Location))
                         {
                             jobItem.Location = bulkUpdate.Location.Trim();

@@ -112,6 +112,17 @@ namespace ThirdStoreBusiness.API.Neto
             return !string.IsNullOrWhiteSpace(UPC);
         }
         #endregion
+
+        #region RRP
+        public decimal? RRP { get; set; }
+        public bool ShouldSerializeRRP()
+        {
+            return RRP.HasValue;
+        }
+        #endregion
+
+        [System.Xml.Serialization.XmlElementAttribute("PriceGroups")]
+        public PriceGroups PriceGroups { get; set; }
     }
 
     public class UpdateItemItemWarehouseQuantity

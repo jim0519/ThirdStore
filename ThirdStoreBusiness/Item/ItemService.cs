@@ -102,8 +102,17 @@ namespace ThirdStoreBusiness.Item
 
             if (sku != null)
             {
-                sku = GetRealSKU(sku);
-                query = query.Where(i => i.SKU.Contains(sku.ToLower())||i.ChildItems.Any(ir=>ir.ChildItem.SKU.Contains(sku)));
+                var splitSKUs = sku.Split(' ');
+                if (splitSKUs.Count() > 1)
+                {
+                    splitSKUs = splitSKUs.Select(s => GetRealSKU(s)).Distinct().ToArray();
+                    query = query.Where(i => splitSKUs.Contains(i.SKU));
+                }
+                else
+                {
+                    sku = GetRealSKU(sku);
+                    query = query.Where(i => i.SKU.Contains(sku.ToLower()) || i.ChildItems.Any(ir => ir.ChildItem.SKU.Contains(sku)));
+                }
             }
             if (itemType.HasValue)
             {
@@ -254,11 +263,14 @@ namespace ThirdStoreBusiness.Item
                 {
                     var item = updateItem.LocalItem;
                     var updateData = updateItem.updateData;
-                    if (!string.IsNullOrWhiteSpace(updateData.Description))
+                    if ((!string.IsNullOrWhiteSpace(updateData.Description) && item.Description != updateData.Description)
+                        || item.Cost != updateData.Cost)
+                    {
                         item.Description = updateData.Description;
-                    item.Cost = updateData.Cost;
-                    item.Price = updateData.Price;
-                    upds.Add(item);
+                        item.Cost = updateData.Cost;
+                        item.Price = updateData.Price;
+                        upds.Add(item);
+                    }
                 }
                 _itemRepository.Update(upds, itm => itm.Description, itm => itm.Cost, itm => itm.Price);
                 #endregion

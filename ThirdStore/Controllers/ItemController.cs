@@ -210,6 +210,7 @@ namespace ThirdStore.Controllers
             if (item != null)
             {
                 editItemViewModel = item.ToCreateNewModel();
+                editItemViewModel.WebsiteLink = "https://www.3rdstore.com.au/?kw="+editItemViewModel.SKU;
             }
 
             //var showSyncInvUsers = new int[] { 1, 4, 10, 14, 16, 17 };

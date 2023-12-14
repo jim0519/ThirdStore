@@ -38,7 +38,7 @@ namespace ThirdStoreCommon.Models.Item
         public string Ref6 { get; set; }//Notes
         public bool DisableDropship { get; set; }
         public string Ref7 { get; set; }//Website Link 2
-        public string Ref8 { get; set; }
+        public string Ref8 { get; set; }//Website Link 3
         public string Ref9 { get; set; }
         public string Ref10 { get; set; }
 

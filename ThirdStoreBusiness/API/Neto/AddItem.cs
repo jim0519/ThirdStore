@@ -137,9 +137,31 @@ namespace ThirdStoreBusiness.API.Neto
         }
         #endregion
 
+        #region RRP
+        public decimal? RRP { get; set; }
+        public bool ShouldSerializeRRP()
+        {
+            return RRP.HasValue;
+        }
+        #endregion
+
         public string PrimarySupplier { get; set; }
 
         public AddItemItemEBayItems eBayItems { get; set; }
+
+        [System.Xml.Serialization.XmlElementAttribute("PriceGroups")]
+        public PriceGroups PriceGroups { get; set; }
+    }
+
+    public class PriceGroups
+    {
+        [System.Xml.Serialization.XmlElementAttribute("PriceGroup")]
+        public PriceGroup[] PriceGroup { get; set; }
+    }
+    public class PriceGroup
+    {
+        public string Group { get; set; }
+        public decimal Price { get; set; }
     }
 
     public class AddItemItemEBayItems
