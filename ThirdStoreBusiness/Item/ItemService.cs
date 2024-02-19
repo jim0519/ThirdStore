@@ -266,7 +266,7 @@ namespace ThirdStoreBusiness.Item
                     if ((!string.IsNullOrWhiteSpace(updateData.Description) && item.Description != updateData.Description)
                         || item.Cost != updateData.Cost)
                     {
-                        item.Description = updateData.Description;
+                        item.Description =(!string.IsNullOrWhiteSpace(updateData.Description)? updateData.Description: string.Empty) ;
                         item.Cost = updateData.Cost;
                         item.Price = updateData.Price;
                         upds.Add(item);

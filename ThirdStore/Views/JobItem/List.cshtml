@@ -91,15 +91,18 @@
             @if (Model.ShowSyncInventory)
             {
                 <img id="imgLoadingJobItem" src="~/Content/images/loading.gif" style="display:none;" />
-                @*<input type="button" id="btnUpdateDSZ" class="k-button" value="Update DSZ Data and Sync" />*@
+                if (Html.IsDebug())
+                {
+                    <input type="button" id="btnUpdateDSZ" class="k-button" value="Update DSZ Data and Sync" />
+                }
                 <input type="button" id="btnSyncByJobItem" class="k-button" value="Sync Inventory" />
                 <input type="button" id="btnExportGumtreeFeed" class="k-button" value="Export Gumtree Feed" />
             }
-            <input type="button" id="btnPrintLabel" class="k-button" value="Print Label" />
-            <input type="button" id="btnDuplicate" class="k-button" value="Duplicate" />
-            <input type="button" id="btnEdit" class="k-button" value="Edit" />
-            <input type="button" id="btnCreateNew" class="k-button" value="Create New Item" />
-            <script>
+                <input type="button" id="btnPrintLabel" class="k-button" value="Print Label" />
+                <input type="button" id="btnDuplicate" class="k-button" value="Duplicate" />
+                <input type="button" id="btnEdit" class="k-button" value="Edit" />
+                <input type="button" id="btnCreateNew" class="k-button" value="Create New Item" />
+                <script>
                 $(document).ready(function () {
 
                     $('#btnImportData').click(function () {
@@ -336,7 +339,41 @@
                                 isValid = false;
                             }
                         });
-                        return isValid;
+
+
+                        if (!isValid)
+                            return isValid;
+
+
+                        $.ajax({
+                            url: '@Url.Action("BulkUpdateJobItem", "JobItem")',
+                            type: "POST",
+                            async: false,
+                            data: $("#bulk-update-jobitem-form").serialize(),
+                            success: function (response) {
+                                debugger;
+                                if (!response.Result)
+                                {
+                                    if (response.ErrMsg != undefined && response.ErrMsg != "") {
+                                        alert(response.ErrMsg);
+                                    }
+                                    else
+                                        isValid = true;
+                                }
+                            },
+                            error: function (response) {
+                                //form.submit();
+                                isValid = false;
+                            }
+                        });
+
+                        if (isValid) {
+                            alert("Bulk update successfully");
+                            var window = $("#bulkUpdateJobItem-window");
+                            window.data('kendoWindow').close();
+                            RefreshGrid(true);
+                        }
+
                     });
 
                     $('#btnPrefill').click(function () {
@@ -388,8 +425,8 @@
                     });
 
                 });
-            </script>
-        </div>
+                </script>
+            </div>
     </div>
 
     <table width="100%">
@@ -777,7 +814,7 @@
             </tr>
             <tr>
                 <td>
-                    <input type="submit" class="k-button" value="Submit" id="btnBulkEditSubmit" />
+                    <input type="button" class="k-button" value="Submit" id="btnBulkEditSubmit" />
                 </td>
             </tr>
         </table>

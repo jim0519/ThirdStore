@@ -642,7 +642,7 @@ namespace ThirdStoreBusiness.DSChannel
                             newItem.SKU = dsData.sku;
                             newItem.Name = dsData.name;
                             newItem.Description = dsData.description;
-                            newItem.Cost = dsData.special_price+(!string.IsNullOrEmpty(dsData.NSW_R)?Convert.ToDecimal(dsData.NSW_R):0);
+                            newItem.Cost = dsData.special_price;//+(!string.IsNullOrEmpty(dsData.NSW_R)?Convert.ToDecimal(dsData.NSW_R):0);
                             newItem.Price = (newItem.Cost) * _commonSetting.DropshipMarkupRate;
                             newItem.Type= ThirdStoreItemType.SINGLE.ToValue();
                             newItem.SupplierID = ThirdStoreSupplier.S.ToValue();
@@ -803,7 +803,9 @@ namespace ThirdStoreBusiness.DSChannel
                         foreach (var data in dsDatasBySKUs)
                         {
                             var invQty = 0;
+                            var shippingClassLevel = (!string.IsNullOrWhiteSpace(data.ShippingClass) ? Convert.ToInt32(Regex.Match(data.ShippingClass, @"\d+").Value) : 999);
                             if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove)
+                                && shippingClassLevel<=3
                                 //&&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "0"
                                 )
                             {

@@ -1022,14 +1022,17 @@ namespace ThirdStore.Controllers
                     }
                 }
 
-                SuccessNotification("Bulk Update Job Item Success.");
-                return RedirectToAction("List");
+                //SuccessNotification("Bulk Update Job Item Success.");
+                //return RedirectToAction("List");
+
+                return Json(new { Result = true });
             }
             catch (Exception exc)
             {
                 LogManager.Instance.Error(exc.Message);
-                ErrorNotification("Bulk Update Job Item Failed." + exc.Message);
-                return RedirectToAction("List");
+                //ErrorNotification("Bulk Update Job Item Failed." + exc.Message);
+                //return RedirectToAction("List");
+                return Json(new { Result = false, ErrMsg = exc.Message });
             }
         }
 
