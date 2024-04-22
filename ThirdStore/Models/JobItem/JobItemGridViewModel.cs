@@ -26,5 +26,7 @@ namespace ThirdStore.Models.JobItem
         public decimal CBM { get; set; }
         public System.DateTime EditTime { get; set; }
         public string EditBy { get; set; }
+
+        public int Qty { get; set; }
     }
 }

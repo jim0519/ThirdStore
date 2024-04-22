@@ -561,6 +561,14 @@
             </td>
         </tr>
         <tr>
+            <td>
+                @Html.LabelFor(model => model.IsBulkQtyItem):
+            </td>
+            <td>
+                @Html.EditorFor(model => model.IsBulkQtyItem)
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <input type="button" id="btnSearch" class="k-button" value="Search" />
                 <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
@@ -651,6 +659,9 @@
                                     field: "Ref2",
                                     title: "Inspectors"
                                 }, {
+                                    field: "Qty",
+                                    title: "Qty"
+                                }, {
                                     field: "ItemPrice",
                                     title: "Price"
                                 },
@@ -728,6 +739,7 @@
             $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val("-1");
             $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').prop('checked', false);
             $('#@Html.FieldIdFor(model => model.ReviewStatus)').val("0");
+            $('#@Html.FieldIdFor(model => model.IsBulkQtyItem)').prop('checked', false);
             var inspectorMultiselect = $('#@Html.FieldIdFor(model => model.SearchInspector)').data("kendoMultiSelect");
             inspectorMultiselect.value("");
             inspectorMultiselect.trigger("change");
@@ -758,7 +770,8 @@
             SearchTrackingNumber: $('#@Html.FieldIdFor(model => model.SearchTrackingNumber)').val(),
             HasStocktakeTime: $('#@Html.FieldIdFor(model => model.HasStocktakeTime)').val(),
             ReviewStatus: $('#@Html.FieldIdFor(model => model.ReviewStatus)').val(),
-            IsExcludeShippedStatus: $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').is(':checked')
+            IsExcludeShippedStatus: $('#@Html.FieldIdFor(model => model.IsExcludeShippedStatus)').is(':checked'),
+            IsBulkQtyItem: $('#@Html.FieldIdFor(model => model.IsBulkQtyItem)').is(':checked')
         };
     }
     </script>

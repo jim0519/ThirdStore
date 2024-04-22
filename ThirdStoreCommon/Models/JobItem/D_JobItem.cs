@@ -33,6 +33,7 @@ namespace ThirdStoreCommon.Models.JobItem
         public DateTime? StocktakeTime { get; set; }
         //public bool NeedReview { get; set; }
         public int ReviewStatus { get; set; }
+        public int Qty { get; set; }
 
 
         public System.DateTime CreateTime { get; set; }

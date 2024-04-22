@@ -47,6 +47,7 @@ namespace ThirdStore.Models.JobItem
         public int HasStocktakeTime { get; set; }
         public bool ShowSyncInventory { get; set; }
         public int ReviewStatus { get; set; }
+        public bool IsBulkQtyItem { get; set; }
 
         public IList<SelectListItem> Suppliers { get; set; }
         public IList<SelectListItem> JobItemTypes { get; set; }

@@ -2226,3 +2226,56 @@ IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_Item_Ref10')
 	ALTER TABLE dbo.D_Item
 		DROP CONSTRAINT DF_D_Item_Ref10
 GO
+
+
+
+
+
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_JobItem' AND C.Name='Qty')
+	ALTER TABLE dbo.D_JobItem ADD
+		Qty int NOT NULL CONSTRAINT DF_D_JobItem_Qty DEFAULT -1
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_Qty')
+	ALTER TABLE dbo.D_JobItem
+		DROP CONSTRAINT DF_D_JobItem_Qty
+GO
+
+
+
+
+
+ALTER FUNCTION [dbo].[fn_GetAffectedItems]
+(
+	@FromDate varchar(10),
+	@ToDate varchar(10)
+)
+RETURNS TABLE
+AS
+	RETURN
+
+select
+distinct 
+ITEM.ID
+--ITEM.SKU
+from V_SKURelationship_Recursive I
+inner join
+(
+	select 
+	distinct
+	case when H.DesignatedSKU<>'' then H.DesignatedSKU else L.SKU end HSKU,
+	H.*
+	from D_JobItem H
+	inner join D_JobItemLine L on H.ID=L.HeaderID
+	where 
+	--ship out or allocated skus
+	(StatusID in (2,4) and DATEDIFF(DAY,@fromDate,ShipTime)>=0 and DATEDIFF(DAY,@toDate,ShipTime)<=0)
+	--create new job item
+	or (StatusID in (2) and DATEDIFF(DAY,@fromDate,H.CreateTime)>=0 and DATEDIFF(DAY,@toDate,H.CreateTime)<=0)
+	or StatusID in (3,5,6)
+) AFF on I.SKU=AFF.HSKU
+inner join V_SKURelationship_Recursive O on I.BottomSKU=O.BottomSKU
+inner join D_Item ITEM on ITEM.SKU=O.SKU and ITEM.IsReadyForList=1
+	

@@ -90,7 +90,8 @@ namespace ThirdStoreCommon
         A = 2,
         S = 3,
         T = 4,
-        O = 5
+        O = 5,
+        K = 6
     }
 
     public enum ThirdStoreOrderStatus
@@ -125,7 +126,8 @@ namespace ThirdStoreCommon
     public enum ThirdStoreReviewStatus
     {
         PendingReview=1,
-        ReviewComplete=2
+        ReviewComplete=2,
+        CSEnquiry=3
     }
 
 

@@ -139,6 +139,7 @@ namespace ThirdStore.Controllers
                 hasStocktakeTime:model.HasStocktakeTime,
                 reviewStatus: reviewStatus,
                 isExcludeShippedStatus:model.IsExcludeShippedStatus,
+                isBulkQtyItem:model.IsBulkQtyItem,
                 pageIndex: command.Page - 1,
                 pageSize: command.PageSize);
 
@@ -163,6 +164,7 @@ namespace ThirdStore.Controllers
         public ActionResult Create(int fromJobItemID = 0,int fromReturnItemID=0)
         {
             var newJobItemViewModel = new JobItemViewModel();
+            newJobItemViewModel.Qty = -1;
 
             if(fromJobItemID!=0)
             {
@@ -820,11 +822,11 @@ namespace ThirdStore.Controllers
                 if (retMessage.IsSuccess)
                     return Json(new { Result = true });
                 else
-                    return Json(new { Result = false, Message = retMessage.Mesage });
+                    return Json(new { Result = false, ErrMsg = retMessage.Mesage });
             }
             catch(Exception ex)
             {
-                return Json(new { Result = false, ex.Message });
+                return Json(new { Result = false, ErrMsg=ex.Message });
             }
             
         }

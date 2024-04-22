@@ -96,6 +96,7 @@ namespace ThirdStoreBusiness.JobItem
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus=false,
             ThirdStoreReviewStatus? reviewStatus = null,
+            bool isBulkQtyItem = false,
             int pageIndex = 0,
             int pageSize = int.MaxValue)
         {
@@ -209,6 +210,9 @@ namespace ThirdStoreBusiness.JobItem
                 var reviewStatusID = reviewStatus.Value.ToValue();
                 query = query.Where(i => i.ReviewStatus.Equals(reviewStatusID));
             }
+
+            if(isBulkQtyItem)
+                query = query.Where(i => i.Qty>=0);
 
             if (reference!=null&&reference.Length>4)
             {
@@ -870,7 +874,9 @@ namespace ThirdStoreBusiness.JobItem
                                 jobItem.ItemPrice,
                                 jobItem.DesignatedSKU,
                                 jobItem.CreateTime,
-                                JobItemReference = jobItem.Ref1
+                                JobItemReference = jobItem.Ref1,
+                                InBulkQty=(jobItem.Qty!=0? Math.Abs( jobItem.Qty):1),
+                                IsInBulk=(jobItem.Qty!=-1)
                             };
 
             var queryItem = (from item in listingItems
@@ -880,7 +886,7 @@ namespace ThirdStoreBusiness.JobItem
 
             var queryInventory = (from unit in inventory
                                   join itemR in _itemRelationship.Table on unit.ItemID equals itemR.ItemID
-                                  group new { unit, itemR } by new { unit.JobItemID, unit.JobItemCreateTime, unit.StatusID, unit.DesignatedSKU, unit.ConditionID, unit.CreateTime, unit.JobItemReference, itemR.ItemID, itemR.Qty, itemR.BottomItemID } into grpInventory
+                                  group new { unit, itemR } by new { unit.JobItemID, unit.JobItemCreateTime, unit.StatusID, unit.DesignatedSKU, unit.ConditionID, unit.CreateTime, unit.JobItemReference, itemR.ItemID, itemR.Qty, itemR.BottomItemID,unit.IsInBulk } into grpInventory
                                   orderby grpInventory.Key.JobItemCreateTime
                                   select new JobItemInv
                                   {
@@ -893,7 +899,8 @@ namespace ThirdStoreBusiness.JobItem
                                       ItemID = grpInventory.Key.ItemID,
                                       RelationQty = grpInventory.Key.Qty,
                                       BottomItemID = grpInventory.Key.BottomItemID,
-                                      SumQty = grpInventory.Sum(l => l.unit.Qty * l.itemR.Qty)
+                                      IsInBulk=grpInventory.Key.IsInBulk,
+                                      SumQty = grpInventory.Sum(l => l.unit.Qty * l.itemR.Qty*l.unit.InBulkQty)
 
                                   }).ToList();
 
@@ -909,6 +916,7 @@ namespace ThirdStoreBusiness.JobItem
                                     select new
                                     {
                                         ItmSection = itemRLine,
+                                        //(!string.IsNullOrEmpty(itmRInv.DesignatedSKU) && itmRInv.DesignatedSKU != itemRLine.SKU) indicates that the job item DesignatedSKU is not null and if the job item line's DesignatedSKU sku != relation's parent sku, this job item line's qty does not count
                                         InvSection = (itmRInv == null || (!string.IsNullOrEmpty(itmRInv.DesignatedSKU) && itmRInv.DesignatedSKU != itemRLine.SKU) ? new JobItemInv { JobItemID = 0, CreateTime = DateTime.MinValue, StatusID = ThirdStoreJobItemStatus.PENDING.ToValue(), DesignatedSKU = string.Empty, ConditionID = conditionID, JobItemReference = string.Empty, ItemID = itemRLine.ItemID, RelationQty = itemRLine.Qty, BottomItemID = itemRLine.BottomItemID, SumQty = 0 } : itmRInv)
                                     };
 
@@ -978,7 +986,7 @@ namespace ThirdStoreBusiness.JobItem
                                          where jobItmInv.ConditionID.Equals(itmInv.ConditionID)
                                          && (string.IsNullOrEmpty(jobItmInv.DesignatedSKU) || jobItmInv.DesignatedSKU.ToLower().Equals(itemR.SKU.ToLower()))
                                                     && itemR.Qty % jobItmInv.RelationQty == 0
-                                                    && jobItmInv.StatusID != ThirdStoreJobItemStatus.ALLOCATED.ToValue()
+                                                    && (jobItmInv.StatusID != ThirdStoreJobItemStatus.ALLOCATED.ToValue() || (jobItmInv.StatusID == ThirdStoreJobItemStatus.ALLOCATED.ToValue()&&jobItmInv.IsInBulk))
                                          select jobItmInv;
 
                         var invJobItemIDs = SortInvJobItemIDs(relatedInv.ToList(), parentItem.Select(i => i).ToList());
@@ -1497,10 +1505,11 @@ namespace ThirdStoreBusiness.JobItem
             D_JobItem jobItem = null;
             var cannotLocateItemReason = string.Empty;
             var inStatus = new int[] { ThirdStoreJobItemStatus.BOOKED.ToValue() };
+            var bulkJobitemStatus = new int[] { ThirdStoreJobItemStatus.BOOKED.ToValue(), ThirdStoreJobItemStatus.READY.ToValue() };
             if (!string.IsNullOrEmpty(jobItemLineID))
             {
                 var intJobItemLineID = Convert.ToInt32(jobItemLineID);
-                jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID)) && inStatus.Contains(ji.StatusID));
+                jobItem = _jobItemRepository.Table.FirstOrDefault(ji => ji.JobItemLines.Any(l => l.ID.Equals(intJobItemLineID)) && (inStatus.Contains(ji.StatusID)||(ji.Qty>0&& bulkJobitemStatus.Contains(ji.StatusID))));
             }
             else if (!string.IsNullOrEmpty(jobItemLineRef))
             {
@@ -1508,7 +1517,7 @@ namespace ThirdStoreBusiness.JobItem
                 if (jobItemsByRef != null && jobItemsByRef.Count > 0)
                 {
 
-                    jobItemsByRef = jobItemsByRef.Where(ji => inStatus.Contains(ji.StatusID)).ToList();
+                    jobItemsByRef = jobItemsByRef.Where(ji => inStatus.Contains(ji.StatusID) || (ji.Qty > 0 && bulkJobitemStatus.Contains(ji.StatusID))).ToList();
                     if (jobItemsByRef.Count == 1)
                     {
                         returnResult.IsSuccess = true;
@@ -1544,7 +1553,16 @@ namespace ThirdStoreBusiness.JobItem
                 {
                     if (!string.IsNullOrWhiteSpace(trackingNumber))
                         jobItem.TrackingNumber = trackingNumber.Trim();
-                    jobItem.StatusID = ThirdStoreJobItemStatus.SHIPPED.ToValue();
+
+                    if (jobItem.Qty > 0)
+                        jobItem.Qty--;
+
+                    if (jobItem.Qty<=0)
+                        jobItem.StatusID = ThirdStoreJobItemStatus.SHIPPED.ToValue();
+                    else
+                    {
+                        jobItem.StatusID = ThirdStoreJobItemStatus.READY.ToValue();
+                    }
                     jobItem.ShipTime = DateTime.Now;
                     this.UpdateJobItem(jobItem);
                     returnMessage.IsSuccess = true;
@@ -1850,6 +1868,7 @@ namespace ThirdStoreBusiness.JobItem
             public int ItemID { get; set; }
             public int RelationQty { get; set; }
             public int BottomItemID { get; set; }
+            public bool IsInBulk { get; set; }
             public int SumQty { get; set; }
         }
 

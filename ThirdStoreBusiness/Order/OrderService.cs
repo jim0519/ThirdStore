@@ -17,6 +17,7 @@ using LINQtoCSV;
 using ThirdStoreBusiness.DSChannel;
 using Ionic.Zip;
 using System.Text.RegularExpressions;
+using ThirdStoreCommon.Models.JobItem;
 
 namespace ThirdStoreBusiness.Order
 {
@@ -379,33 +380,75 @@ namespace ThirdStoreBusiness.Order
                             var orderCustomInstruction = "";
                             if (nodeJID != null&& nodeRef!=null)
                             {
+                                var allocateInvJobItems = new List<D_JobItem>();
                                 var allocateInvJobItemIDs = nodeJID.Attributes["value"].Value;
                                 var allocateInvJobItemRefs = nodeRef.InnerText;
+                                var remainingQty = orderLine.Qty;
+
+                                var tmpJobItems = _jobItemService.GetJobItemsByIDs(allocateInvJobItemIDs.Split(',').Select(s => Convert.ToInt32(s)).ToList());
+                                if (tmpJobItems.Count > 1)
+                                {
+                                    remainingQty--;
+                                    allocateInvJobItems.AddRange(tmpJobItems);
+                                }
+                                else if (tmpJobItems.Count == 1)
+                                {
+                                    var ji = tmpJobItems.FirstOrDefault();
+                                    if (ji.Qty < 0)
+                                    {
+                                        remainingQty--;
+                                    }
+                                    else if (ji.Qty > 0)
+                                    {
+                                        remainingQty -= ji.Qty;
+                                        //if(remainingQty>=0) //TODO: check if need to add this job item to array to update the job item to be allocated
+                                    }
+                                    allocateInvJobItems.Add(ji);
+                                }
+
+                                //allocateInvJobItems.AddRange(_jobItemService.GetJobItemsByIDs(allocateInvJobItemIDs.Split(',').Select(s => Convert.ToInt32(s)).ToList()));
 
                                 lstOrderLineAllocateInvJobItemIDs.Add(allocateInvJobItemIDs);
 
-                                //if (orderLine.Qty > 1)
-                                //{
-                                    if (orderLine.Qty > 1&&nodeJobItemInvIDs != null)
+                                if (remainingQty > 0 && nodeJobItemInvIDs != null)
+                                {
+                                    var arrJobItemInvIDs = nodeJobItemInvIDs.Attributes["value"].Value.Split(';');
+                                    //var arrJobItemInvRefs = _jobItemService.ConvertToJobItemReference(arrJobItemInvIDs);
+                                    foreach (var jobItemInvIDs in arrJobItemInvIDs)
                                     {
-                                        var arrJobItemInvIDs = nodeJobItemInvIDs.Attributes["value"].Value.Split(';');
-                                        //var arrJobItemInvRefs = _jobItemService.ConvertToJobItemReference(arrJobItemInvIDs);
-                                        int i = 2;
-                                        foreach (var jobItemInvIDs in arrJobItemInvIDs)
+                                        if (!_jobItemService.CanConsistInv(jobItemInvIDs))
+                                            continue;
+
+                                        if (remainingQty <= 0)
+                                            break;
+
+                                        tmpJobItems = _jobItemService.GetJobItemsByIDs(jobItemInvIDs.Split(',').Select(s => Convert.ToInt32(s)).ToList());
+                                        if(tmpJobItems.Count>1)
                                         {
-                                            if (!_jobItemService.CanConsistInv(jobItemInvIDs))
-                                                continue;
-
-                                            if (i > orderLine.Qty)
-                                                break;
-
-                                            lstOrderLineAllocateInvJobItemIDs.Add(jobItemInvIDs);
-                                            i++;
+                                            remainingQty--;
+                                            allocateInvJobItems.AddRange(tmpJobItems);
                                         }
-                                    }
-                                //}
+                                        else if(tmpJobItems.Count ==1)
+                                        {
+                                            var ji = tmpJobItems.FirstOrDefault();
+                                            if (ji.Qty<0)
+                                            {
+                                                remainingQty--;
+                                            }
+                                            else if(ji.Qty>0)
+                                            {
+                                                remainingQty -= ji.Qty;
+                                                //if(remainingQty>=0) //TODO: check if need to add this job item to array to update the job item to be allocated (NO, it will not be correct finally, e.g bulk job item A qty=8, customer ordered 6, if the status is ready, then if another customer ordered 4, the qty of the bulk job item A is still 8, cannot subtract the previous one.)
+                                                //allocateInvJobItems.Add(ji);
+                                            }
+                                            allocateInvJobItems.Add(ji);
+                                        }
 
-                                var allocateInvJobItems = _jobItemService.GetJobItemsByIDs(lstOrderLineAllocateInvJobItemIDs.SelectMany(jiids=>jiids.Split(',')).Select(s=>Convert.ToInt32(s)).ToList());
+                                        lstOrderLineAllocateInvJobItemIDs.Add(jobItemInvIDs);
+                                    }
+                                }
+
+                                //var allocateInvJobItems = _jobItemService.GetJobItemsByIDs(lstOrderLineAllocateInvJobItemIDs.SelectMany(jiids=>jiids.Split(',')).Select(s=>Convert.ToInt32(s)).ToList());
                                 orderLine.Ref5 = _jobItemService.ConvertToJobItemReference(lstOrderLineAllocateInvJobItemIDs).Aggregate((current, next) => current + "," + next);
                                 orderLine.Ref6 = lstOrderLineAllocateInvJobItemIDs.SelectMany(jiids => jiids.Split(',')).Aggregate((current, next) => current + "," + next);
 
@@ -466,6 +509,8 @@ namespace ThirdStoreBusiness.Order
                     if (jobItem.StatusID != ThirdStoreJobItemStatus.SHIPPED.ToValue()&&jobItem.StatusID!= ThirdStoreJobItemStatus.BOOKED.ToValue())
                     {
                         jobItem.StatusID = ThirdStoreJobItemStatus.ALLOCATED.ToValue();
+                        //if (jobItem.Qty > 0)
+                        //    jobItem.Qty--;
                         _jobItemService.UpdateJobItem(jobItem);//TODO: Jobitem Edit time should not be changed if it is from logic action
                     }
                 }

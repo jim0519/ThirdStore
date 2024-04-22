@@ -35,6 +35,7 @@ namespace ThirdStoreBusiness.JobItem
             int hasStocktakeTime = -1,
             bool isExcludeShippedStatus = false,
             ThirdStoreReviewStatus? reviewStatus=null,
+            bool isBulkQtyItem=false,
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
