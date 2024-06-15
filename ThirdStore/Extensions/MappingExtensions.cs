@@ -197,6 +197,21 @@ namespace ThirdStore.Extensions
             return model.MapTo(destination);
         }
 
+        public static JobItemViewModel.JobItemAttachmentViewModel ToModel(this M_JobItemAttachment entity)
+        {
+            return entity.MapTo<M_JobItemAttachment, JobItemViewModel.JobItemAttachmentViewModel>();
+        }
+
+        public static M_JobItemAttachment ToEntity(this JobItemViewModel.JobItemAttachmentViewModel model)
+        {
+            return model.MapTo<JobItemViewModel.JobItemAttachmentViewModel, M_JobItemAttachment>();
+        }
+
+        public static M_JobItemAttachment ToEntity(this JobItemViewModel.JobItemAttachmentViewModel model, M_JobItemAttachment destination)
+        {
+            return model.MapTo(destination);
+        }
+
         #endregion
 
         #region Order

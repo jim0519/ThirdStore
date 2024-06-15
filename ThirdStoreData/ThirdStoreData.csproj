@@ -53,6 +53,7 @@
     <Compile Include="Mapping\D_AttachmentMap.cs" />
     <Compile Include="Mapping\D_ReturnItemLineMap.cs" />
     <Compile Include="Mapping\D_ReturnItemMap.cs" />
+    <Compile Include="Mapping\M_JobItemAttachmentMap.cs" />
     <Compile Include="Mapping\M_ItemAttachmentMap.cs" />
     <Compile Include="Mapping\M_RolePermissionMap.cs" />
     <Compile Include="Mapping\M_UserRoleMap.cs" />

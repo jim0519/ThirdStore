@@ -321,6 +321,17 @@ namespace ThirdStoreBusiness.JobItem
                     img.EditTime = currentTime;
             }
 
+            foreach (var attachment in jobItem.JobItemAttachments)
+            {
+                attachment.FillOutNull();
+                attachment.CreateBy = currentUser;
+                if (attachment.CreateTime.Equals(DateTime.MinValue))
+                    attachment.CreateTime = currentTime;
+                attachment.EditBy = currentUser;
+                if (attachment.EditTime.Equals(DateTime.MinValue))
+                    attachment.EditTime = currentTime;
+            }
+
             _jobItemRepository.Insert(jobItem);
         }
 
@@ -1218,27 +1229,217 @@ namespace ThirdStoreBusiness.JobItem
                     return default(UpdateItemItemImages);
                 }
 
+                var checkImageValidCount = 0;
+
                 if (item.ItemImages.Count > 0)
                 {
+                    var isSKUImageURLValid = false;
                     foreach (var itmImg in item.ItemImages.OrderBy(img=>img.DisplayOrder))
                     {
                         if (i <6)
                         {
-                            lstItemImages.Add(new UpdateItemItemImage() { Name = (i == 0 ? "Main" : "Alt " + i), URL = _imageService.GetImageURL(itmImg.ImageID), Delete = false });
+                            var skuImgURL = _imageService.GetImageURL(itmImg.ImageID);
+                            var imgName = (i == 0 ? "Main" : "Alt " + i);
+                            
+
+                            if (!isSKUImageURLValid&& checkImageValidCount<2)
+                            {
+                                if(CommonFunc.DoesImageExistRemotely(skuImgURL))
+                                { 
+                                    lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                                    isSKUImageURLValid = true;
+                                }
+                                else
+                                {
+                                    if (onlineListing != null)
+                                    {
+                                        var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                        var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : skuImgURL;
+                                        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                    }
+                                    else
+                                    {
+                                        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                                    }
+                                    checkImageValidCount++;
+                                }
+                            }
+                            else if(!isSKUImageURLValid && checkImageValidCount >= 2)
+                            {
+                                if (onlineListing != null)
+                                {
+                                    var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                    var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : skuImgURL;
+                                    lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                }
+                                else
+                                {
+                                    lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                                }
+                            }
+                            else
+                            {
+                                lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                            }
+
+
+                            //    if (checkImageValidCount<2&&!isSKUImageURLValid)
+                            //{
+                            //    if (CommonFunc.DoesImageExistRemotely(skuImgURL))
+                            //    {
+                            //        isSKUImageURLValid = true;
+                            //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                            //    }
+                            //    else
+                            //    {
+                            //        if (onlineListing != null)
+                            //        {
+                            //            var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                            //            var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : skuImgURL;
+                            //            lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                            //        }
+                            //        else
+                            //        {
+                            //            lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                            //        }
+                            //        checkImageValidCount++;
+                            //    }
+
+                                //if(isSKUImageURLValid)
+                                //{
+                                //    lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                                //}
+                                //else
+                                //{
+                                //    if (onlineListing != null)
+                                //    {
+                                //        var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                //        var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : skuImgURL;
+                                //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                //    }
+                                //    else
+                                //    {
+                                //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                                //    }
+                                //}
+                            //}
+                            //else
+                            //{
+                            //    if (onlineListing != null)
+                            //    {
+                            //        var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                            //        var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : skuImgURL;
+                            //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                            //    }
+                            //    else
+                            //    {
+                            //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = skuImgURL, Delete = false });
+                            //    }
+                            //}
+                            
+                            //lstItemImages.Add(new UpdateItemItemImage() { Name = (i == 0 ? "Main" : "Alt " + i), URL = _imageService.GetImageURL(itmImg.ImageID), Delete = false });
                             i++;
                         }
                     }
                 }
 
+                checkImageValidCount = 0;
+
                 if (firstInvJobItems != null && firstInvJobItems.Count() > 0)
                 {
                     foreach (var jobItem in firstInvJobItems)
                     {
+                        var isJobItemImageURLValid = false;
                         foreach (var jobItmImg in jobItem.JobItemImages.Where(img=>!img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
                         {
                             if (i <12)
                             {
-                                lstItemImages.Add(new UpdateItemItemImage() { Name = (i == 0 ? "Main" : "Alt " + i), URL = _imageService.GetImageURL(jobItmImg.ImageID), Delete = false });
+                                var jobItemImgURL = _imageService.GetImageURL(jobItmImg.ImageID);
+                                var imgName = (i == 0 ? "Main" : "Alt " + i);
+                               
+
+                                if (!isJobItemImageURLValid && checkImageValidCount < 2)
+                                {
+                                    if (CommonFunc.DoesImageExistRemotely(jobItemImgURL))
+                                    {
+                                        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                        isJobItemImageURLValid = true;
+                                    }
+                                    else
+                                    {
+                                        if (onlineListing != null)
+                                        {
+                                            var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                            var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : jobItemImgURL;
+                                            lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                        }
+                                        else
+                                        {
+                                            lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                        }
+                                        checkImageValidCount++;
+                                    }
+                                }
+                                else if (!isJobItemImageURLValid && checkImageValidCount >= 2)
+                                {
+                                    if (onlineListing != null)
+                                    {
+                                        var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                        var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : jobItemImgURL;
+                                        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                    }
+                                    else
+                                    {
+                                        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                    }
+                                }
+                                else
+                                {
+                                    lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                }
+
+                                //if (checkImageValidCount < 2)
+                                //{
+                                //    if (!CommonFunc.DoesImageExistRemotely(jobItemImgURL))
+                                //    {
+                                //        isJobItemImageURLValid = false;
+                                //        checkImageValidCount++;
+                                //    }
+
+                                //    if (isJobItemImageURLValid)
+                                //    {
+                                //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                //    }
+                                //    else
+                                //    {
+                                //        if (onlineListing != null)
+                                //        {
+                                //            var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                //            var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : jobItemImgURL;
+                                //            lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                //        }
+                                //        else
+                                //        {
+                                //            lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                //        }
+                                //    }
+
+                                //}
+                                //else
+                                //{
+                                //    if (onlineListing != null)
+                                //    {
+                                //        var onlineListingImageURL = onlineListing.Images.FirstOrDefault(img => img.Name.Equals(imgName));
+                                //        var useImageURL = onlineListingImageURL != null ? onlineListingImageURL.URL : jobItemImgURL;
+                                //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = useImageURL, Delete = false });
+                                //    }
+                                //    else
+                                //    {
+                                //        lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
+                                //    }
+                                //}
+
+                                //lstItemImages.Add(new UpdateItemItemImage() { Name = imgName, URL = jobItemImgURL, Delete = false });
                                 i++;
                             }
                         }

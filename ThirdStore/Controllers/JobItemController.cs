@@ -28,6 +28,8 @@ using System.Text.RegularExpressions;
 using ThirdStoreBusiness.AccessControl;
 using ThirdStoreBusiness.ReturnItem;
 using ThirdStoreBusiness.Setting;
+using ThirdStore.Models.Item;
+using ThirdStoreBusiness.Attachment;
 
 namespace ThirdStore.Controllers
 {
@@ -45,6 +47,7 @@ namespace ThirdStore.Controllers
         private readonly IReturnItemService _returnItemService;
         private readonly ISettingService _settingService;
         private readonly CommonSettings _commonSetting;
+        private readonly IAttachmentService _attachmentService;
 
         public JobItemController(IJobItemService jobItemService,
             IItemService itemService,
@@ -56,7 +59,8 @@ namespace ThirdStore.Controllers
             IPermissionService permissionService,
             IUserService userService,
             IReturnItemService returnItemService,
-            ISettingService settingService)
+            ISettingService settingService,
+            IAttachmentService attachmentService)
         {
             _jobItemService = jobItemService;
             _itemService = itemService;
@@ -70,6 +74,7 @@ namespace ThirdStore.Controllers
             _returnItemService = returnItemService;
             _settingService = settingService;
             _commonSetting = _settingService.LoadSetting<CommonSettings>();
+            _attachmentService = attachmentService;
         }
 
         public ActionResult List(JobItemListViewModel model)
@@ -275,6 +280,15 @@ namespace ThirdStore.Controllers
                 }
             }
 
+            if (model.JobItemViewAttachments != null && model.JobItemViewAttachments.Count > 0)
+            {
+                foreach (var lModel in model.JobItemViewAttachments)
+                {
+                    var newEntityLine = lModel.ToEntity().FillOutNull();
+                    newEntityModel.JobItemAttachments.Add(newEntityLine);
+                }
+            }
+
             _jobItemService.InsertJobItem(newEntityModel);
 
             if (isPrintLabel)
@@ -394,6 +408,32 @@ namespace ThirdStore.Controllers
                     {
                         var editEntityLine = lModel.ToEntity().FillOutNull();
                         editEntityModel.JobItemImages.Add(editEntityLine);
+                    }
+                }
+            }
+
+            if (model.JobItemViewAttachments != null && model.JobItemViewAttachments.Count > 0)
+            {
+                foreach (var lModel in model.JobItemViewAttachments)
+                {
+                    if (lModel.ID > 0)
+                    {
+                        var originLine = editEntityModel.JobItemAttachments.Where(l => l.ID == lModel.ID).FirstOrDefault();
+                        if (originLine != null)
+                        {
+                            originLine = lModel.ToEntity(originLine).FillOutNull();
+                            originLine.EditTime = editTime;
+                            originLine.EditBy = editBy;
+                        }
+                    }
+                    else
+                    {
+                        var editEntityLine = lModel.ToEntity().FillOutNull();
+                        editEntityLine.CreateTime = editTime;
+                        editEntityLine.CreateBy = editBy;
+                        editEntityLine.EditTime = editTime;
+                        editEntityLine.EditBy = editBy;
+                        editEntityModel.JobItemAttachments.Add(editEntityLine);
                     }
                 }
             }
@@ -682,13 +722,13 @@ namespace ThirdStore.Controllers
                 return Json(new { Result = false, Message = "Please input the item location." });
             }
 
-            if (isPrintLabel)
-            {
-                if (model.JobItemViewImages == null || model.JobItemViewImages.Count < 6)
-                {
-                    return Json(new { Result = false, Message = "Please upload ast least 6 photos." });
-                }
-            }
+            //if (isPrintLabel)
+            //{
+            //    if (model.JobItemViewImages == null || model.JobItemViewImages.Count < 6)
+            //    {
+            //        return Json(new { Result = false, Message = "Please upload ast least 6 photos." });
+            //    }
+            //}
 
             //if(model.JobItemViewLines.Any(l=>l.Qty>1))
             return Json(new { Result=true});
@@ -1095,6 +1135,70 @@ namespace ThirdStore.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult UploadAttachments(HttpPostedFileBase[] attachments, string notes)
+        {
+            var lstSavedAttachments = new List<JobItemViewModel.JobItemAttachmentViewModel>();
+            if (attachments != null)
+            {
+                foreach (var attachment in attachments)
+                {
+                    var savedAttachment = _attachmentService.SaveAttachment(attachment.InputStream, attachment.FileName);
+                    var jobItemAttachmentViewModel = new JobItemViewModel.JobItemAttachmentViewModel() { AttachmentID = savedAttachment.ID, AttachmentName = savedAttachment.Name, AttachmentURL = _attachmentService.GetAttachmentURL(savedAttachment.ID), Notes = notes };
+                    lstSavedAttachments.Add(jobItemAttachmentViewModel);
+                }
+            }
+
+            return Json(new { AttachmentList = lstSavedAttachments });
+        }
+
+
+        [HttpPost]
+        public ActionResult ReadJobItemAttachments(DataSourceRequest command, int jobItemID)
+        {
+            if (jobItemID > 0)
+            {
+                IList<JobItemViewModel.JobItemAttachmentViewModel> jobItemAttachments = null;
+                var jobItem = _jobItemService.GetJobItemByID(jobItemID);
+                if (jobItem != null)
+                {
+                    jobItemAttachments = jobItem.JobItemAttachments.Select(r =>
+                    {
+                        var viewModel = r.ToModel();
+                        viewModel.AttachmentURL = _attachmentService.GetAttachmentURL(r.AttachmentID);
+                        viewModel.AttachmentName = r.Attachment.Name;
+                        return viewModel;
+                    }).ToList();
+                }
+
+
+                var gridModel = new DataSourceResult() { Data = jobItemAttachments, Total = jobItemAttachments.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else
+                return Json(new object { });
+        }
+
+
+        [HttpPost]
+        public ActionResult JobItemAttachmentDelete(JobItemViewModel.JobItemAttachmentViewModel model)
+        {
+            if (model.ID > 0)
+            {
+                var attachment = _attachmentService.GetAttachmentByID(model.AttachmentID);
+                if (attachment != null)
+                    _attachmentService.DeleteAttachment(attachment);
+            }
+
+            return new NullJsonResult();
+        }
+
 
         #region Private Methods
 
@@ -1122,344 +1226,8 @@ namespace ThirdStore.Controllers
 
         #endregion
 
-        #region Import Temp
-        [HttpPost]
-        public ActionResult ImportData()
-        {
-            try
-            {
-                var imageDI = @"C:\Users\gdutj\Downloads\3rdStockSystem\images";
-                var csvContext = new CsvContext();
-                var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true };
-                //var importData = csvContext.Read<JobItemImport>(@"C:\Users\gdutj\OneDrive\Document\Code\3rdStore\TODOList\File2\JobItem20190801.csv", inputFileDescription);
-                var importData = csvContext.Read<JobItemImport>(@"C:\Users\gdutj\OneDrive\Document\Code\3rdStore\TODOList\FileNew20190820\ALL_Without_T_R.Jul.csv", inputFileDescription);
-                var soldData = csvContext.Read<SoldJobItem>(@"C:\Users\gdutj\OneDrive\Document\Code\3rdStore\TODOList\SoldItem20190808.csv", inputFileDescription);
-                var netoProducts = _dbContext.SqlQuery<NetoProduct>("select * from NetoProducts").ToList();
-                var items = _itemService.GetAllItems();
-                var grpImportData = from import in importData
-                                    group import by new { import.JobItemCreateTime, import.Reference } into grp
-                                    select grp;
-                var existingJobItem = _jobItemService.GetAllJobItems();
-                //var data = from import in importData
-                //           join netoProduct in netoProducts on import.SKU.ToLower() equals netoProduct.SKU.ToLower()
-                //           select new
-                //           {
-                //               import.SKU,
-                //               ConditionID=import.ConditionID.ToUpper(),
-                //               ItemName=netoProduct.Name,
-                //               import.ItemDetail,
-                //               ItemPrice=(import.ConditionID.ToUpper().Equals(ThirdStoreJobItemCondition.NEW.ToName())? netoProduct.DefaultPrice: import.ItemPrice),
-                //               import.Location
-
-                //           };
-
-
-                foreach (var grp in grpImportData)
-                {
-
-                    var headerLine = grp.FirstOrDefault(l => !string.IsNullOrEmpty(l.JobItemCreateTime) && !string.IsNullOrEmpty(l.ConditionID));
-                    if (headerLine != null)
-                    {
-                        try
-                        {
-                            var checkStr = (headerLine.OriginalReference.Trim().IndexOf("/") != -1 ? headerLine.OriginalReference.Trim().Substring(0, headerLine.OriginalReference.Trim().IndexOf("/")) : headerLine.OriginalReference.Trim()) + "-" + headerLine.SKU.Trim();
-                            if (existingJobItem.FirstOrDefault(eji => eji.Ref5.Equals(checkStr)) != null)
-                                continue;
-                            //throw new Exception($"Job Item Reference: {headerLine.OriginalReference.Trim()} SKU {headerLine.SKU.Trim()} already exist");
-                            var soldItem = soldData.FirstOrDefault(si => si.Reference.Trim().Equals(headerLine.OriginalReference.Trim()) && si.SKU.ToLower().Equals(headerLine.SKU.ToLower()));
-                            if (soldItem != null)
-                            {
-                                LogManager.Instance.Error($"SKU {soldItem.SKU} Reference {soldItem.Reference} has been sold.");
-                                continue;
-                            }
-                            var childLines = grp.Where(l => !l.Equals(headerLine));
-                            var item = items.FirstOrDefault(itm => itm.SKU.ToLower().Equals(headerLine.SKU.ToLower()));
-                            var netoProduct = netoProducts.FirstOrDefault(np => np.SKU.ToLower().Equals(headerLine.SKU.ToLower()));
-                            if (item != null)
-                            {
-                                var isNew = headerLine.ConditionID.ToUpper().Equals(ThirdStoreJobItemCondition.NEW.ToName());
-                                var newItem = new D_JobItem();
-                                //newItem.JobItemCreateTime = DateTime.ParseExact(headerLine.JobItemCreateTime, "dd/MM/yyyy", CultureInfo.InvariantCulture);
-                                newItem.JobItemCreateTime = Convert.ToDateTime(headerLine.JobItemCreateTime);
-                                newItem.Type = ThirdStoreJobItemType.SELFSTORED.ToValue();
-                                newItem.StatusID = ThirdStoreJobItemStatus.PENDING.ToValue();
-                                newItem.ConditionID = headerLine.ConditionID.ToUpper().ToEnumValue<ThirdStoreJobItemCondition>();
-                                newItem.ItemName = (netoProduct != null ? netoProduct.Name : item.Name);
-                                newItem.Note = headerLine.ItemDetail;
-                                newItem.ItemPrice = Convert.ToDecimal((netoProduct != null ? netoProduct.DefaultPrice : headerLine.ItemPrice));
-                                newItem.Location = headerLine.Location;
-                                newItem.DesignatedSKU = (childLines != null && childLines.Count() > 0 ? headerLine.SKU : string.Empty);
-                                newItem.Ref1 = headerLine.Reference.Trim();
-                                newItem.Ref5 = (headerLine.OriginalReference.Trim().IndexOf("/") != -1 ? headerLine.OriginalReference.Trim().Substring(0, headerLine.OriginalReference.Trim().IndexOf("/")) : headerLine.OriginalReference.Trim()) + "-" + headerLine.SKU.Trim();
-                                newItem.CreateTime = newItem.JobItemCreateTime;
-                                newItem.EditTime = newItem.JobItemCreateTime;
-
-                                if (childLines != null && childLines.Count() > 0)
-                                {
-                                    foreach (var line in childLines)
-                                    {
-                                        var lineItem = items.FirstOrDefault(itm => itm.SKU.ToLower().Equals(line.SKU.ToLower()));
-                                        if (lineItem != null)
-                                        {
-                                            var newItemLine = new D_JobItemLine();
-                                            newItemLine.SKU = line.SKU;
-                                            newItemLine.ItemID = lineItem.ID;
-                                            newItemLine.Qty = 1;
-                                            newItemLine.Length = (string.IsNullOrEmpty(line.Length) ? lineItem.Length : Convert.ToDecimal(line.Length));
-                                            newItemLine.Width = (string.IsNullOrEmpty(line.Width) ? lineItem.Width : Convert.ToDecimal(line.Width));
-                                            newItemLine.Height = (string.IsNullOrEmpty(line.Height) ? lineItem.Height : Convert.ToDecimal(line.Height));
-                                            newItemLine.Weight = (string.IsNullOrEmpty(line.Weight) ? lineItem.GrossWeight : Convert.ToDecimal(line.Weight));
-                                            newItemLine.CreateTime = newItem.JobItemCreateTime;
-                                            newItemLine.EditTime = newItem.JobItemCreateTime;
-
-                                            newItem.JobItemLines.Add(newItemLine);
-                                        }
-                                        else
-                                        {
-                                            throw new Exception(line.SKU + " Job item line item info missed");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    var newItemLine = new D_JobItemLine();
-                                    newItemLine.SKU = headerLine.SKU;
-                                    newItemLine.ItemID = _itemService.GetItemBySKU(newItemLine.SKU).ID;
-                                    newItemLine.Qty = 1;
-                                    newItemLine.Length = Convert.ToDecimal((string.IsNullOrEmpty(headerLine.Length) ? item.Length.ToString() : headerLine.Length));
-                                    newItemLine.Width = Convert.ToDecimal((string.IsNullOrEmpty(headerLine.Width) ? item.Width.ToString() : headerLine.Width));
-                                    newItemLine.Height = Convert.ToDecimal((string.IsNullOrEmpty(headerLine.Height) ? item.Height.ToString() : headerLine.Height));
-                                    newItemLine.Weight = Convert.ToDecimal((string.IsNullOrEmpty(headerLine.Weight) ? item.GrossWeight.ToString() : headerLine.Weight));
-                                    newItemLine.CreateTime = newItem.JobItemCreateTime;
-                                    newItemLine.EditTime = newItem.JobItemCreateTime;
-
-                                    newItem.JobItemLines.Add(newItemLine);
-                                }
-
-                                if (!string.IsNullOrEmpty(headerLine.ImagePath))
-                                {
-                                    if (Directory.Exists(imageDI + "\\" + headerLine.ImagePath))
-                                    {
-                                        var imageFiles = Directory.GetFiles(imageDI + "\\" + headerLine.ImagePath, "*", SearchOption.AllDirectories);
-                                        int j = 0;
-                                        foreach (var imgFile in imageFiles)
-                                        {
-                                            //Image img = Image.FromFile(imgFile);
-
-                                            using (var stream = new MemoryStream(System.IO.File.ReadAllBytes(imgFile)))
-                                            {
-                                                var fileName = headerLine.SKU + "-" + newItem.JobItemCreateTime.ToString("ddMM") + headerLine.Reference + "-" + j.ToString().PadLeft(2, '0') + ".jpg";
-                                                var imgObj = _imageService.SaveImage(stream, fileName);
-                                                newItem.JobItemImages.Add(new M_JobItemImage()
-                                                {
-                                                    Image = imgObj,
-                                                    DisplayOrder = j,
-                                                    StatusID = 0,//TODO Get item active status id
-                                                    CreateTime = newItem.CreateTime,
-                                                    EditTime = newItem.EditTime
-                                                });
-                                            }
-                                            j++;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        throw new Exception(headerLine.SKU + " Image file path not exists");
-                                    }
-                                }
-                                else if (!string.IsNullOrEmpty(headerLine.Image1))
-                                {
-                                    var imagesURL = new List<string>();
-                                    if (!string.IsNullOrEmpty(headerLine.Image1))
-                                        imagesURL.Add(headerLine.Image1);
-                                    if (!string.IsNullOrEmpty(headerLine.Image2))
-                                        imagesURL.Add(headerLine.Image2);
-                                    if (!string.IsNullOrEmpty(headerLine.Image3))
-                                        imagesURL.Add(headerLine.Image3);
-                                    if (!string.IsNullOrEmpty(headerLine.Image4))
-                                        imagesURL.Add(headerLine.Image4);
-                                    if (!string.IsNullOrEmpty(headerLine.Image5))
-                                        imagesURL.Add(headerLine.Image5);
-                                    if (!string.IsNullOrEmpty(headerLine.Image6))
-                                        imagesURL.Add(headerLine.Image6);
-
-                                    int i = 0;
-                                    using (var wc = new WebClient())
-                                    {
-                                        foreach (var imageURL in imagesURL)
-                                        {
-                                            try
-                                            {
-                                                var imgBytes = wc.DownloadData(imageURL);
-                                                using (var stream = new MemoryStream(imgBytes))
-                                                {
-                                                    var fileName = headerLine.SKU + "-" + newItem.JobItemCreateTime.ToString("ddMM") + headerLine.Reference + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
-                                                    var imgObj = _imageService.SaveImage(stream, fileName);
-                                                    newItem.JobItemImages.Add(new M_JobItemImage()
-                                                    {
-                                                        Image = imgObj,
-                                                        DisplayOrder = i,
-                                                        StatusID = 0,//TODO Get item active status id
-                                                        CreateTime = newItem.CreateTime,
-                                                        EditTime = newItem.EditTime
-                                                    });
-                                                }
-
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
-                                            }
-
-                                            i++;
-                                        }
-                                    }
-                                }
-
-                                _jobItemService.InsertJobItem(newItem);
-                                LogManager.Instance.Info($"Reference {headerLine.OriginalReference} SKU {headerLine.SKU} Supplier {headerLine.Supplier} import successfully.");
-                            }
-                            else
-                            {
-                                throw new Exception("Item or Neto Product Info Missed.");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogManager.Instance.Error($"Reference {headerLine.OriginalReference} SKU {headerLine.SKU} Supplier {headerLine.Supplier} import failed. " + ex.Message);
-                        }
-
-                    }
-
-
-                }
-            }
-            catch (Exception ex)
-            {
-                LogManager.Instance.Error(ex.Message);
-            }
-
-
-            return Json(new { Result = true });
-        }
-
-        #endregion
-
-        #region Update DSZ and Sync Temp
-
-        [HttpPost]
-        public ActionResult UpdateDSZandSync()
-        {
-            try
-            {
-                var type2 = System.Type.GetType("ThirdStoreBusiness.ScheduleTask.UpdateDSDataAndSync, ThirdStoreBusiness");
-                object instance;
-                if (!ThirdStoreWebContext.Instance.TryResolve(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope(), out instance))
-                {
-                    //not resolved
-                    instance = ThirdStoreWebContext.Instance.ResolveUnregistered(type2, ThirdStoreWebContext.Instance.ContainerManager.Scope());
-                }
-                ThirdStoreBusiness.ScheduleTask.ITask task = instance as ThirdStoreBusiness.ScheduleTask.ITask;
-                task.Execute();
-            }
-            catch (Exception ex)
-            {
-                LogManager.Instance.Error(ex.Message);
-            }
-
-
-            return Json(new { Result = true });
-        }
-
-        #endregion
     }
 
-    #region Import Temp 2
-    public class JobItemImport
-    {
-        [CsvColumn(Name = "OriginalReference")]
-        public string OriginalReference { get; set; }
-
-        [CsvColumn(Name = "reference")]
-        public string Reference { get; set; }
-
-        public string JobItemCreateTime{ get; set; }
-
-        public string ConditionID { get; set; }
-
-        public string SKU { get; set; }
-
-        public string ItemName { get; set; }
-
-        public string ItemDetail { get; set; }
-
-        public string ItemPrice { get; set; }
-
-        public string Length { get; set; }
-
-        public string Width { get; set; }
-
-        public string Height { get; set; }
-
-        public string Weight { get; set; }
-
-        public string Supplier { get; set; }
-
-        [CsvColumn(Name = "imagepath")]
-        public string ImagePath { get; set; }
-
-        public string Location { get; set; }
-
-        [CsvColumn(Name = "img1")]
-        public string Image1 { get; set; }
-
-        [CsvColumn(Name = "img2")]
-        public string Image2 { get; set; }
-
-        [CsvColumn(Name = "img3")]
-        public string Image3 { get; set; }
-
-        [CsvColumn(Name = "img4")]
-        public string Image4 { get; set; }
-
-        [CsvColumn(Name = "img5")]
-        public string Image5 { get; set; }
-
-        [CsvColumn(Name = "img6")]
-        public string Image6 { get; set; }
-    }
-
-    public class NetoProduct
-    {
-        public string ID { get; set; }
-        public string SKU { get; set; }
-        public string DefaultPrice { get; set; }
-        public string Name { get; set; }
-        public string PrimarySupplier { get; set; }
-        public string Image1 { get; set; }
-        public string Image2 { get; set; }
-        public string Image3 { get; set; }
-        public string Image4 { get; set; }
-        public string Image5 { get; set; }
-        public string Image6 { get; set; }
-        public string Image7 { get; set; }
-        public string Image8 { get; set; }
-        public string Image9 { get; set; }
-        public string Image10 { get; set; }
-        public string Image11 { get; set; }
-        public string Image12 { get; set; }
-        public string ShippingLength { get; set; }
-        public string ShippingHeight { get; set; }
-        public string ShippingWidth { get; set; }
-        public string ShippingWeight { get; set; }
-    }
-
-    public class SoldJobItem
-    {
-        public string Reference { get; set; }
-        public string SKU { get; set; }
-    }
-
-    #endregion
+    
 
 }

@@ -91,7 +91,8 @@ namespace ThirdStoreCommon
         S = 3,
         T = 4,
         O = 5,
-        K = 6
+        K = 6,
+        CW=7
     }
 
     public enum ThirdStoreOrderStatus
@@ -114,7 +115,8 @@ namespace ThirdStoreCommon
         OrderEdit=3,
         JobItemSync=4,
         SKUEdit=5,
-        UserAccessControl=6
+        UserAccessControl=6,
+        DeveloperOperation=7
     }
 
     public enum ThirdStoreReturnItemStatus

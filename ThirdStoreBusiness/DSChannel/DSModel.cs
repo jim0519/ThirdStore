@@ -211,7 +211,7 @@ namespace ThirdStoreBusiness.DSChannel
 
     public class DSZImportLine
     {
-        public string serial_number { get; set; }
+        public string your_order_id { get; set; }
         public string first_name { get; set; }
         public string last_name { get; set; }
         public string address1 { get; set; }
@@ -222,10 +222,10 @@ namespace ThirdStoreBusiness.DSChannel
         public string postcode { get; set; }
         public string telephone { get; set; }
         public string sku { get; set; }
-        public decimal price { get; set; }
-        public decimal postage { get; set; }
+        //public decimal postage { get; set; }
         public int qty { get; set; }
-        public string comment { get; set; }
+        [CsvColumn(Name = "delivery_notes (max. 50 characters)")] 
+        public string delivery_notes { get; set; }
 
     }
 

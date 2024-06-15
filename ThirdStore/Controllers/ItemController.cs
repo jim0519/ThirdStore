@@ -185,6 +185,20 @@ namespace ThirdStore.Controllers
                     newEntityModel.ItemImages.Add(newEntityLine);
                 }
             }
+
+            if (model.ItemViewAttachments != null && model.ItemViewAttachments.Count > 0)
+            {
+                foreach (var lModel in model.ItemViewAttachments)
+                {
+                    var newEntityLine = lModel.ToEntity().FillOutNull();
+                    newEntityLine.CreateTime = createTime;
+                    newEntityLine.CreateBy = createBy;
+                    newEntityLine.EditTime = createTime;
+                    newEntityLine.EditBy = createBy;
+                    newEntityModel.ItemAttachments.Add(newEntityLine);
+                }
+            }
+
             _itemService.InsertItem(newEntityModel);
 
             return RedirectToAction("Edit", new { itemID = newEntityModel.ID });

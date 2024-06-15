@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ThirdStoreCommon.Models.Attachment;
 using ThirdStoreCommon.Models.Image;
 
 namespace ThirdStoreCommon.Models.JobItem
@@ -10,6 +11,7 @@ namespace ThirdStoreCommon.Models.JobItem
         {
             this.JobItemLines = new List<D_JobItemLine>();
             this.JobItemImages = new List<M_JobItemImage>();
+            this.JobItemAttachments = new List<M_JobItemAttachment>();
         }
 
         public System.DateTime JobItemCreateTime { get; set; }
@@ -25,7 +27,7 @@ namespace ThirdStoreCommon.Models.JobItem
         public string TrackingNumber { get; set; }
         public string Ref1 { get; set; }//JobItemReference
         public string Ref2 { get; set; }//Inspectors
-        public string Ref3 { get; set; }//From Return Item ID
+        public string Ref3 { get; set; }//CS Note
         public string Ref4 { get; set; }//Previous Location
         public string Ref5 { get; set; }//Review Comments
         public string Note { get; set; }
@@ -43,5 +45,6 @@ namespace ThirdStoreCommon.Models.JobItem
 
         public virtual ICollection<D_JobItemLine> JobItemLines { get; set; }
         public virtual ICollection<M_JobItemImage> JobItemImages { get; set; }
+        public virtual ICollection<M_JobItemAttachment> JobItemAttachments { get; set; }
     }
 }

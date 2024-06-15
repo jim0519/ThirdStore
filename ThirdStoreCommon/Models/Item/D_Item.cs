@@ -12,6 +12,7 @@ namespace ThirdStoreCommon.Models.Item
             this.ParentItems = new List<D_Item_Relationship>();
             this.ChildItems = new List<D_Item_Relationship>();
             this.ItemImages = new List<M_ItemImage>();
+            this.ItemAttachments = new List<M_ItemAttachment>();
             //this.SubstituteItemGroupLines = new List<D_Substitute_Item_Group_Line>();
         }
 

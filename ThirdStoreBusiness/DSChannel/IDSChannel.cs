@@ -74,7 +74,7 @@ namespace ThirdStoreBusiness.DSChannel
                     {
                         var o = line.Order;
                         var importLine = new DSZImportLine();
-                        importLine.serial_number = line.Ref1;
+                        importLine.your_order_id = line.Ref1;
                         var firstName = o.ConsigneeName.Substring(0, o.ConsigneeName.IndexOf(" "));
                         var lastName = o.ConsigneeName.Substring(o.ConsigneeName.IndexOf(" ") + 1);
                         importLine.first_name = firstName;
@@ -88,10 +88,10 @@ namespace ThirdStoreBusiness.DSChannel
                         importLine.postcode = o.ShippingPostcode;
                         importLine.telephone = o.ConsigneePhoneNo;
                         importLine.sku = line.SKU;
-                        importLine.price = 10;
-                        importLine.postage = 0;
+                        //importLine.price = 10;
+                        //importLine.postage = 0;
                         importLine.qty = line.Qty;
-                        importLine.comment = o.BuyerNote;
+                        importLine.delivery_notes = o.BuyerNote;
 
                         listDSZImportLine.Add(importLine);
                     }

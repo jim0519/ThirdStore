@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.ComponentModel.DataAnnotations;
 using FluentValidation.Attributes;
 using ThirdStore.Validators.JobItem;
+using static ThirdStore.Models.Item.ItemViewModel;
 
 namespace ThirdStore.Models.JobItem
 {
@@ -17,6 +18,7 @@ namespace ThirdStore.Models.JobItem
         {
             this.JobItemViewLines = new List<JobItemLineViewModel>();
             this.JobItemViewImages = new List<JobItemImageViewModel>();
+            this.JobItemViewAttachments = new List<JobItemAttachmentViewModel>();
         }
 
         //[UIHint("DateTimeNullable")]
@@ -49,6 +51,9 @@ namespace ThirdStore.Models.JobItem
         public int ReviewStatus { get; set; }
         public int Qty { get; set; }
         public DateTime EditTime { get; set; }
+        public IList<JobItemAttachmentViewModel> JobItemViewAttachments { get; set; }
+        public string Notes { get; set; }
+        public string CSNotes { get; set; }
 
 
         public IList<SelectListItem> JobItemTypes { get; set; }
@@ -79,6 +84,15 @@ namespace ThirdStore.Models.JobItem
             public string ImageName { get; set; }
             public int DisplayOrder { get; set; }
             public bool StatusID { get; set; }
+        }
+
+        public class JobItemAttachmentViewModel : BaseEntityViewModel
+        {
+            public int AttachmentID { get; set; }
+            public string AttachmentURL { get; set; }
+            public string AttachmentName { get; set; }
+            public int DisplayOrder { get; set; }
+            public string Notes { get; set; }
         }
 
 

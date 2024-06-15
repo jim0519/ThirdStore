@@ -15,6 +15,7 @@ using ThirdStoreCommon.Models.Image;
 using ThirdStoreBusiness.API.Neto;
 using ThirdStoreBusiness.DSChannel;
 using ThirdStoreCommon.Models.Misc;
+using ThirdStoreCommon.Models.JobItem;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -183,6 +184,40 @@ namespace ThirdStoreBusiness.Item
             if (item.EditTime.Equals(DateTime.MinValue))
                 item.EditTime = currentTime;
 
+            foreach (var line in item.ChildItems)
+            {
+                line.FillOutNull();
+                line.CreateBy = currentUser;
+                if (line.CreateTime.Equals(DateTime.MinValue))
+                    line.CreateTime = currentTime;
+                line.EditBy = currentUser;
+                if (line.EditTime.Equals(DateTime.MinValue))
+                    line.EditTime = currentTime;
+            }
+
+            foreach (var img in item.ItemImages)
+            {
+                img.FillOutNull();
+                img.CreateBy = currentUser;
+                if (img.CreateTime.Equals(DateTime.MinValue))
+                    img.CreateTime = currentTime;
+                img.EditBy = currentUser;
+                if (img.EditTime.Equals(DateTime.MinValue))
+                    img.EditTime = currentTime;
+            }
+
+            foreach (var attachment in item.ItemAttachments)
+            {
+                attachment.FillOutNull();
+                attachment.CreateBy = currentUser;
+                if (attachment.CreateTime.Equals(DateTime.MinValue))
+                    attachment.CreateTime = currentTime;
+                attachment.EditBy = currentUser;
+                if (attachment.EditTime.Equals(DateTime.MinValue))
+                    attachment.EditTime = currentTime;
+            }
+
+
             _itemRepository.Insert(item);
         }
 
@@ -263,16 +298,28 @@ namespace ThirdStoreBusiness.Item
                 {
                     var item = updateItem.LocalItem;
                     var updateData = updateItem.updateData;
+                    var needUpdate = false;
                     if ((!string.IsNullOrWhiteSpace(updateData.Description) && item.Description != updateData.Description)
                         || item.Cost != updateData.Cost)
                     {
                         item.Description =(!string.IsNullOrWhiteSpace(updateData.Description)? updateData.Description: string.Empty) ;
                         item.Cost = updateData.Cost;
                         item.Price = updateData.Price;
+                        needUpdate = true;
+                    }
+
+                    if(updateData.GrossWeight!=item.GrossWeight)
+                    {
+                        item.GrossWeight = updateData.GrossWeight;
+                        needUpdate = true;
+                    }
+
+                    if(needUpdate)
+                    {
                         upds.Add(item);
                     }
                 }
-                _itemRepository.Update(upds, itm => itm.Description, itm => itm.Cost, itm => itm.Price);
+                _itemRepository.Update(upds, itm => itm.Description, itm => itm.Cost, itm => itm.Price,itm=>itm.GrossWeight);
                 #endregion
 
                 #region Add Section

@@ -2279,3 +2279,82 @@ inner join
 inner join V_SKURelationship_Recursive O on I.BottomSKU=O.BottomSKU
 inner join D_Item ITEM on ITEM.SKU=O.SKU and ITEM.IsReadyForList=1
 	
+
+
+
+--JobItem Attachment
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[M_JobItemAttachment]') AND type in (N'U'))
+DROP TABLE [dbo].[M_JobItemAttachment]
+GO
+CREATE TABLE [dbo].[M_JobItemAttachment](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[JobItemID] [int] NOT NULL,
+	[AttachmentID] [int] NOT NULL,
+	[DisplayOrder] [int] NOT NULL,
+	[Notes] varchar(4000) NOT NULL,
+	[StatusID] [int] NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_M_JobItemAttachment] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_M_JobItemAttachment_D_Attachment]') AND parent_object_id = OBJECT_ID(N'[dbo].[M_JobItemAttachment]'))
+ALTER TABLE [dbo].[M_JobItemAttachment]  WITH CHECK ADD CONSTRAINT [FK_M_JobItemAttachment_D_Attachment] FOREIGN KEY([AttachmentID])
+REFERENCES [dbo].[D_Attachment] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_M_JobItemAttachment_D_JobItem]') AND parent_object_id = OBJECT_ID(N'[dbo].[M_JobItemAttachment]'))
+ALTER TABLE [dbo].[M_JobItemAttachment]  WITH CHECK ADD CONSTRAINT [FK_M_JobItemAttachment_D_JobItem] FOREIGN KEY([JobItemID])
+REFERENCES [dbo].[D_JobItem] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+
+
+
+
+--Sandy Job Item Report
+select 
+JobItemType,
+JobItemCreateTime,
+Reference,
+Location,
+Condition,
+HSKU SKU,
+Ref2 as Inspectors,
+Qty,
+ItemPrice Price,
+ShipTime,
+StocktakeTime,
+ItemDetail,
+SL.CBM
+--,* 
+from V_JobItemWithSKU H
+inner join (select SUM(cast(Ref1 as decimal(18,8))) CBM,L.HeaderID from D_JobItemLine L group by L.HeaderID) SL on H.ID=SL.HeaderID
+where JobItemCreateTime>'20230101' and JobItemCreateTime<'20240401'
+and Type in (1,2)
+
+
+
+
+
+insert into T_Permission
+select 
+'DeveloperOperation' as Name,
+'Developer Operation' as Description,
+1 as IsActive,
+GETDATE(),
+'System',
+GETDATE(),
+'System'
