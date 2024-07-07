@@ -16,6 +16,7 @@ using ThirdStoreBusiness.API.Neto;
 using ThirdStoreBusiness.DSChannel;
 using ThirdStoreCommon.Models.Misc;
 using ThirdStoreCommon.Models.JobItem;
+using eBay.Service.Core.Soap;
 
 namespace ThirdStoreBusiness.Item
 {
@@ -485,9 +486,20 @@ namespace ThirdStoreBusiness.Item
             if (item.ItemImages.Count > 0)
             {
                 var itemImages = GetItemImagesByItemID(item.ID);
+                var keepItemImages = itemImages.Where(ii => ii.StatusID == 1).ToList();
                 itemImages = itemImages.Where(ii => ii.StatusID == 0).ToList();
                 foreach (var existPic in itemImages)
                     DeleteItemImage(existPic);
+
+                var keepButNotValidItemImages = new List<M_ItemImage>();
+                foreach(var kii in keepItemImages)
+                {
+                    var imgURL=_imageService.GetImageURL(kii.ImageID);
+                    if (!CommonFunc.DoesImageExistRemotely(imgURL))
+                        keepButNotValidItemImages.Add(kii);
+                }
+                foreach (var kbii in keepButNotValidItemImages)
+                    DeleteItemImage(kbii);
             }
 
             int i = 0;

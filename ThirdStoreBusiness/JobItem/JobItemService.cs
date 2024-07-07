@@ -717,7 +717,7 @@ namespace ThirdStoreBusiness.JobItem
 
                 var gumtreeFeed = (from record in queryBase
                                    group new { record.localListing, record.jobItem, record.item } by new { record.localListing.SKUWSuffix } into grpUpdates
-                                   
+                                   let imgURLs= GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item)
                                    select new GumtreeFeed()
                                    {
                                        
@@ -729,18 +729,19 @@ namespace ThirdStoreBusiness.JobItem
                                        Condition = grpUpdates.FirstOrDefault().localListing.Condition,
                                        CreateTime = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.FirstOrDefault().jobItem.CreateTime : DateTime.MinValue),
                                        JobItemIDs = (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem.ID.ToString()).Aggregate((current, next) => current + ";" + next) : string.Empty),
-                                       Image1 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 1),
-                                       Image2 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 2),
-                                       Image3 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 3),
-                                       Image4 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 4),
-                                       Image5 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 5),
-                                       Image6 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 6),
-                                       Image7 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 7),
-                                       Image8 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 8),
-                                       Image9 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 9),
-                                       Image10 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 10),
-                                       Image11 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 11),
-                                       Image12 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 12),
+                                       //Image1 = GetGumtreeImageURL(grpUpdates.FirstOrDefault().localListing, (grpUpdates.FirstOrDefault().jobItem != null ? grpUpdates.Select(grp => grp.jobItem) : null), grpUpdates.FirstOrDefault().item, 1),
+                                       Image1 = (imgURLs.Count >= 1 ? imgURLs[0]:string.Empty),
+                                       Image2 = (imgURLs.Count >= 2 ? imgURLs[1] : string.Empty),
+                                       Image3 = (imgURLs.Count >= 3 ? imgURLs[2] : string.Empty),
+                                       Image4 = (imgURLs.Count >= 4 ? imgURLs[3] : string.Empty),
+                                       Image5 = (imgURLs.Count >= 5 ? imgURLs[4] : string.Empty),
+                                       Image6 = (imgURLs.Count >= 6 ? imgURLs[5] : string.Empty),
+                                       Image7 = (imgURLs.Count >= 7 ? imgURLs[6] : string.Empty),
+                                       Image8 = (imgURLs.Count >= 8 ? imgURLs[7] : string.Empty),
+                                       Image9 = (imgURLs.Count >= 9 ? imgURLs[8] : string.Empty),
+                                       Image10 = (imgURLs.Count >= 10 ? imgURLs[9] : string.Empty),
+                                       Image11 = (imgURLs.Count >= 11 ? imgURLs[10] : string.Empty),
+                                       Image12 = (imgURLs.Count >= 12 ? imgURLs[11] : string.Empty),
 
                                    }).Select((x,index)=> {
                                        x.ID = index+1;
@@ -764,41 +765,125 @@ namespace ThirdStoreBusiness.JobItem
 
         }
 
-        private string GetGumtreeImageURL(ExportProductListing localListing, IEnumerable<D_JobItem> firstInvJobItems, D_Item item, int picNum)
+        private List<string> GetGumtreeImageURL(ExportProductListing localListing, IEnumerable<D_JobItem> firstInvJobItems, D_Item item)
         {
             int i = 1;
-
+            var lstImageURLs = new List<string>();
+            var checkImageValidCount = 0;
+            
             if (item.ItemImages.Count > 0)
             {
+                var isSKUImageURLValid = false;
                 foreach (var itmImg in item.ItemImages.OrderBy(img => img.DisplayOrder))
                 {
                     if (i <= 6)
                     {
-                        if (i == picNum)
-                            return _imageService.GetImageURL(itmImg.ImageID);
+                        var skuImgURL = _imageService.GetImageURL(itmImg.ImageID);
+
+                        if (!isSKUImageURLValid)
+                        {
+                            if (checkImageValidCount < 2)
+                            {
+                                if (CommonFunc.DoesImageExistRemotely(skuImgURL))
+                                {
+                                    lstImageURLs.Add(skuImgURL);
+                                    isSKUImageURLValid = true;
+                                }
+                                checkImageValidCount++;
+                            }
+                        }
+                        else
+                        {
+                            lstImageURLs.Add(skuImgURL);
+                        }
+
                         i++;
                     }
                 }
             }
+            
 
             if (firstInvJobItems != null && firstInvJobItems.Count() > 0)
             {
+                checkImageValidCount = 0;
                 foreach (var jobItem in firstInvJobItems)
                 {
+                    var isJobItemImageURLValid = false;
                     foreach (var jobItmImg in jobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
                     {
-                        if (i <= 12)
+                        var jobItemImgURL = _imageService.GetImageURL(jobItmImg.ImageID);
+
+                        if (checkImageValidCount < 2)
                         {
-                            if(i == picNum)
-                                return _imageService.GetImageURL(jobItmImg.ImageID);
-                            //lstItemImages.Add(new UpdateItemItemImage() { Name = (i == 0 ? "Main" : "Alt " + i), URL = _imageService.GetImageURL(jobItmImg.ImageID), Delete = false });
-                            i++;
+                            if (CommonFunc.DoesImageExistRemotely(jobItemImgURL))
+                            {
+                                isJobItemImageURLValid = true;
+                                break;
+                            }
+                            checkImageValidCount++;
                         }
+                        //if (i <= 12)
+                        //{
+                        //    //if(i == picNum)
+                        //    //    return _imageService.GetImageURL(jobItmImg.ImageID);
+                        //    //lstItemImages.Add(new UpdateItemItemImage() { Name = (i == 0 ? "Main" : "Alt " + i), URL = _imageService.GetImageURL(jobItmImg.ImageID), Delete = false });
+                        //    i++;
+                        //}
+                    }
+
+                    if(isJobItemImageURLValid)
+                    {
+                        foreach (var jobItmImg in jobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
+                        {
+                            if (i <= 12)
+                            {
+                                var jobItemImgURL = _imageService.GetImageURL(jobItmImg.ImageID);
+                                lstImageURLs.Add(jobItemImgURL);
+                                i++;
+                            }
+                        }
+                    }
+                    else if(!string.IsNullOrEmpty( localListing.JobItemInvIDs))
+                    {
+                        var jobItemIDs = localListing.JobItemInvIDs.Split(';');
+                        var newestJobItemID = Convert.ToInt32( jobItemIDs.Skip(jobItemIDs.Count()-1).Take(1).FirstOrDefault());
+                        var newestJobItem = GetJobItemByID(newestJobItemID);
+
+                        checkImageValidCount = 0;
+                        foreach (var jobItmImg in newestJobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
+                        {
+                            if (i <= 12)
+                            {
+                                var jobItemImgURL = _imageService.GetImageURL(jobItmImg.ImageID);
+
+                                if (!isJobItemImageURLValid)
+                                {
+                                    if (checkImageValidCount < 2)
+                                    {
+                                        if (CommonFunc.DoesImageExistRemotely(jobItemImgURL))
+                                        {
+                                            lstImageURLs.Add(jobItemImgURL);
+                                            isJobItemImageURLValid = true;
+                                        }
+                                        checkImageValidCount++;
+                                    }
+                                }
+                                else
+                                {
+                                    lstImageURLs.Add(jobItemImgURL);
+                                }
+
+                                i++;
+                            }
+                        }
+
+
+                        break;
                     }
                 }
             }
 
-            return string.Empty;
+            return lstImageURLs;
         }
 
         private string GenerateGumtreeDesc(ExportProductListing localListing, IEnumerable<D_JobItem> firstInvJobItems, D_Item item)
