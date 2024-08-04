@@ -224,7 +224,7 @@ namespace ThirdStoreBusiness.API.Dropshipzone
                         exceedLimit = pageNum / 60;
                     }
                     //var getProductsRequest = new RestRequest("/products?limit={limit}&page_no={pageNum}");
-                    var getProductsRequest = new RestRequest("/products");
+                    var getProductsRequest = new RestRequest("v2/products");
                     //getProductsRequest.AddHeader("api-version", "2.4");
                     getProductsRequest.AddHeader("Content-Type", "application/json");
                     getProductsRequest.AddParameter("limit", limit, ParameterType.QueryString);
