@@ -298,6 +298,8 @@
                             alert("Bulk update successfully");
                             var window = $("#bulkUpdateJobItem-window");
                             window.data('kendoWindow').close();
+                            selectedIds = [];
+                            $('#selectedNum').text(selectedIds.length + ' selected');
                             RefreshGrid(true);
                         }
 
@@ -750,6 +752,14 @@
                 </td>
                 <td>
                     @Html.EditorFor(model => model.BulkUpdate.PricePercentage)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.BulkUpdate.TrackingNumber):
+                </td>
+                <td>
+                    @Html.EditorFor(model => model.BulkUpdate.TrackingNumber)
                 </td>
             </tr>
             <tr>

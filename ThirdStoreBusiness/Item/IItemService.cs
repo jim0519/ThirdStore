@@ -54,5 +54,10 @@ namespace ThirdStoreBusiness.Item
         void FetchNetoProducts();
 
         void RedownloadImage(IList<int> ids);
+
+        IList<M_ItemImage> GetItemImagesByItemID(int itemID);
+
+        void DeleteItemImage(M_ItemImage itemImage);
+
     }
 }

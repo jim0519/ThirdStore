@@ -147,5 +147,42 @@ namespace ThirdStore.Controllers
             };
         }
 
+        public ActionResult SupplierStatisticReport()
+        {
+
+            //if (!_permissionService.Authorize(ThirdStorePermission.KPIReport.ToName()))
+            //{
+            //    ErrorNotification("You do not have permission to process this page.");
+            //    return Redirect("~/");
+            //}
+
+
+            var model = new SupplierStatisticReportViewModel();
+
+            model.CreateTimeFrom = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            model.CreateTimeTo = DateTime.Now.Date;
+            model.Suppliers = ThirdStoreSupplier.A.ToSelectList(false).ToList();
+            model.Suppliers.Insert(0, new SelectListItem { Text = "All", Value = "0" });
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult SupplierStatisticReport(DataSourceRequest command, SupplierStatisticReportViewModel model)
+        {
+            var staticRptDS = _reportService.GetSupplierStatisticReport(
+                createTimeFrom: model.CreateTimeFrom,
+                createTimeTo: model.CreateTimeTo,
+                supplierID:model.SupplierID
+                );
+
+            var gridModel = new DataSourceResult() { Data = staticRptDS, Total = staticRptDS.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+        }
+
     }
 }

@@ -455,19 +455,27 @@ namespace ThirdStore.Controllers
         {
             try
             {
-                var costwayFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\ThirdStoreDSZData\\CostwayProductData.csv";
+                var costwayFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\ThirdStoreDSZData\\CostwayProductData20250116.csv";
                 var csvContext = new CsvContext();
                 var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true };
                 //var importData = csvContext.Read<JobItemImport>(@"C:\Users\gdutj\OneDrive\Document\Code\3rdStore\TODOList\File2\JobItem20190801.csv", inputFileDescription);
                 var importData = csvContext.Read<CostwayItem>(costwayFilePath, inputFileDescription);
-                foreach(var costwayItem in importData)
+                var allItems = _itemService.GetAllItems();
+                var costwayItems = allItems.Where(i => i.SupplierID.Equals(ThirdStoreSupplier.CW.ToValue())).ToList();
+                foreach (var costwayItem in importData)
                 {
+                    if (costwayItems.FirstOrDefault(cw => cw.SKU.Trim().ToUpper().Equals(costwayItem.SKU.Trim().ToUpper())) != null)
+                        continue;
                     var newItem = new D_Item();
-                    newItem.SKU = "CW_" + costwayItem.SKU;
-                    newItem.Length = costwayItem.Length;
-                    newItem.Width = costwayItem.Width;
-                    newItem.Height = costwayItem.Height;
-                    newItem.GrossWeight = costwayItem.Weight;
+                    newItem.SKU = costwayItem.SKU;
+                    newItem.Name = costwayItem.Name;
+                    newItem.Length = Math.Round( Convert.ToDecimal( costwayItem.Length)/100,2);
+                    newItem.Width = Math.Round(Convert.ToDecimal(costwayItem.Width) / 100, 2);
+                    newItem.Height = Math.Round(Convert.ToDecimal(costwayItem.Height) / 100, 2);
+                    newItem.GrossWeight = Math.Round(Convert.ToDecimal(costwayItem.Weight)/1000, 2);
+                    newItem.Ref1 = costwayItem.ReferenceSKU;
+                    newItem.Ref4 = costwayItem.ProductLink;
+                    newItem.Ref6 = costwayItem.Note;
                     newItem.SupplierID = 7;
                     newItem.Type = 2;
                     newItem.IsActive=true;
@@ -482,6 +490,18 @@ namespace ThirdStore.Controllers
                         imagesURL.Add(costwayItem.Image1);
                     if (!string.IsNullOrEmpty(costwayItem.Image2))
                         imagesURL.Add(costwayItem.Image2);
+                    if (!string.IsNullOrEmpty(costwayItem.Image3))
+                        imagesURL.Add(costwayItem.Image3);
+                    if (!string.IsNullOrEmpty(costwayItem.Image4))
+                        imagesURL.Add(costwayItem.Image4);
+                    if (!string.IsNullOrEmpty(costwayItem.Image5))
+                        imagesURL.Add(costwayItem.Image5);
+                    if (!string.IsNullOrEmpty(costwayItem.Image6))
+                        imagesURL.Add(costwayItem.Image6);
+                    if (!string.IsNullOrEmpty(costwayItem.Image7))
+                        imagesURL.Add(costwayItem.Image7);
+                    if (!string.IsNullOrEmpty(costwayItem.Image8))
+                        imagesURL.Add(costwayItem.Image8);
 
                     int i = 0;
                     using (var wc = new WebClient())
@@ -753,6 +773,120 @@ namespace ThirdStore.Controllers
 
         #endregion
 
+
+        #region update Sello Image
+
+        [HttpPost]
+        public ActionResult UpdateSelloImage()
+        {
+            try 
+            {
+                var selloFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\ThirdStoreDSZData\\SelloImages.csv";
+                var csvContext = new CsvContext();
+                var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true };
+                var importData = csvContext.Read<SelloImageLine>(selloFilePath, inputFileDescription);
+                var allItems = _itemService.GetAllItems();
+                var selloItems = allItems.Where(i => i.SupplierID.Equals(ThirdStoreSupplier.S.ToValue()));
+                foreach(var si in selloItems)
+                {
+                    var fi = importData.FirstOrDefault(d=>d.SKU.ToLower().Equals(si.SKU.ToLower()));
+                    if(fi!=null)
+                    {
+                        var imagesURL = new List<string>();
+                        if (!string.IsNullOrEmpty(fi.Image1))
+                            imagesURL.Add(fi.Image1);
+                        if (!string.IsNullOrEmpty(fi.Image2))
+                            imagesURL.Add(fi.Image2);
+                        if (!string.IsNullOrEmpty(fi.Image3))
+                            imagesURL.Add(fi.Image3);
+                        if (!string.IsNullOrEmpty(fi.Image4))
+                            imagesURL.Add(fi.Image4);
+                        if (!string.IsNullOrEmpty(fi.Image5))
+                            imagesURL.Add(fi.Image5);
+                        if (!string.IsNullOrEmpty(fi.Image6))
+                            imagesURL.Add(fi.Image6);
+                        if (!string.IsNullOrEmpty(fi.Image7))
+                            imagesURL.Add(fi.Image7);
+                        if (!string.IsNullOrEmpty(fi.Image8))
+                            imagesURL.Add(fi.Image8);
+
+                        if (imagesURL.Count == 0)
+                            continue;
+
+                        var createTime = DateTime.Now;
+                        var createBy = "System";
+                        if (si.ItemImages.Count > 0)
+                        {
+                            var itemImages = _itemService.GetItemImagesByItemID(si.ID);
+                            var keepItemImages = itemImages.Where(ii => ii.StatusID == 1).ToList();
+                            itemImages = itemImages.Where(ii => ii.StatusID == 0).ToList();
+                            foreach (var existPic in itemImages)
+                                _itemService.DeleteItemImage(existPic);
+
+                            var keepButNotValidItemImages = new List<M_ItemImage>();
+                            foreach (var kii in keepItemImages)
+                            {
+                                var imgURL = _imageService.GetImageURL(kii.ImageID);
+                                if (!CommonFunc.DoesImageExistRemotely(imgURL))
+                                    keepButNotValidItemImages.Add(kii);
+                            }
+                            foreach (var kbii in keepButNotValidItemImages)
+                                _itemService.DeleteItemImage(kbii);
+                        }
+
+                        int i = 0;
+                        using (var wc = new ThirdStoreWebClient())
+                        {
+                            foreach (var existPic in si.ItemImages)
+                            {
+                                existPic.DisplayOrder = i;
+                                i++;
+                            }
+
+                            foreach (var imageURL in imagesURL)
+                            {
+                                try
+                                {
+                                    var imgBytes = wc.DownloadData(imageURL);
+                                    using (var stream = new MemoryStream(imgBytes))
+                                    {
+                                        var fileName = si.SKU + "-" + i.ToString().PadLeft(2, '0') + ".jpg";
+                                        var imgObj = _imageService.SaveImage(stream, fileName);
+                                        si.ItemImages.Add(new M_ItemImage()
+                                        {
+                                            Image = imgObj,
+                                            DisplayOrder = i,
+                                            StatusID = 0,//TODO Get item active status id
+                                            CreateTime = createTime,
+                                            CreateBy = createBy,
+                                            EditTime = createTime,
+                                            EditBy = createBy
+                                        });
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    LogManager.Instance.Error(imageURL + " download failed. " + ex.Message);
+                                }
+
+                                i++;
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+            }
+
+
+            return Json(new { Result = true });
+        }
+
+        #endregion
+
     }
 
     #region Import Temp 2
@@ -843,21 +977,63 @@ namespace ThirdStore.Controllers
 
     public class CostwayItem
     {
-        [CsvColumn(Name = "Item_no(costway)")]
+        [CsvColumn(Name = "SKU")]
         public string SKU { get; set; }
-        [CsvColumn(Name = "Length(cm)")]
-        public int Length { get; set; }
-        [CsvColumn(Name = "Width(cm)")]
-        public int Width { get; set; }
-        [CsvColumn(Name = "Height(cm)")]
-        public int Height { get; set; }
-        [CsvColumn(Name = "Weight(kg)")]
+        [CsvColumn(Name = "Length")]
+        public decimal Length { get; set; }
+        [CsvColumn(Name = "Width")]
+        public decimal Width { get; set; }
+        [CsvColumn(Name = "Height")]
+        public decimal Height { get; set; }
+        [CsvColumn(Name = "Weight")]
         public decimal Weight { get; set; }
+        [CsvColumn(Name = "Reference SKU")]
+        public string ReferenceSKU { get; set; }
+        [CsvColumn(Name = "Note")]
+        public string Note { get; set; }
+        [CsvColumn(Name = "Name")]
+        public string Name { get; set; }
+        [CsvColumn(Name = "Product Link")]
+        public string ProductLink { get; set; }
         [CsvColumn(Name = "Image1")]
         public string Image1 { get; set; }
         [CsvColumn(Name = "Image2")]
         public string Image2 { get; set; }
-        
+        [CsvColumn(Name = "Image3")]
+        public string Image3 { get; set; }
+        [CsvColumn(Name = "Image4")]
+        public string Image4 { get; set; }
+        [CsvColumn(Name = "Image5")]
+        public string Image5 { get; set; }
+        [CsvColumn(Name = "Image6")]
+        public string Image6 { get; set; }
+        [CsvColumn(Name = "Image7")]
+        public string Image7 { get; set; }
+        [CsvColumn(Name = "Image8")]
+        public string Image8 { get; set; }
+
+    }
+
+    public class SelloImageLine
+    {
+        [CsvColumn(Name = "Item No.")]
+        public string SKU { get; set; }
+        [CsvColumn(Name = "Image 1")]
+        public string Image1 { get; set; }
+        [CsvColumn(Name = "Image 2")]
+        public string Image2 { get; set; }
+        [CsvColumn(Name = "Image 3")]
+        public string Image3 { get; set; }
+        [CsvColumn(Name = "Image 4")]
+        public string Image4 { get; set; }
+        [CsvColumn(Name = "Image 5")]
+        public string Image5 { get; set; }
+        [CsvColumn(Name = "Image 6")]
+        public string Image6 { get; set; }
+        [CsvColumn(Name = "Image 7")]
+        public string Image7 { get; set; }
+        [CsvColumn(Name = "Image 8")]
+        public string Image8 { get; set; }
     }
 
     #endregion

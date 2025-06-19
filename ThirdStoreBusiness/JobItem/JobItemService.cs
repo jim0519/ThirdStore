@@ -846,39 +846,43 @@ namespace ThirdStoreBusiness.JobItem
                     else if(!string.IsNullOrEmpty( localListing.JobItemInvIDs))
                     {
                         var jobItemIDs = localListing.JobItemInvIDs.Split(';');
-                        var newestJobItemID = Convert.ToInt32( jobItemIDs.Skip(jobItemIDs.Count()-1).Take(1).FirstOrDefault());
-                        var newestJobItem = GetJobItemByID(newestJobItemID);
-
-                        checkImageValidCount = 0;
-                        foreach (var jobItmImg in newestJobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
+                        var newestJobItemID = 0;
+                        int.TryParse(jobItemIDs.Skip(jobItemIDs.Count() - 1).Take(1).FirstOrDefault(), out newestJobItemID);
+                        if (newestJobItemID > 0)
                         {
-                            if (i <= 12)
+                            var newestJobItem = GetJobItemByID(newestJobItemID);
+
+                            checkImageValidCount = 0;
+                            foreach (var jobItmImg in newestJobItem.JobItemImages.Where(img => !img.StatusID.Equals(0)).OrderBy(img => img.DisplayOrder))
                             {
-                                var jobItemImgURL = _imageService.GetImageURL(jobItmImg.ImageID);
-
-                                if (!isJobItemImageURLValid)
+                                if (i <= 12)
                                 {
-                                    if (checkImageValidCount < 2)
+                                    var jobItemImgURL = _imageService.GetImageURL(jobItmImg.ImageID);
+
+                                    if (!isJobItemImageURLValid)
                                     {
-                                        if (CommonFunc.DoesImageExistRemotely(jobItemImgURL))
+                                        if (checkImageValidCount < 2)
                                         {
-                                            lstImageURLs.Add(jobItemImgURL);
-                                            isJobItemImageURLValid = true;
+                                            if (CommonFunc.DoesImageExistRemotely(jobItemImgURL))
+                                            {
+                                                lstImageURLs.Add(jobItemImgURL);
+                                                isJobItemImageURLValid = true;
+                                            }
+                                            checkImageValidCount++;
                                         }
-                                        checkImageValidCount++;
                                     }
-                                }
-                                else
-                                {
-                                    lstImageURLs.Add(jobItemImgURL);
-                                }
+                                    else
+                                    {
+                                        lstImageURLs.Add(jobItemImgURL);
+                                    }
 
-                                i++;
+                                    i++;
+                                }
                             }
+
+
+                            break;
                         }
-
-
-                        break;
                     }
                 }
             }

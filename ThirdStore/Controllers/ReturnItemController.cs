@@ -12,6 +12,8 @@ using ThirdStoreBusiness.ReturnItem;
 using ThirdStoreBusiness.Item;
 using ThirdStoreCommon.Models.ReturnItem;
 using ThirdStoreFramework.MVC;
+using ThirdStore.Models.Item;
+using ThirdStoreBusiness.Image;
 
 namespace ThirdStore.Controllers
 {
@@ -19,11 +21,14 @@ namespace ThirdStore.Controllers
     {
         private readonly IReturnItemService _returnItemService;
         private readonly IItemService _itemService;
+        private readonly IImageService _imageService;
         public ReturnItemController(IReturnItemService returnItemService,
+            IImageService imageService,
              IItemService itemService)
         {
             _returnItemService = returnItemService;
             _itemService = itemService;
+            _imageService = imageService;
         }
 
         public ActionResult List()
@@ -125,14 +130,14 @@ namespace ThirdStore.Controllers
                 }
             }
 
-            //if (model.ReturnItemViewImages != null && model.ReturnItemViewImages.Count > 0)
-            //{
-            //    foreach (var lModel in model.ReturnItemViewImages)
-            //    {
-            //        var newEntityLine = lModel.ToEntity().FillOutNull();
-            //        newEntityModel.ReturnItemImages.Add(newEntityLine);
-            //    }
-            //}
+            if (model.ReturnItemViewImages != null && model.ReturnItemViewImages.Count > 0)
+            {
+                foreach (var lModel in model.ReturnItemViewImages)
+                {
+                    var newEntityLine = lModel.ToEntity().FillOutNull();
+                    newEntityModel.ReturnItemImages.Add(newEntityLine);
+                }
+            }
 
             _returnItemService.InsertReturnItem(newEntityModel);
 
@@ -222,25 +227,25 @@ namespace ThirdStore.Controllers
             }
 
 
-            //if (model.ReturnItemViewImages != null && model.ReturnItemViewImages.Count > 0)
-            //{
-            //    foreach (var lModel in model.ReturnItemViewImages)
-            //    {
-            //        if (lModel.ID > 0)
-            //        {
-            //            var originLine = editEntityModel.ReturnItemImages.Where(l => l.ID == lModel.ID).FirstOrDefault();
-            //            if (originLine != null)
-            //            {
-            //                originLine = lModel.ToEntity(originLine).FillOutNull();
-            //            }
-            //        }
-            //        else
-            //        {
-            //            var editEntityLine = lModel.ToEntity().FillOutNull();
-            //            editEntityModel.ReturnItemImages.Add(editEntityLine);
-            //        }
-            //    }
-            //}
+            if (model.ReturnItemViewImages != null && model.ReturnItemViewImages.Count > 0)
+            {
+                foreach (var lModel in model.ReturnItemViewImages)
+                {
+                    if (lModel.ID > 0)
+                    {
+                        var originLine = editEntityModel.ReturnItemImages.Where(l => l.ID == lModel.ID).FirstOrDefault();
+                        if (originLine != null)
+                        {
+                            originLine = lModel.ToEntity(originLine).FillOutNull();
+                        }
+                    }
+                    else
+                    {
+                        var editEntityLine = lModel.ToEntity().FillOutNull();
+                        editEntityModel.ReturnItemImages.Add(editEntityLine);
+                    }
+                }
+            }
 
             _returnItemService.UpdateReturnItem(editEntityModel);
 
@@ -270,10 +275,17 @@ namespace ThirdStore.Controllers
         [HttpPost]
         public ActionResult FindReturnItemByTrackingNumber(string trackingNumber)
         {
-            var returnItem = _returnItemService.FindByTrackingNumber(trackingNumber);
+            D_ReturnItem returnItem = null;
+            var trackingNumberRule = _returnItemService.GetTrackingNumberRule(trackingNumber);
+            if(trackingNumberRule!=null)
+            {
+                var realTrackingNumber = trackingNumber.Substring(trackingNumberRule.TrackingPrefixDigit, trackingNumberRule.TrackingMainDigit);
+                returnItem = _returnItemService.FindByTrackingNumber(realTrackingNumber);
+            }
+
             if (returnItem == null)
             {
-                return Json(new { Result = false, ErrMessage = "Cannot match the return item or there are more than one return item matches the tracking number" });
+                return Json(new { Result = false, ErrMessage = "Cannot match the return item or there are more than one return item matches the tracking number",SupplierID=(trackingNumberRule!=null? trackingNumberRule.SupplierID:0),CarrierName= (trackingNumberRule != null ? trackingNumberRule.CarrierName : string.Empty) });
             }
             else
             {
@@ -365,12 +377,125 @@ namespace ThirdStore.Controllers
             return Json(new { Result = true });
         }
 
+        [HttpPost]
+        public ActionResult ValidateFullSet(IList<ReturnItemViewModel.ReturnItemLineViewModel> returnItemLines,string designatedSKU)
+        {
+            try
+            {
+                if (returnItemLines == null || returnItemLines.Count==0|| string.IsNullOrWhiteSpace(designatedSKU))
+                    return Json(new { Result = true, Fullset = false });
+                //else if(string.IsNullOrWhiteSpace(designatedSKU))
+                var designatedItem = _itemService.GetItemBySKU(designatedSKU);
+                if (designatedItem == null)
+                    return Json(new { Result = true, Fullset = false });
+
+                var grpViewItemLines = from vl in returnItemLines
+                                       group vl by vl.SKU.ToUpper() into grp
+                                       select new
+                                       {
+                                           SKU = grp.Key,
+                                           Qty = grp.Count()
+                                       };
+
+                var leftJoinResult = from vl in grpViewItemLines
+                                         //join itm in childItems on vl.SKU.ToUpper() equals itm.SKU.ToUpper()
+                                     join dc in designatedItem.ChildItems on new { SKU = vl.SKU.ToUpper(), Qty = vl.Qty } equals new { SKU = dc.ChildItem.SKU.ToUpper(), Qty = dc.ChildItemQty } into leftJoin
+                                     from lj in leftJoin.DefaultIfEmpty()
+                                     select lj;
+
+                var rightJoinResult = from dc in designatedItem.ChildItems
+                                      join vl in grpViewItemLines on new { SKU = dc.ChildItem.SKU.ToUpper(), Qty = dc.ChildItemQty } equals new { SKU = vl.SKU.ToUpper(), Qty = vl.Qty } into rightJoin
+                                      from rj in rightJoin.DefaultIfEmpty()
+                                      select rj;
+
+                if (leftJoinResult.Any(lj => lj == null) || rightJoinResult.Any(rj => rj == null))
+                {
+                    return Json(new { Result = true, Fullset = false });
+                }
+                else
+                {
+                    return Json(new { Result = true, Fullset = true });
+                }
+            }
+            catch(Exception ex)
+            {
+                return Json(new { Result = false, ErrMessage=ex.Message });
+            }
+
+            
+        }
+
+        [HttpPost]
+        public ActionResult UploadImages(HttpPostedFileBase[] returnItemImages)
+        {
+
+            var lstSavedImages = new List<ReturnItemViewModel.ReturnItemImageViewModel>();
+            if (returnItemImages != null)
+            {
+                foreach (var imgFile in returnItemImages)
+                {
+                    var img = _imageService.SaveImage(imgFile.InputStream, imgFile.FileName);
+                    var imgViewModel = new ReturnItemViewModel.ReturnItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID) };
+                    lstSavedImages.Add(imgViewModel);
+                }
+            }
+
+            return Json(new { ImageList = lstSavedImages });
+        }
+
+        [HttpPost]
+        public ActionResult ReadReturnItemImages(DataSourceRequest command, int returnItemID)
+        {
+            if (returnItemID > 0)
+            {
+                IList<ReturnItemViewModel.ReturnItemImageViewModel> returnItemImages = null;
+                var returnItem = _returnItemService.GetReturnItemByID(returnItemID);
+                if (returnItem != null)
+                {
+                    returnItemImages = returnItem.ReturnItemImages.Select(r =>
+                    {
+                        var viewModel = r.ToModel();
+                        viewModel.ImageURL = _imageService.GetImageURL(r.ImageID);
+                        viewModel.ImageName = r.Image.ImageName;
+                        return viewModel;
+                    }).ToList();
+                }
+
+
+                var gridModel = new DataSourceResult() { Data = returnItemImages, Total = returnItemImages.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else
+                return Json(new object { });
+        }
+
+
+        [HttpPost]
+        public ActionResult ReturnItemImageDelete(ReturnItemViewModel.ReturnItemImageViewModel model)
+        {
+            if (model.ID > 0)
+            {
+                var image = _imageService.GetImageByID(model.ImageID);
+                if (image != null)
+                    _imageService.DeleteImage(image);
+            }
+
+            return new NullJsonResult();
+        }
 
 
 
         private void FillDropDownDS(ReturnItemViewModel model)
         {
             model.ReturnItemStatuses = ThirdStoreReturnItemStatus.PARTIAL.ToSelectList(false).ToList();
+            model.Suppliers=ThirdStoreSupplier.T.ToSelectList(false).ToList();
+            //model.Couriers = ThirdStoreCouriers.AustraliaPost.ToSelectList(false).ToList();
         }
 
         private string GetSKUsDetails(D_ReturnItem returnItem)

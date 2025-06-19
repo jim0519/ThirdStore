@@ -53,12 +53,14 @@
     <Compile Include="Mapping\D_AttachmentMap.cs" />
     <Compile Include="Mapping\D_ReturnItemLineMap.cs" />
     <Compile Include="Mapping\D_ReturnItemMap.cs" />
+    <Compile Include="Mapping\M_ReturnItemImageMap.cs" />
     <Compile Include="Mapping\M_JobItemAttachmentMap.cs" />
     <Compile Include="Mapping\M_ItemAttachmentMap.cs" />
     <Compile Include="Mapping\M_RolePermissionMap.cs" />
     <Compile Include="Mapping\M_UserRoleMap.cs" />
     <Compile Include="Mapping\NetoProductsMap.cs" />
     <Compile Include="Mapping\D_NewAimSKUBarcodeMap.cs" />
+    <Compile Include="Mapping\T_CarrierTrackingRuleMap.cs" />
     <Compile Include="Mapping\T_LogMap.cs" />
     <Compile Include="Mapping\T_SettingMap.cs" />
     <Compile Include="Mapping\T_ScheduleRuleLineMap.cs" />

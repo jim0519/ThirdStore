@@ -759,12 +759,16 @@ namespace ThirdStoreBusiness.Order
                 carrierCode = "Australia Post";
             else if (carrier == "ARAMEX")
                 carrierCode = "FASTWAY COURIERS";
+            else if (carrier == "Aramex Australia")
+                carrierCode = "FASTWAY COURIERS";
             else if (carrier == "HUNTER")
                 carrierCode = "Hunter Express";
             else if (carrier == "TOLL")
                 carrierCode = "Toll";
             else if (carrier == "ALLIED")
                 carrierCode = "Allied Express";
+            else if (carrier == "TEAM GLOBAL EXPRESS")
+                carrierCode = "TEAM GLOBAL EXPRESS";
             else
                 carrierCode = "Australia Post";
 

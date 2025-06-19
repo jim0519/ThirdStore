@@ -125,6 +125,16 @@ namespace ThirdStoreCommon
         FULL = 2
     }
 
+    public enum ThirdStoreCouriers
+    {
+        AustraliaPost=1,
+        Aramex=2,
+        AlliedExpress=3,
+        HunterExpress=4,
+        CouriersPlease=5,
+        Hubbed=6
+    }
+
     public enum ThirdStoreReviewStatus
     {
         PendingReview=1,

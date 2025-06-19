@@ -21,6 +21,10 @@ namespace ThirdStoreData.Mapping
                 .IsRequired()
                 .HasMaxLength(100);
 
+            this.Property(t => t.CarrierName)
+                .IsRequired()
+                .HasMaxLength(100);
+
             this.Property(t => t.Note)
                 .IsRequired()
                 .HasMaxLength(4000);
@@ -64,6 +68,10 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.DesignatedSKU).HasColumnName("DesignatedSKU");
             this.Property(t => t.Note).HasColumnName("Note");
             this.Property(t => t.TrackingNumber).HasColumnName("TrackingNumber");
+            this.Property(t => t.SupplierID).HasColumnName("SupplierID");
+            this.Property(t => t.CarrierName).HasColumnName("CarrierName");
+            this.Property(t => t.NOP).HasColumnName("NOP");
+            this.Property(t => t.FullSet).HasColumnName("FullSet");
             this.Property(t => t.CreateTime).HasColumnName("CreateTime");
             this.Property(t => t.CreateBy).HasColumnName("CreateBy");
             this.Property(t => t.EditTime).HasColumnName("EditTime");

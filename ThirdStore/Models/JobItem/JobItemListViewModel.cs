@@ -67,6 +67,7 @@ namespace ThirdStore.Models.JobItem
             [RegularExpression(@"^[0-1]\.\d{1,2}$", ErrorMessage = "Percentage only can be decimal and 2 decimal places")]
             [DisplayFormat(DataFormatString = "{0:0.00}", ApplyFormatInEditMode = true)]
             public decimal PricePercentage { get; set; } = 0;
+            public string TrackingNumber { get; set; }
         }
     }
 }

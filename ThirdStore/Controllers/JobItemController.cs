@@ -722,13 +722,13 @@ namespace ThirdStore.Controllers
                 return Json(new { Result = false, Message = "Please input the item location." });
             }
 
-            //if (isPrintLabel)
-            //{
-            //    if (model.JobItemViewImages == null || model.JobItemViewImages.Count < 6)
-            //    {
-            //        return Json(new { Result = false, Message = "Please upload ast least 6 photos." });
-            //    }
-            //}
+            if (isPrintLabel)
+            {
+                if (model.JobItemViewImages == null || model.JobItemViewImages.Count < 6)
+                {
+                    return Json(new { Result = false, Message = "Please upload ast least 6 photos." });
+                }
+            }
 
             //if(model.JobItemViewLines.Any(l=>l.Qty>1))
             return Json(new { Result=true});
@@ -941,6 +941,7 @@ namespace ThirdStore.Controllers
                     jobItemImages = jobItem.JobItemImages.Select(r =>
                     {
                         var img = _imageService.DuplicateImageByID(r.ImageID);
+                        //var img = _imageService.GetImageByID(r.ImageID);
                         return new JobItemViewModel.JobItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID), StatusID=Convert.ToBoolean( r.StatusID), DisplayOrder=r.DisplayOrder };
                     }).ToList();
                 }
@@ -1058,6 +1059,11 @@ namespace ThirdStore.Controllers
                         if(bulkUpdate.PricePercentage>0)
                         {
                             jobItem.PricePercentage = bulkUpdate.PricePercentage;
+                        }
+
+                        if (!string.IsNullOrEmpty(bulkUpdate.TrackingNumber))
+                        {
+                            jobItem.TrackingNumber = bulkUpdate.TrackingNumber.Trim();
                         }
 
                         _jobItemService.UpdateJobItem(jobItem);

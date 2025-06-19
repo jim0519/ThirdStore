@@ -27,5 +27,12 @@ namespace ThirdStoreBusiness.Report
             int pageIndex = 0,
             int pageSize = int.MaxValue);
 
+        IPagedList<SupplierStatisticReport> GetSupplierStatisticReport(
+            DateTime? createTimeFrom = null,
+            DateTime? createTimeTo = null,
+            int supplierID = 0,
+            int pageIndex = 0,
+            int pageSize = int.MaxValue);
+
     }
 }

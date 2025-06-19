@@ -1912,7 +1912,11 @@ CREATE TABLE [dbo].[D_ReturnItem](
 	[StatusID] int NOT NULL,
 	[DesignatedSKU] [varchar](500) not null,
 	[TrackingNumber] [varchar](100) not null,
+	[SupplierID][int] not null,
+	[CarrierName][varchar](100) not null,
 	[Note] varchar(4000) NOT NULL,
+	[NOP] bit not null,
+	[FullSet] bit not null,
 	[Ref1] [varchar](4000) NOT NULL,
 	[Ref2] [varchar](4000) NOT NULL,
 	[Ref3] [varchar](4000) NOT NULL,
@@ -1948,6 +1952,7 @@ CREATE TABLE [dbo].[D_ReturnItemLine](
 	[Height] decimal(18,8) NOT NULL,
 	[CubicWeight] decimal(18,8) NOT NULL,
 	[Location] [varchar](500) NOT NULL,
+	[TrackingNumber] [varchar](500) NOT NULL,
 	[Ref1] [varchar](4000) NOT NULL,
 	[Ref2] [varchar](4000) NOT NULL,
 	[Ref3] [varchar](4000) NOT NULL,
@@ -2346,6 +2351,40 @@ where JobItemCreateTime>'20230101' and JobItemCreateTime<'20240401'
 and Type in (1,2)
 
 
+select 
+Status,
+JobItemType,
+JobItemCreateTime,
+Reference,
+Location,
+case I.SupplierID when 1 then 'New Aim'
+ when 2 then 'CrazySale'
+ when 3 then 'Sello'
+ when 4 then 'T'
+ when 5 then 'O'
+ when 6 then 'K'
+ when 7 then 'CostWay'
+ else 'Unknown'
+ end Supplier,
+Condition,
+HSKU SKU,
+H.Ref2 as Inspectors,
+Qty,
+ItemPrice Price,
+--ShipTime,
+StocktakeTime,
+ItemDetail,
+SL.CBM
+--,* 
+from V_JobItemWithSKU H
+inner join (select SUM(cast(Ref1 as decimal(18,8))) CBM,L.HeaderID from D_JobItemLine L group by L.HeaderID) SL on H.ID=SL.HeaderID
+left join D_Item I on H.HSKU=I.SKU
+where 
+--JobItemCreateTime>'20230101' and JobItemCreateTime<'20240401' and 
+JobItemType='SELFSTORED' and
+status not in ('SHIPPED')
+
+
 
 
 
@@ -2358,3 +2397,120 @@ GETDATE(),
 'System',
 GETDATE(),
 'System'
+
+
+
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[T_CarrierTrackingRule]') AND type in (N'U'))
+DROP TABLE [dbo].[T_CarrierTrackingRule]
+GO
+CREATE TABLE [dbo].[T_CarrierTrackingRule](
+	[ID] [int] IDENTITY (1, 1) NOT NULL,
+    [CarrierMatchCode] [varchar] (500) NOT NULL,
+	[TrackingPrefixDigit] int NOT NULL,
+    [TrackingMainDigit] int NOT NULL,
+    [SupplierID] int NOT NULL,
+	[CarrierName] [varchar] (500) NOT NULL,
+    [CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null
+
+ CONSTRAINT [PK_T_CarrierTrackingRule] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+insert into T_CarrierTrackingRule
+select
+'33RMX',
+18,
+23,
+1,
+'Australia Post',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_CarrierTrackingRule
+select
+'33RMY',
+18,
+23,
+1,
+'Australia Post',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_CarrierTrackingRule
+select
+'AIB',
+0,
+9,
+1,
+'Hunter Express',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+insert into T_CarrierTrackingRule
+select
+'AIM',
+0,
+9,
+1,
+'Hunter Express',
+GETDATE(),
+'System',
+GETDATE(),
+'System'
+
+
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[M_ReturnItemImage]') AND type in (N'U'))
+DROP TABLE [dbo].[M_ReturnItemImage]
+GO
+CREATE TABLE [dbo].[M_ReturnItemImage](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ReturnItemID] [int] NOT NULL,
+	[ImageID] [int] NOT NULL,
+	[DisplayOrder] [int] NOT NULL,
+	[StatusID] [int] NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](100) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](100) not null,
+
+ CONSTRAINT [PK_M_ReturnItemImage] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_M_ReturnItemImage_D_Image]') AND parent_object_id = OBJECT_ID(N'[dbo].[M_ReturnItemImage]'))
+ALTER TABLE [dbo].[M_ReturnItemImage]  WITH CHECK ADD CONSTRAINT [FK_M_ReturnItemImage_D_Image] FOREIGN KEY([ImageID])
+REFERENCES [dbo].[D_Image] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_M_ReturnItemImage_D_Item]') AND parent_object_id = OBJECT_ID(N'[dbo].[M_ReturnItemImage]'))
+ALTER TABLE [dbo].[M_ReturnItemImage]  WITH CHECK ADD CONSTRAINT [FK_M_ReturnItemImage_D_ReturnItem] FOREIGN KEY([ReturnItemID])
+REFERENCES [dbo].[D_ReturnItem] ([ID])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO

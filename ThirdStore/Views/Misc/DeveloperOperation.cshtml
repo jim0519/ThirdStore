@@ -16,6 +16,7 @@
             <input type="button" id="btnUpdateDSZ" class="k-button" value="Update DSZ Data and Sync" />
             <input type="button" id="btnImportData" class="k-button" value="Import Data" />
             <input type="button" id="btnImportCostwayData" class="k-button" value="Import Costway Data" />
+            <input type="button" id="btnUpdateSelloImage" class="k-button" value="Update Sello Image" />
         </div>
     </div>
 
@@ -106,6 +107,40 @@
                             success: function (data) {
                                 if (data.Result) {
                                     alert("Update DSZ Success");
+                                }
+                                else {
+                                    //debugger;
+                                    if (data.Message != "")
+                                        alert(data.Message);
+                                    else
+                                        alert("Unknown error occurred.");
+                                }
+                            },
+                            error: function (data) {
+                                //debugger;
+
+                                alert("error");
+                            }
+                        });
+                        return false;
+                    });
+
+            $('#btnUpdateSelloImage').click(function () {
+                        var link="@Html.Raw(Url.Action("UpdateSelloImage", "Misc"))"
+
+                        $.ajax({
+                            url: link,
+                            type: "POST",
+                            dataType: "json",
+                            beforeSend: function () {
+                                $("#imgLoading").show();
+                            },
+                            complete: function () {
+                                $("#imgLoading").hide();
+                            },
+                            success: function (data) {
+                                if (data.Result) {
+                                    alert("Update Sello Image Success");
                                 }
                                 else {
                                     //debugger;

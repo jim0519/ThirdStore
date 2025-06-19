@@ -622,47 +622,47 @@ namespace ThirdStoreBusiness.DSChannel
 
             try
             {
-                IList<SelloDSModel> dsDatas = null;
-                using (var webClient = new ThirdStoreWebClient())
-                {
-                    if (!Directory.Exists(this.DSDataPath))
-                        Directory.CreateDirectory(this.DSDataPath);
-                    var fileName = this.DSDataPath + "\\" + CommonFunc.ToCSVFileName("SelloDSData");
+                //IList<SelloDSModel> dsDatas = null;
+                //using (var webClient = new ThirdStoreWebClient())
+                //{
+                //    if (!Directory.Exists(this.DSDataPath))
+                //        Directory.CreateDirectory(this.DSDataPath);
+                //    var fileName = this.DSDataPath + "\\" + CommonFunc.ToCSVFileName("SelloDSData");
 
-                    webClient.DownloadFile(DSDataURL, fileName);
-                    dsDatas = _csvContext.Read<SelloDSModel>(fileName, _csvFileDescription).ToList();
-                    if (dsDatas != null)
-                    {
-                        foreach (var dsData in dsDatas)
-                        {
-                            var newItem = new D_Item();
-                            if (dsData.sku.Length > 23)
-                                LogManager.Instance.Info($"SKU {dsData.sku} length is larger than 23.");
+                //    webClient.DownloadFile(DSDataURL, fileName);
+                //    dsDatas = _csvContext.Read<SelloDSModel>(fileName, _csvFileDescription).ToList();
+                //    if (dsDatas != null)
+                //    {
+                //        foreach (var dsData in dsDatas)
+                //        {
+                //            var newItem = new D_Item();
+                //            if (dsData.sku.Length > 23)
+                //                LogManager.Instance.Info($"SKU {dsData.sku} length is larger than 23.");
 
-                            newItem.SKU = dsData.sku;
-                            newItem.Name = dsData.name;
-                            newItem.Description = dsData.description;
-                            newItem.Cost = dsData.special_price;//+(!string.IsNullOrEmpty(dsData.NSW_R)?Convert.ToDecimal(dsData.NSW_R):0);
-                            newItem.Price = (newItem.Cost) * _commonSetting.DropshipMarkupRate;
-                            newItem.Type= ThirdStoreItemType.SINGLE.ToValue();
-                            newItem.SupplierID = ThirdStoreSupplier.S.ToValue();
-                            newItem.GrossWeight = (!string.IsNullOrWhiteSpace(dsData.weight) ? Convert.ToDecimal(dsData.weight) : 0);
-                            newItem.NetWeight = (!string.IsNullOrWhiteSpace(dsData.weight) ? Convert.ToDecimal(dsData.weight) : 0);
-                            newItem.Length = (!string.IsNullOrWhiteSpace(dsData.length) ? Convert.ToDecimal(dsData.length) / 100 : 0);
-                            newItem.Width = (!string.IsNullOrWhiteSpace(dsData.width) ? Convert.ToDecimal(dsData.width) / 100 : 0);
-                            newItem.Height = (!string.IsNullOrWhiteSpace(dsData.height) ? Convert.ToDecimal(dsData.height) / 100 : 0);
-                            newItem.Ref3 = dsData.UPC?.Trim();
-                            newItem.IsReadyForList = (dsData.sku.Length <= 23 && dsData.special_price > Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove) ? true : false);
-                            newItem.IsActive = true;
+                //            newItem.SKU = dsData.sku;
+                //            newItem.Name = dsData.name;
+                //            newItem.Description = dsData.description;
+                //            newItem.Cost = dsData.special_price;//+(!string.IsNullOrEmpty(dsData.NSW_R)?Convert.ToDecimal(dsData.NSW_R):0);
+                //            newItem.Price = (newItem.Cost) * _commonSetting.DropshipMarkupRate;
+                //            newItem.Type= ThirdStoreItemType.SINGLE.ToValue();
+                //            newItem.SupplierID = ThirdStoreSupplier.S.ToValue();
+                //            newItem.GrossWeight = (!string.IsNullOrWhiteSpace(dsData.weight) ? Convert.ToDecimal(dsData.weight) : 0);
+                //            newItem.NetWeight = (!string.IsNullOrWhiteSpace(dsData.weight) ? Convert.ToDecimal(dsData.weight) : 0);
+                //            newItem.Length = (!string.IsNullOrWhiteSpace(dsData.length) ? Convert.ToDecimal(dsData.length) / 100 : 0);
+                //            newItem.Width = (!string.IsNullOrWhiteSpace(dsData.width) ? Convert.ToDecimal(dsData.width) / 100 : 0);
+                //            newItem.Height = (!string.IsNullOrWhiteSpace(dsData.height) ? Convert.ToDecimal(dsData.height) / 100 : 0);
+                //            newItem.Ref3 = dsData.UPC?.Trim();
+                //            newItem.IsReadyForList = (dsData.sku.Length <= 23 && dsData.special_price > Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove) ? true : false);
+                //            newItem.IsActive = true;
 
-                            var imagesURL = GetImageURLList(dsData);
-                            if(imagesURL.Count>0)
-                                newItem.Ref5=imagesURL.Aggregate((current, next) => current + ";" + next);
+                //            var imagesURL = GetImageURLList(dsData);
+                //            if(imagesURL.Count>0)
+                //                newItem.Ref5=imagesURL.Aggregate((current, next) => current + ";" + next);
 
-                            retItems.Add(newItem);
-                        }
-                    }
-                }
+                //            retItems.Add(newItem);
+                //        }
+                //    }
+                //}
 
                 return retItems;
             }
@@ -727,55 +727,55 @@ namespace ThirdStoreBusiness.DSChannel
             try
             {
                 List<string> syncSKUs = new List<string>();
-                var di = new DirectoryInfo(this.DSDataPath);
-                if (di.Exists)
-                {
-                    FileInfo[] files = di.GetFiles().ToArray();
-                    if (files.Count() > 0)
-                    {
-                        var top2DataFile = files.OrderByDescending(fi => fi.CreationTime).Take(2);
-                        var syncDSPriceAbove = Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove);
-                        var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
-                        if (top2DataFile.Count() == 2)
-                        {
-                            var latestDataFile = top2DataFile.First();
-                            var secondLatestDataFile = top2DataFile.Last();
+                //var di = new DirectoryInfo(this.DSDataPath);
+                //if (di.Exists)
+                //{
+                //    FileInfo[] files = di.GetFiles().ToArray();
+                //    if (files.Count() > 0)
+                //    {
+                //        var top2DataFile = files.OrderByDescending(fi => fi.CreationTime).Take(2);
+                //        var syncDSPriceAbove = Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove);
+                //        var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
+                //        if (top2DataFile.Count() == 2)
+                //        {
+                //            var latestDataFile = top2DataFile.First();
+                //            var secondLatestDataFile = top2DataFile.Last();
 
-                            var latestData = _csvContext.Read<SelloDSModel>(latestDataFile.FullName, _csvFileDescription);
-                            var secondLatestData = _csvContext.Read<SelloDSModel>(secondLatestDataFile.FullName, _csvFileDescription);
+                //            var latestData = _csvContext.Read<SelloDSModel>(latestDataFile.FullName, _csvFileDescription);
+                //            var secondLatestData = _csvContext.Read<SelloDSModel>(secondLatestDataFile.FullName, _csvFileDescription);
 
-                            var leftJoinResult = from ld in latestData
-                                                 join sld in secondLatestData on ld.sku equals sld.sku into leftJoin
-                                                 from lj in leftJoin.DefaultIfEmpty()
-                                                 where lj == null
-                                                 ||
-                                                 ((((ld.qty >= dsInventoryThredshold && lj.qty < dsInventoryThredshold) || (ld.qty < dsInventoryThredshold && lj.qty >= dsInventoryThredshold))
-                                                 || (ld.special_price != lj.special_price)) && (ld.special_price > syncDSPriceAbove || lj.special_price > syncDSPriceAbove))
-                                                 select ld.sku;
+                //            var leftJoinResult = from ld in latestData
+                //                                 join sld in secondLatestData on ld.sku equals sld.sku into leftJoin
+                //                                 from lj in leftJoin.DefaultIfEmpty()
+                //                                 where lj == null
+                //                                 ||
+                //                                 ((((ld.qty >= dsInventoryThredshold && lj.qty < dsInventoryThredshold) || (ld.qty < dsInventoryThredshold && lj.qty >= dsInventoryThredshold))
+                //                                 || (ld.special_price != lj.special_price)) && (ld.special_price > syncDSPriceAbove || lj.special_price > syncDSPriceAbove))
+                //                                 select ld.sku;
 
-                            var rightJoinResult = from sld in secondLatestData
-                                                  join ld in latestData on sld.sku equals ld.sku into rightJoin
-                                                  from rj in rightJoin.DefaultIfEmpty()
-                                                  where rj == null
-                                                  ||
-                                                  ((((sld.qty >= dsInventoryThredshold && rj.qty < dsInventoryThredshold) || (sld.qty < dsInventoryThredshold && rj.qty >= dsInventoryThredshold))
-                                                  || (sld.special_price != rj.special_price)) && (sld.special_price > syncDSPriceAbove || rj.special_price > syncDSPriceAbove))
-                                                  select sld.sku;
+                //            var rightJoinResult = from sld in secondLatestData
+                //                                  join ld in latestData on sld.sku equals ld.sku into rightJoin
+                //                                  from rj in rightJoin.DefaultIfEmpty()
+                //                                  where rj == null
+                //                                  ||
+                //                                  ((((sld.qty >= dsInventoryThredshold && rj.qty < dsInventoryThredshold) || (sld.qty < dsInventoryThredshold && rj.qty >= dsInventoryThredshold))
+                //                                  || (sld.special_price != rj.special_price)) && (sld.special_price > syncDSPriceAbove || rj.special_price > syncDSPriceAbove))
+                //                                  select sld.sku;
 
-                            syncSKUs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
-                                        select sku).ToList();
-                        }
-                        else if (top2DataFile.Count() == 1)
-                        {
-                            var latestDataFile = top2DataFile.First();
-                            var latestData = _csvContext.Read<SelloDSModel>(latestDataFile.FullName, _csvFileDescription);
+                //            syncSKUs = (from sku in leftJoinResult.Union(rightJoinResult).Distinct()
+                //                        select sku).ToList();
+                //        }
+                //        else if (top2DataFile.Count() == 1)
+                //        {
+                //            var latestDataFile = top2DataFile.First();
+                //            var latestData = _csvContext.Read<SelloDSModel>(latestDataFile.FullName, _csvFileDescription);
 
-                            syncSKUs = (from ld in latestData
-                                        where ld.special_price > syncDSPriceAbove
-                                        select ld.sku).ToList();
-                        }
-                    }
-                }
+                //            syncSKUs = (from ld in latestData
+                //                        where ld.special_price > syncDSPriceAbove
+                //                        select ld.sku).ToList();
+                //        }
+                //    }
+                //}
                 return syncSKUs;
             }
             catch(Exception ex)
@@ -790,31 +790,31 @@ namespace ThirdStoreBusiness.DSChannel
             try
             {
                 var retList = new List<Tuple<string, int,bool>>();
-                var di = new DirectoryInfo(DSDataPath);
-                if (di.Exists)
-                {
-                    FileInfo[] files = di.GetFiles().ToArray();
-                    if (files.Count() > 0)
-                    {
-                        var dszDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
-                        var dsDatas = _csvContext.Read<SelloDSModel>(dszDataFile.FullName, _csvFileDescription);
-                        var dsDatasBySKUs = dsDatas.Where(d => skus.Select(s => s.ToLower()).Contains(d.sku.ToLower()));
-                        var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
-                        foreach (var data in dsDatasBySKUs)
-                        {
-                            var invQty = 0;
-                            var shippingClassLevel = (!string.IsNullOrWhiteSpace(data.ShippingClass) ? Convert.ToInt32(Regex.Match(data.ShippingClass, @"\d+").Value) : 999);
-                            if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove)
-                                && shippingClassLevel<=3
-                                //&&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "0"
-                                )
-                            {
-                                invQty = dsInventoryThredshold;
-                            }
-                            retList.Add(new Tuple<string, int,bool>(data.sku, invQty,false));
-                        }
-                    }
-                }
+                //var di = new DirectoryInfo(DSDataPath);
+                //if (di.Exists)
+                //{
+                //    FileInfo[] files = di.GetFiles().ToArray();
+                //    if (files.Count() > 0)
+                //    {
+                //        var dszDataFile = files.OrderByDescending(fi => fi.CreationTime).FirstOrDefault();
+                //        var dsDatas = _csvContext.Read<SelloDSModel>(dszDataFile.FullName, _csvFileDescription);
+                //        var dsDatasBySKUs = dsDatas.Where(d => skus.Select(s => s.ToLower()).Contains(d.sku.ToLower()));
+                //        var dsInventoryThredshold = Convert.ToInt32(ThirdStoreConfig.Instance.DSInventoryThreshold);
+                //        foreach (var data in dsDatasBySKUs)
+                //        {
+                //            var invQty = 0;
+                //            var shippingClassLevel = (!string.IsNullOrWhiteSpace(data.ShippingClass) ? Convert.ToInt32(Regex.Match(data.ShippingClass, @"\d+").Value) : 999);
+                //            if (data.qty >= dsInventoryThredshold && data.special_price >Convert.ToDecimal(ThirdStoreConfig.Instance.SyncDSPriceAbove)
+                //                && shippingClassLevel<=3
+                //                //&&!string.IsNullOrWhiteSpace(data.shipping_operation)&& data.shipping_operation== "0"
+                //                )
+                //            {
+                //                invQty = dsInventoryThredshold;
+                //            }
+                //            retList.Add(new Tuple<string, int,bool>(data.sku, invQty,false));
+                //        }
+                //    }
+                //}
                 return retList;
             }
             catch(Exception ex)

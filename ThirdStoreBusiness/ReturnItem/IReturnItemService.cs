@@ -34,6 +34,8 @@ namespace ThirdStoreBusiness.ReturnItem
         D_ReturnItemLine GetReturnItemLineByID(int returnItemLineID);
 
         void DeleteReturnItemLine(D_ReturnItemLine returnItemLine);
+
+        T_CarrierTrackingRule GetTrackingNumberRule(string trackingNumber);
     }
 
     public class ReturnItemService : IReturnItemService
@@ -41,14 +43,17 @@ namespace ThirdStoreBusiness.ReturnItem
         private readonly IRepository<D_ReturnItem> _returnItemRepository;
         private readonly IRepository<D_ReturnItemLine> _returnItemLineRepository;
         private readonly IWorkContext _workContext;
+        private readonly IRepository<T_CarrierTrackingRule> _carrierTrackingRuleRepository;
         public ReturnItemService(IRepository<D_ReturnItem> returnItemRepository,
             IRepository<D_ReturnItemLine> returnItemLineRepository,
-            IWorkContext workContext
+            IWorkContext workContext,
+            IRepository<T_CarrierTrackingRule> carrierTrackingRuleRepository
             )
         {
             _returnItemRepository = returnItemRepository;
             _returnItemLineRepository = returnItemLineRepository;
             _workContext = workContext;
+            _carrierTrackingRuleRepository = carrierTrackingRuleRepository;
         }
 
         public D_ReturnItem FindByTrackingNumber(string trackingNumber)
@@ -122,16 +127,16 @@ namespace ThirdStoreBusiness.ReturnItem
                     line.EditTime = currentTime;
             }
 
-            //foreach (var img in returnItem.JobItemImages)
-            //{
-            //    img.FillOutNull();
-            //    img.CreateBy = currentUser;
-            //    if (img.CreateTime.Equals(DateTime.MinValue))
-            //        img.CreateTime = currentTime;
-            //    img.EditBy = currentUser;
-            //    if (img.EditTime.Equals(DateTime.MinValue))
-            //        img.EditTime = currentTime;
-            //}
+            foreach (var img in returnItem.ReturnItemImages)
+            {
+                img.FillOutNull();
+                img.CreateBy = currentUser;
+                if (img.CreateTime.Equals(DateTime.MinValue))
+                    img.CreateTime = currentTime;
+                img.EditBy = currentUser;
+                if (img.EditTime.Equals(DateTime.MinValue))
+                    img.EditTime = currentTime;
+            }
 
             _returnItemRepository.Insert(returnItem);
         }
@@ -169,22 +174,22 @@ namespace ThirdStoreBusiness.ReturnItem
                 }
             }
 
-            //foreach (var img in returnItem.JobItemImages)
-            //{
-            //    img.FillOutNull();
-            //    if (img.ID > 0)
-            //    {
-            //        img.EditBy = currentUser;
-            //        img.EditTime = currentTime;
-            //    }
-            //    else
-            //    {
-            //        img.CreateBy = currentUser;
-            //        img.CreateTime = currentTime;
-            //        img.EditBy = currentUser;
-            //        img.EditTime = currentTime;
-            //    }
-            //}
+            foreach (var img in returnItem.ReturnItemImages)
+            {
+                img.FillOutNull();
+                if (img.ID > 0)
+                {
+                    img.EditBy = currentUser;
+                    img.EditTime = currentTime;
+                }
+                else
+                {
+                    img.CreateBy = currentUser;
+                    img.CreateTime = currentTime;
+                    img.EditBy = currentUser;
+                    img.EditTime = currentTime;
+                }
+            }
 
             _returnItemRepository.Update(returnItem);
         }
@@ -205,6 +210,49 @@ namespace ThirdStoreBusiness.ReturnItem
                 throw new ArgumentNullException("returnItemLine null");
 
             _returnItemLineRepository.Delete(returnItemLine);
+        }
+
+        public T_CarrierTrackingRule GetTrackingNumberRule(string trackingNumber)
+        {
+            T_CarrierTrackingRule retTrackingRule = null;
+            var carrierTrackingRules = _carrierTrackingRuleRepository.Table.Where(tr => trackingNumber.Contains(tr.CarrierMatchCode));
+            if(carrierTrackingRules.Count()==1)
+            {
+                var carrierTrackingRule = carrierTrackingRules.FirstOrDefault();
+                if(IsMatchingRule(trackingNumber, carrierTrackingRule))
+                    retTrackingRule = carrierTrackingRule;
+            }
+            else if(carrierTrackingRules.Count()>1)
+            {
+                foreach(var carrierTrackingRule in carrierTrackingRules)
+                {
+                    //if (carrierTrackingRule.TrackingPrefixDigit + carrierTrackingRule.TrackingMainDigit > trackingNumber.Length)
+                    //    continue;
+                    //var trackingBaseOnRule=trackingNumber.Substring(carrierTrackingRule.TrackingPrefixDigit-1, carrierTrackingRule.TrackingMainDigit);
+                    //if (trackingBaseOnRule.StartsWith(carrierTrackingRule.CarrierMatchCode))
+                    //    retTrackingNumber = trackingBaseOnRule;
+                    //else
+                    //    continue;
+                    if (IsMatchingRule(trackingNumber, carrierTrackingRule))
+                    {
+                        retTrackingRule = carrierTrackingRule;
+                        break;
+                    }
+                }
+            }
+
+            return retTrackingRule;
+        }
+
+        private bool IsMatchingRule(string trackingNumber,T_CarrierTrackingRule rule)
+        {
+            if (rule.TrackingPrefixDigit + rule.TrackingMainDigit > trackingNumber.Length)
+                return false;
+            var trackingBaseOnRule = trackingNumber.Substring(rule.TrackingPrefixDigit , rule.TrackingMainDigit);
+            if (trackingBaseOnRule.StartsWith(rule.CarrierMatchCode))
+                return true;
+
+            return false;
         }
     }
 }

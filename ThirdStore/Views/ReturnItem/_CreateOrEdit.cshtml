@@ -1,16 +1,16 @@
 ﻿@model ReturnItemViewModel
 
 @*<style>
-    /*Batch Edit Mode*/
-    .k-edit-cell input {
-        width: 100%;
-    }
+        /*Batch Edit Mode*/
+        .k-edit-cell input {
+            width: 100%;
+        }
 
-    /*InLine Edit Mode*/
-    .k-grid-edit-row input {
-        width: 100%;
-    }
-</style>*@
+        /*InLine Edit Mode*/
+        .k-grid-edit-row input {
+            width: 100%;
+        }
+    </style>*@
 
 @Html.HiddenFor(model => model.ID)
 @*<!-- The Templates plugin is included to render the upload/download listings -->
@@ -35,7 +35,7 @@
 <div id="tabs">
     <ul>
         <li><a href="#tabs-1">Basic Info</a></li>
-        <li><a href="#tabs-2">Misc</a></li>
+        <li><a href="#tabs-2">Images</a></li>
     </ul>
 
     <div id="tabs-1">
@@ -49,7 +49,7 @@
 
     </div>
     <div id="tabs-2">
-        
+        @Images()
     </div>
 </div>
 <div>
@@ -63,48 +63,79 @@
 
 @helper BasicInfo()
 {
-<table style="width:100%;">
-    <tr>
-        <td>
-            @Html.LabelFor(m => m.TrackingNumber)
+    <table style="width:100%;">
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.TrackingNumber)
 
-        </td>
-        <td>
-            @if (Model.ID == 0)
-            {@Html.EditorFor(model => model.TrackingNumber) <input type="button" id="btnFind" class="k-button" value="Find" />} 
-        else
-        { @Html.EditorFor(model => model.TrackingNumber, new { htmlAttributes = new { @readonly = "readonly" } })<input type="button" id="btnFind" class="k-button" value="Find" disabled />}
-            
-        </td>
-        <td>
-            @Html.LabelFor(m => m.StatusID)
-        </td>
-        <td>
-            @Html.DropDownListFor(model => model.StatusID, Model.ReturnItemStatuses)
-        </td>
-    </tr>
-    <tr>
-        <td>
-            @Html.LabelFor(m => m.DesignatedSKU)
+            </td>
+            <td>
+                @if (Model.ID == 0)
+                {@Html.EditorFor(model => model.TrackingNumber) <input type="button" id="btnFind" class="k-button" value="Find" />}
+            else
+            { @Html.EditorFor(model => model.TrackingNumber, new { htmlAttributes = new { @readonly = "readonly" } })<input type="button" id="btnFind" class="k-button" value="Find" disabled />}
 
-        </td>
-        <td>
-            @Html.EditorFor(model => model.DesignatedSKU)
-            @if (!string.IsNullOrWhiteSpace(Model.DesignatedSKU))
-            {
-                <a href='@Url.Action("EditBySKU", "Item")?SKU=@Model.DesignatedSKU' target='_blank'>View</a>
-            }
-            @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
-        </td>
-        <td>
-            @Html.LabelFor(m => m.Note)
-        </td>
-        <td>
-            @Html.TextAreaFor(model => model.Note, 4, 30, null)
-        </td>
-    </tr>
-    
-</table>
+            </td>
+            <td>
+                @Html.LabelFor(m => m.StatusID)
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.StatusID, Model.ReturnItemStatuses)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.SupplierID)
+
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.SupplierID, Model.Suppliers)
+                @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
+            </td>
+            <td>
+                @Html.LabelFor(m => m.CarrierName)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.CarrierName)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.DesignatedSKU)
+
+            </td>
+            <td>
+                @Html.EditorFor(model => model.DesignatedSKU)
+                @if (!string.IsNullOrWhiteSpace(Model.DesignatedSKU))
+                {
+                    <a href='@Url.Action("EditBySKU", "Item")?SKU=@Model.DesignatedSKU' target='_blank'>View</a>
+                }
+                @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
+            </td>
+            <td>
+                @Html.LabelFor(m => m.Note)
+            </td>
+            <td>
+                @Html.TextAreaFor(model => model.Note, 4, 30, null)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.NOP)
+
+            </td>
+            <td>
+                @Html.CheckBoxFor(model => model.NOP)
+            </td>
+            <td>
+                @Html.LabelFor(m => m.FullSet)
+            </td>
+            <td>
+                @Html.CheckBoxFor(model => model.FullSet)
+            </td>
+        </tr>
+
+    </table>
 
 }
 
@@ -188,25 +219,32 @@
                                 Height: { editable: true, type: "number" },
                                 CubicWeight: { editable: true, type: "number" },
                                 Ref1: { editable: true, type: "number" },
-                                Location: { editable: true, type: "string" }
+                                Location: { editable: true, type: "string" },
+                                TrackingNumber:{ editable: true, type: "string" }
                             }
                         }
                     },
                     pageSize: "100",
                     requestEnd: function (e) {
-                        //debugger;
-                        if (e.type == "create" || e.type == "update") {
-
+                        debugger;
+                        if (e.type == "create" || e.type == "update" || e.type =="destroy") {
+                            //alert(e.type + " completed.");
+                            ValidateFullSet(e)
                             //this.read();
                         }
                     },
                     error: function (e) {
+                        debugger;
                         display_kendoui_grid_error(e);
                         // Cancel the changes
                         this.cancelChanges();
                     },
-
+                    batch:false
                 },
+                //dataBound: function (e) {
+
+
+                //},
                 pageable: {
                     refresh: true,
                     pageSizes: ["100"]
@@ -336,7 +374,12 @@
                     field: "Location",
                     template: "#=Location#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Location' value='#=Location#' />",
                     width: 100,
-                },
+                    },
+                    {
+                        field: "TrackingNumber",
+                        template: "#=TrackingNumber#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].TrackingNumber' value='#=TrackingNumber#' />",
+                        width: 100,
+                    },
                 //    field: "CreateTime",
                 //    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].CreateTime' value='#=CreateTime#' />",
                 //    hidden: true
@@ -395,6 +438,12 @@
                                 alert(data.ErrMessage);
                             else
                                 alert("Unknown error occurred.");
+
+                            if (data.SupplierID != 0)
+                                $('#@Html.FieldIdFor(model => model.SupplierID)').val(data.SupplierID);
+
+                            if (data.CarrierName != "")
+                                $('#@Html.FieldIdFor(model => model.CarrierName)').val(data.CarrierName);
                         }
                     },
                     error: function (data) {
@@ -459,11 +508,20 @@
     </script>
 }
 
+@helper Images()
+{
 
+    <input type="file" id="uploadImages" name="uploadImages" multiple accept="image/*" />
+    <input type="button" id="btnUpload" value="Upload" />
+    <img name="imgUploadLoading" src="~/Content/images/loading.gif" style="display:none;" />
+    <div id="returnItemImage-grid"></div>
+}
 
 <script>
         $(document).ready(function () {
             $("#tabs").tabs();
+
+            $('#@Html.FieldIdFor(model => model.DesignatedSKU)').change(ValidateFullSet);
 
             $("input[type=submit]").click(function () {
                 //debugger;
@@ -519,9 +577,194 @@
                 }
             });*@
 
-            
+
+            $('#btnUpload').click(function () {
+                var data = new FormData();
+                var files = $("#uploadImages").get(0).files;
+                if (files.length > 0) {
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("ReturnItemImages",files[x]);
+                    }
+                    //data.append("JobItemImages", files);
+                }
+
+                var link = '@Html.Raw(@Url.Action("UploadImages","ReturnItem"))';
+                //debugger;
+                $.ajax({
+                    url: link,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    data: data,
+                    beforeSend: function () {
+                        $("[name='imgUploadLoading']").show();
+                    },
+                    complete: function () {
+                        $("[name='imgUploadLoading']").hide();
+                    },
+                    success: function (response) {
+                        //code after success
+                        //debugger;
+
+                        if (response.ImageList != undefined) {
+                            var grid = $("#returnItemImage-grid").data("kendoGrid");
+                            var data = grid.dataSource.data().toJSON(); //the data of the DataSource
+                            var newRowIndex = data.length;
+                            //var res = Math.max.apply(Math, array.map(function (o) { return o.y; }))
+                            $.each(response.ImageList, function (i, item) {
+                                //debugger;
+                                //alert(key + ": " + value);
+                                var newImage = { ID: 0, ImageID: item['ImageID'], ImageName: item['ImageName'], ImageURL: item['ImageURL'],DisplayOrder: newRowIndex, StatusID: true};
+                                data.push(newImage);
+                                newRowIndex++;
+                            });
+
+                            grid.dataSource.data(data);
+
+                        }
+                        alert("Images upload success.")
+                    },
+                    error: function (er) {
+                        alert(er);
+                    }
+
+                });
+            });
+
+
+            $("#returnItemImage-grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "@Html.Raw(Url.Action("ReadReturnItemImages", "ReturnItem", new { returnItemID = Model.ID }))",
+                            type: "POST",
+                            dataType: "json"
+                        },
+                        update: function (e) { },
+                        create: function (e) { },
+                        destroy: {
+                            url: "@Html.Raw(Url.Action("ReturnItemImageDelete", "ReturnItem"))",
+                            type: "POST",
+                            dataType: "json"
+                        }
+                    },
+                    schema: {
+                        data: "Data",
+                        total: "Total",
+                        errors: "Errors",
+                        model: {
+                            id: "ID",
+                            fields: {
+                                ID: { editable: false, type: "number" },
+                                ImageID: { editable: false, type: "number" },
+                                ImageURL: { editable: false, type: "string" },
+                                ImageName: { editable: false, type: "string" },
+                                DisplayOrder: {
+                                    editable: true, type: "number"
+                                },
+                                StatusID: { editable: true, type: "boolean" }
+                            }
+                        }
+                    },
+                    pageSize: "100",
+                    requestEnd: function (e) {
+                        //debugger;
+                        if (e.type == "create" || e.type == "update") {
+
+                            //this.read();
+                        }
+                    },
+                    error: function (e) {
+                        display_kendoui_grid_error(e);
+                        // Cancel the changes
+                        this.cancelChanges();
+                    },
+
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: ["100"]
+                },
+                editable: {
+                    confirmation: false,
+                    mode: "inline"
+                },
+                scrollable: false,
+                edit: function (e) {
+                    //debugger;
+                    if (e.container.find('.k-grid-cancel') != "undefined") {
+                        e.container.find('.k-grid-cancel').hide();
+                    }
+                    if (e.model.isNew()) {
+                    }
+                },
+                columns: [{
+                    field: "ID",
+                    template: "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].ID' value='#=ID#' />",
+                    hidden: true
+                }, {
+                        field: "ImageID",
+                        template: "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].ImageID' value='#=ImageID#' />",
+                    hidden: true
+                    },
+                    {
+                        field: "ImageURL",
+                        title: "Image",
+                        template: '<a href="#=ImageURL#" target="_blank"><img alt="#=ImageID#" src="#=ImageURL#" width="150" /></a>',
+                        width: 200
+                    },
+                    {
+                        field: "ImageName",
+                        title: "Image Name",
+                        template: '<a href="#=ImageURL#" target="_blank">#=ImageName#</a>',
+                        width: 200
+                    },
+                    //{
+                    //    field: "CreateBy",
+                    //    template: "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].CreateBy' value='#=CreateBy#' />",
+                    //    hidden: true
+                    //}, {
+                    //    field: "CreateTime",
+                    //    template: "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].CreateTime' value='#=CreateTime#' />",
+                    //    hidden: true
+                    //}, {
+                    //    field: "EditBy",
+                    //    template: "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].EditBy' value='#=EditBy#' />",
+                    //    hidden: true
+                    //}, {
+                    //    field: "EditTime",
+                    //    template: "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].EditTime' value='#=EditTime#' />",
+                    //    hidden: true
+                    //},
+                    {
+                        field: "DisplayOrder",
+                        template: "#=DisplayOrder#" + "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].DisplayOrder' value='#=DisplayOrder#' />"
+                }, {
+                        field: "StatusID",
+                        title: "Status",
+                        headerAttributes: { style: "text-align:center" },
+                        attributes: { style: "text-align:center" },
+                        template: '<img src="@Url.Content("~/Content/images/")active-#=StatusID#.gif" />' + "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />"
+                        //template: "#=StatusID#" + "<input type='hidden' name='ReturnItemViewImages[#= imgIndex(data)#].StatusID' value='#=StatusID#' />",
+                    }, {
+                    command: ["edit"
+                        @*@if(Model.ID==0)
+                    {
+                        <text>*@
+                        , { name: "destroy", text: "Del" }
+                //    </text>
+                //}
+                    ], title: "&nbsp;", width: "150px"
+                }]
+            });
 
         });
+
+    function imgIndex(dataItem) {
+        var data = $("#returnItemImage-grid").data("kendoGrid").dataSource.data();
+        return data.indexOf(dataItem);
+    }
 
 
     function appendValidateSummary(appendMessage) {
@@ -552,6 +795,46 @@
             $summary.removeClass("validation-summary-valid")
                 .addClass("validation-summary-errors");
         }
+    }
+
+    function ValidateFullSet(e) {
+        debugger;
+        //var gridDataArray = $('#returnItemLine-grid').data('kendoGrid')._data;// dataSource.data();
+        var grid = $('#returnItemLine-grid').data('kendoGrid');
+        var rowsObjs = $('#returnItemLine-grid').find('tr:has(td)');
+        var dataItems = [];
+                rowsObjs.each(function () {
+            var di = grid.dataItem($(this));
+                    dataItems.push(di);
+        });
+        var postData = JSON.stringify({
+            returnItemLines: dataItems,
+            designatedSKU:$('#@Html.FieldIdFor(model => model.DesignatedSKU)').val()
+        });
+        $.ajax({
+            url: '@Url.Action("ValidateFullSet", "ReturnItem")',
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: postData,
+            dataType: "json",
+            //async: false,
+            success: function (data) {
+                //debugger;
+                if (data.Result) {
+                    if (data.Fullset)
+                        $('#@Html.FieldIdFor(model => model.FullSet)').prop('checked', true);
+                    else
+                        $('#@Html.FieldIdFor(model => model.FullSet)').prop('checked', false);
+                }
+                else {
+                    alert("Fullset check error. " + data.ErrMessage );
+                }
+            },
+            error: function (data) {
+                debugger;
+                alert("Fullset check error");
+            }
+        });
     }
 
 </script>

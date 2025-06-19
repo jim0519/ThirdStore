@@ -17,6 +17,7 @@ using ThirdStoreCommon.Models.Misc;
 using ThirdStore.Models.ReturnItem;
 using ThirdStoreCommon.Models.ReturnItem;
 using ThirdStoreCommon.Models.Attachment;
+using static ThirdStore.Models.ReturnItem.ReturnItemViewModel;
 
 namespace ThirdStore.Extensions
 {
@@ -268,7 +269,21 @@ namespace ThirdStore.Extensions
         {
             return model.MapTo(destination);
         }
-        
+
+        public static ReturnItemViewModel.ReturnItemImageViewModel ToModel(this M_ReturnItemImage entity)
+        {
+            return entity.MapTo<M_ReturnItemImage, ReturnItemViewModel.ReturnItemImageViewModel>();
+        }
+
+        public static M_ReturnItemImage ToEntity(this ReturnItemViewModel.ReturnItemImageViewModel model)
+        {
+            return model.MapTo<ReturnItemViewModel.ReturnItemImageViewModel, M_ReturnItemImage>();
+        }
+
+        public static M_ReturnItemImage ToEntity(this ReturnItemViewModel.ReturnItemImageViewModel model, M_ReturnItemImage destination)
+        {
+            return model.MapTo(destination);
+        }
 
         #endregion
     }

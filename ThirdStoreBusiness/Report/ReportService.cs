@@ -79,5 +79,35 @@ namespace ThirdStoreBusiness.Report
 
             return new PagedList<PriceCompareReport>(query.ToList(), pageIndex, pageSize);
         }
+
+        public IPagedList<SupplierStatisticReport> GetSupplierStatisticReport(
+            DateTime? createTimeFrom = null, 
+            DateTime? createTimeTo = null, 
+            int supplierID = 0, 
+            int pageIndex = 0, 
+            int pageSize = int.MaxValue)
+        {
+            var sqlStr = new StringBuilder();
+            sqlStr.Append("select * from fn_GetShippedReport(@SupplierID,@CreateTimeFrom,@CreateTimeTo)");
+
+            var paraSupplierID = new SqlParameter();
+            paraSupplierID.ParameterName = "supplierID";
+            paraSupplierID.DbType = DbType.Int32;
+            paraSupplierID.Value = supplierID;
+
+            var paraCreateTimeFrom = new SqlParameter();
+            paraCreateTimeFrom.ParameterName = "CreateTimeFrom";
+            paraCreateTimeFrom.DbType = DbType.Date;
+            paraCreateTimeFrom.Value = (createTimeFrom.HasValue ? createTimeFrom.Value.Date : Convert.ToDateTime(Constants.MinDate).Date);
+
+            var paraCreateTimeTo = new SqlParameter();
+            paraCreateTimeTo.ParameterName = "CreateTimeTo";
+            paraCreateTimeTo.DbType = DbType.Date;
+            paraCreateTimeTo.Value = (createTimeTo.HasValue ? createTimeTo.Value.Date : Convert.ToDateTime(Constants.MaxDate).Date);
+
+            var query = _dbContext.SqlQuery<SupplierStatisticReport>(sqlStr.ToString(), paraSupplierID, paraCreateTimeFrom, paraCreateTimeTo);
+
+            return new PagedList<SupplierStatisticReport>(query.ToList(), pageIndex, pageSize);
+        }
     }
 }

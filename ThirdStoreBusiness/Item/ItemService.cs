@@ -85,7 +85,14 @@ namespace ThirdStoreBusiness.Item
             if (newaimSKU != null)
                 return this.GetItemBySKU(newaimSKU.SKU);
             else
-                return this.GetItemBySKU(skubarcode);
+            {
+                var cwItem= GetItemBySKU("CW"+skubarcode);
+                if (cwItem != null)
+                    return cwItem;
+                else
+                    return this.GetItemBySKU(skubarcode);
+            }
+                
 
         }
 
@@ -1013,7 +1020,7 @@ namespace ThirdStoreBusiness.Item
             }
         }
 
-        private IList<M_ItemImage> GetItemImagesByItemID(int itemID)
+        public IList<M_ItemImage> GetItemImagesByItemID(int itemID)
         {
             var query = from ii in _itemImageRepository.Table
                         where ii.ItemID.Equals(itemID)
@@ -1022,7 +1029,7 @@ namespace ThirdStoreBusiness.Item
             return query.ToList();
         }
 
-        private void DeleteItemImage(M_ItemImage itemImage)
+        public void DeleteItemImage(M_ItemImage itemImage)
         {
             if (itemImage == null)
                 throw new ArgumentNullException("item Image");

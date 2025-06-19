@@ -106,10 +106,14 @@ namespace ThirdStore.Infrastructure
                .ForMember(dest => dest.Status, mce => mce.MapFrom(s => s.StatusID.ToEnumName<ThirdStoreReturnItemStatus>()));
             Mapper.CreateMap<D_ReturnItem, ReturnItemViewModel>();
             Mapper.CreateMap<D_ReturnItemLine, ReturnItemViewModel.ReturnItemLineViewModel>();
+            Mapper.CreateMap<M_ReturnItemImage, ReturnItemViewModel.ReturnItemImageViewModel>()
+                .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToBoolean(s.StatusID)));
 
 
             Mapper.CreateMap<ReturnItemViewModel, D_ReturnItem>();
             Mapper.CreateMap<ReturnItemViewModel.ReturnItemLineViewModel, D_ReturnItemLine>();
+            Mapper.CreateMap<ReturnItemViewModel.ReturnItemImageViewModel, M_ReturnItemImage>()
+                .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));
 
         }
 

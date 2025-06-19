@@ -21,6 +21,7 @@ namespace ThirdStoreCommon.Models.ReturnItem
         public decimal Width { get; set; }
         public decimal Height { get; set; }
         public decimal CubicWeight { get; set; }
+        public string TrackingNumber { get; set; }
         public string Ref1 { get; set; }
         public string Ref2 { get; set; }
         public string Ref3 { get; set; }

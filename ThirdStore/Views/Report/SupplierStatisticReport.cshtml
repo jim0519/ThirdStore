@@ -1,0 +1,162 @@
+﻿@model SupplierStatisticReportViewModel
+@{
+    ViewBag.Title = "Supplier Statistic Report";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+<h2>Supplier Statistic Report</h2>
+@using (Html.BeginForm())
+{
+<table width="100%">
+    <tr>
+        <td>
+            @Html.LabelFor(model => model.CreateTimeFrom): @Html.EditorFor(model => model.CreateTimeFrom)
+            @Html.LabelFor(model => model.CreateTimeTo):@Html.EditorFor(model => model.CreateTimeTo)
+        </td>
+
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(model => model.SupplierID): @Html.DropDownListFor(model => model.SupplierID, Model.Suppliers)
+        </td>
+
+    </tr>
+
+    <tr>
+        <td class="adminTitle" colspan="2">
+            <input type="button" id="btnSearch" class="k-button" value="Search" />
+            <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+        </td>
+    </tr>
+</table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="supplierStatisticRpt-grid"></div>
+
+                <script>
+    $(document).ready(function () {
+        $("#supplierStatisticRpt-grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Html.Raw(Url.Action("SupplierStatisticReport", "Report"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function (e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "100",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["100", "200", "300"]
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            toolbar: ["excel"],
+                            excel: {
+                                allPages: true,
+                                fileName: "SupplierStatistic.xlsx"
+                            },
+                            dataBound: onDataBound,
+                            columns: [
+                                {
+                                    field: "Supplier",
+                                    title: "Supplier"
+                                }, {
+                                    field: "SelfStored",
+                                    title: "SelfStored"
+                                }, {
+                                    field: "SelfStoredTotalPrice",
+                                    title: "SelfStoredTotalPrice"
+                                }, {
+                                    field: "Shipped",
+                                    title: "Shipped"
+                                }, {
+                                    field: "ShippedTotalPrice",
+                                    title: "ShippedTotalPrice"
+                                }, {
+                                    field: "ShippedPercentage",
+                                    title: "ShippedPercentage",
+                                    template: '#=kendo.format("{0:p}", ShippedPercentage / 100)#'
+                                }, {
+                                    field: "ShippedTotalPricePercentage",
+                                    title: "ShippedTotalPricePercentage",
+                                    template: '#=kendo.format("{0:p}", ShippedTotalPricePercentage / 100)#'
+                                }, {
+                                    field: "Distributed",
+                                    title: "Distributed"
+                                },{
+                                    field: "Total",
+                                    title: "Total"
+                                }, {
+                                    field: "DistributedPercentage",
+                                    title: "DistributedPercentage",
+                                    template: '#=kendo.format("{0:p}", DistributedPercentage / 100)#'
+                                }
+                            ]
+                        });
+    });
+
+                    
+                </script>
+            </td>
+        </tr>
+    </table>
+    <script>
+    $(document).ready(function () {
+
+        //search button
+        $('#btnSearch').click(function () {
+            //search
+            var grid = $('#supplierStatisticRpt-grid').data('kendoGrid');
+            grid.dataSource.page(1);
+
+            return false;
+        });
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+
+            $('#@Html.FieldIdFor(model => model.CreateTimeFrom)').val("");
+            $('#@Html.FieldIdFor(model => model.CreateTimeTo)').val("");
+            $('#@Html.FieldIdFor(model => model.SupplierID)').val("0");
+
+            selectedIds = [];
+
+            var grid = $('#supplierStatisticRpt-grid').data('kendoGrid');
+            grid.dataSource.page(1);
+
+            return false;
+        });
+
+    });
+        function additionalData() {
+            return {
+                CreateTimeFrom: $('#@Html.FieldIdFor(model => model.CreateTimeFrom)').val(),
+                CreateTimeTo: $('#@Html.FieldIdFor(model => model.CreateTimeTo)').val(),
+                SupplierID:$('#@Html.FieldIdFor(model => model.SupplierID)').val()
+            };
+        }
+
+    </script>
+}
