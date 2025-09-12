@@ -73,13 +73,21 @@
 });
 
 $(document).on('keypress', function (e) {
-    //debugger;
-    if (e.which == 13 ) {
+    if (e.which == 13) {
+        //debugger;
         if ($("#btnSearch").length)
             $("#btnSearch").click();
         else if (typeof RefreshGrid === "function")
             RefreshGrid(false);
     }
+});
+
+window.addEventListener("blur", function () {
+    document.querySelectorAll("textarea").forEach(el => {
+        if (document.activeElement === el) {
+            el.blur();
+        }
+    });
 });
 
 function onDataBound(e) {

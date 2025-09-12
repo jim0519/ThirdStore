@@ -213,15 +213,15 @@ namespace ThirdStoreBusiness.API.Dropshipzone
                 var retProducts = new List<DropshipzoneProduct>();
 
                 var pageNum = 1;
-                var limit = 160;
+                var limit = 200;
                 var totalPage=1;
                 var exceedLimit = 0;
                 do
                 {
-                    if(pageNum/60!=exceedLimit)
+                    if(pageNum/45!=exceedLimit)
                     {
-                        Thread.Sleep(1000 * 90);
-                        exceedLimit = pageNum / 60;
+                        Thread.Sleep(1000 * 60);
+                        exceedLimit = pageNum / 45;
                     }
                     //var getProductsRequest = new RestRequest("/products?limit={limit}&page_no={pageNum}");
                     var getProductsRequest = new RestRequest("v2/products");
@@ -229,6 +229,7 @@ namespace ThirdStoreBusiness.API.Dropshipzone
                     getProductsRequest.AddHeader("Content-Type", "application/json");
                     getProductsRequest.AddParameter("limit", limit, ParameterType.QueryString);
                     getProductsRequest.AddParameter("page_no", pageNum, ParameterType.QueryString);
+                    getProductsRequest.AddParameter("supplier_ids", 1, ParameterType.QueryString);
                     var getProductsResponse = APIClient.Execute<GetDropshipzoneProductResponse>(getProductsRequest);
                     if (getProductsResponse != null && getProductsResponse.StatusCode == HttpStatusCode.OK && getProductsResponse.Data != null)
                     {

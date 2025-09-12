@@ -182,7 +182,11 @@ namespace ThirdStore.Controllers
                     newJobItemViewModel.ShipTime = null;
                     newJobItemViewModel.TrackingNumber = string.Empty;
                     newJobItemViewModel.StatusID = ThirdStoreJobItemStatus.PENDING.ToValue();
-                    newJobItemViewModel.Note += " From job item id " + fromJobItemID;
+                    newJobItemViewModel.ItemDetail += " From job item id " + fromJobItemID;
+                    newJobItemViewModel.Ref2 = new List<string>();
+                    newJobItemViewModel.Location = string.Empty;
+                    newJobItemViewModel.ItemPrice = 0;
+                    newJobItemViewModel.PricePercentage = 1;
                     //newJobItemViewModel.JobItemViewImages.Clear();
                     //foreach (var oriImg in jobItem.JobItemImages)
                     //{

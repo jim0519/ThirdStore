@@ -2337,7 +2337,16 @@ Reference,
 Location,
 Condition,
 HSKU SKU,
-Ref2 as Inspectors,
+case I.SupplierID when 1 then 'New Aim'
+ when 2 then 'CrazySale'
+ when 3 then 'Sello'
+ when 4 then 'T'
+ when 5 then 'O'
+ when 6 then 'K'
+ when 7 then 'CostWay'
+ else 'Unknown'
+ end Supplier,
+H.Ref2 as Inspectors,
 Qty,
 ItemPrice Price,
 ShipTime,
@@ -2347,8 +2356,9 @@ SL.CBM
 --,* 
 from V_JobItemWithSKU H
 inner join (select SUM(cast(Ref1 as decimal(18,8))) CBM,L.HeaderID from D_JobItemLine L group by L.HeaderID) SL on H.ID=SL.HeaderID
-where JobItemCreateTime>'20230101' and JobItemCreateTime<'20240401'
-and Type in (1,2)
+left join D_Item I on H.HSKU=I.SKU
+where JobItemCreateTime>'20240601' and JobItemCreateTime<'20250620'
+and H.Type in (1,2)
 
 
 select 

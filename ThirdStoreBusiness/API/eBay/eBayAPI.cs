@@ -166,7 +166,7 @@ namespace ThirdStoreBusiness.API.eBay
                             LogManager.Instance.Error($"Get item itemID:{getItemRequest.ItemID}, transactionID:{getItemRequest.TransactionID} failed. {ex.ToString()}");
                         }
                     }
-                    while (failTimes < 5&&!isSuccess);
+                    while (failTimes < 2&&!isSuccess);
                     //if (!isSuccess)
                     //    throw new Exception($"Get item itemID:{getItemRequest.ItemID}, transactionID:{getItemRequest.TransactionID} failed for {failTimes} times.");
 
