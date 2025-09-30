@@ -38,7 +38,7 @@ namespace ThirdStoreCommon.Models.Order
         public decimal TotalAmount { get; set; }
         public string ShippingMethod { get; set; }
         public string PaymentMethod { get; set; }
-        public string PaymentTransactionID { get; set; }
+        public string PaymentTransactionID { get; set; }//Purchase Order Number
         public Nullable<System.DateTime> PaidTime { get; set; }
         public string Carrier { get; set; }
         public string BuyerNote { get; set; }

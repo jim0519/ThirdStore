@@ -106,7 +106,10 @@ namespace ThirdStoreBusiness.API.Neto
 
         private System.DateTime datePlacedFromField;
 
+        private bool datePlacedFromFieldSpecified;
+
         private System.DateTime datePlacedToField;
+        private bool datePlacedToFieldSpecified;
 
         private System.DateTime dateUpdatedFromField;
 
@@ -523,6 +526,20 @@ namespace ThirdStoreBusiness.API.Neto
         }
 
         /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool DatePlacedFromSpecified
+        {
+            get
+            {
+                return this.datePlacedFromFieldSpecified;
+            }
+            set
+            {
+                this.datePlacedFromFieldSpecified = value;
+            }
+        }
+
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
         public System.DateTime DatePlacedTo
         {
@@ -533,6 +550,20 @@ namespace ThirdStoreBusiness.API.Neto
             set
             {
                 this.datePlacedToField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool DatePlacedToSpecified
+        {
+            get
+            {
+                return this.datePlacedToFieldSpecified;
+            }
+            set
+            {
+                this.datePlacedToFieldSpecified = value;
             }
         }
 

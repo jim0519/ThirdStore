@@ -32,6 +32,59 @@
                 <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
                 <script>
                     $(document).ready(function () {
+
+                        $("#btnConvertTemuOrder").click(function (e) {
+                            //debugger;
+                            e.preventDefault();
+                            var window = $("#importTemuOrder-window");
+                            if (!window.data("kendoWindow")) {
+                                window.kendoWindow({
+                                    modal: true,
+                                    width: "400px",
+                                    title: "Convert Temu Order",
+                                    actions: ["Close"]
+                                });
+                            }
+                            window.data('kendoWindow').center().open();
+                        });
+
+                        $('#btnExportTemuTracking').click(function (e) {
+                            var link = "@Html.Raw(Url.Action("ExportTemuTracking", "Order"))"
+                            var ids = selectedIds.join(",");
+                            var postData = {
+                                orderIDs: ids
+                            };
+                            //debugger;
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                //contentType: "application/json; charset=utf-8",
+                                data: postData,
+                                dataType: "json",
+                                beforeSend: function () {
+                                    $("#imgLoading").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoading").hide();
+                                },
+                                success: function (data) {
+                                    if (data.Result) {
+                                        window.location = '@Html.Raw(Url.Action("DownloadExcel", new { FileGuid = "_FileGuid_" }))'.replace('_FileGuid_', data.FileGuid);
+                                    }
+                                    else {
+                                        alert("Export Temu Tracking Failed." + data.ErrMsg);
+                                        //window.location = '@Url.Action("List")';
+                                    }
+
+                                },
+                                error: function (data) {
+                                    //debugger;
+                                    alert("error");
+                                }
+                            });
+                            return false;
+                        });
+
                         $("#btnUpdateOrder").click(function (e) {
                             if ($('#@Html.FieldIdFor(model => model.UpdateOrderFrom)').val() == "" || $('#@Html.FieldIdFor(model => model.UpdateOrderTo)').val() == "")
                             {
@@ -82,7 +135,7 @@
                             if (selectedIds.length == 0) {
                                 alert("Please select more than one order to export.");
                                 return false;
-                            } 
+                            }
 
                             var link = "@Html.Raw(Url.Action("ExportDSZFile", "Order"))"
                             var ids = selectedIds.join(",");
@@ -161,6 +214,11 @@
                             return;
                         });
 
+                        $('#btnConvertoTemuOrderSubmit').click(function () {
+                            var window = $("#importTemuOrder-window");
+                            window.data('kendoWindow').close();
+                        });
+
                     });
 
                 </script>
@@ -171,6 +229,8 @@
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
+            <input type="button" id="btnConvertTemuOrder" class="k-button" value="Convert Temu Order" />
+            <input type="button" id="btnExportTemuTracking" class="k-button" value="Export Temu Tracking" />
             <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
             <input type="button" id="btnUploadTracking" class="k-button" value="Upload Tracking" />
             <input type="button" id="btnEdit" class="k-button" value="Edit" />
@@ -288,6 +348,7 @@
                                         fields: {
                                             ID: { editable: false, type: "number" },
                                             ChannelOrderID: { editable: false, type: "string" },
+                                            PaymentTransactionID: { editable: false, type: "string" },
                                             OrderTransactions: { editable: false, type: "string" },
                                             Ref2: { editable:@if (Model.CanEditOrder)
                                             {<text>true </text> }
@@ -387,6 +448,10 @@
                                     template: OrderTransactionsColumnTemplate,
                                     title: "Order Transactions",
                                     width: 120
+                                }, {
+                                    field: "PaymentTransactionID",
+                                    title: "Purchase Order #",
+                                    width: 100
                                 }, {
                                     field: "CustomerID",
                                     title: "Customer ID",
@@ -613,6 +678,25 @@
                 <tr>
                     <td>
                         <input type="submit" class="k-button" value="Submit" id="btnBulkEditSubmit" />
+                    </td>
+                </tr>
+            </table>
+        }
+    </div>
+
+
+    <div id="importTemuOrder-window" style="display:none;">
+        @using (Html.BeginForm("ConvertTemuOrder", "Order", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <table style="text-align:left;">
+                <tr>
+                    <td>
+                        <input type="file" id="importTemuOrderfile" name="importTemuOrderfile" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" class="k-button" value="Submit" id="btnConvertoTemuOrderSubmit" />
                     </td>
                 </tr>
             </table>

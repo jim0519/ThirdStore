@@ -14,6 +14,9 @@ using ThirdStoreCommon.Infrastructure;
 using System.IO;
 using ThirdStoreBusiness.AccessControl;
 using ThirdStoreBusiness.JobItem;
+using LINQtoCSV;
+using System.Text;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace ThirdStore.Controllers
 {
@@ -185,6 +188,22 @@ namespace ThirdStore.Controllers
             }
         }
 
+        [HttpGet]
+        public virtual ActionResult DownloadExcel(string fileGuid)
+        {
+            if (TempData[fileGuid] != null)
+            {
+                byte[] data = TempData[fileGuid] as byte[];
+                return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", CommonFunc.ToFileName("ExportTemuTracking", "xlsx"));
+            }
+            else
+            {
+                // Problem - Log the error, generate a blank file,
+                //           redirect to another controller action - whatever fits with your application
+                return new EmptyResult();
+            }
+        }
+
         [HttpPost]
         public ActionResult UploadTracking()
         {
@@ -282,6 +301,88 @@ namespace ThirdStore.Controllers
             {
                 LogManager.Instance.Error(exc.Message);
                 ErrorNotification("Bulk Update Order Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult ConvertTemuOrder()
+        {
+            try
+            {
+                var file = Request.Files["importTemuOrderfile"];
+
+                if (file != null && file.ContentLength > 0)
+                {
+                    byte[] bytes = null;
+                    using (var sr = new StreamReader(file.InputStream))
+                    {
+                        var context = new CsvContext();
+                        var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.UTF8 };
+                        var temuOrderLines = context.Read<TemuOrderLine>(sr, inputFileDescription);
+                        var netoOrderLines = _orderService.ConvertTemuOrderToNetoOrder(temuOrderLines.ToList());
+
+                        using (var netoOrderStream = new MemoryStream())
+                        {
+                            using (var stWriter = new StreamWriter(netoOrderStream))
+                            {
+                                context.Write(netoOrderLines, stWriter, inputFileDescription);
+                                stWriter.Flush();
+                                netoOrderStream.Position = 0;
+                                bytes = netoOrderStream.ToArray();
+
+                                var fileName = CommonFunc.ToCSVFileName("NetoOrdersFromTemu");
+
+                                return File(bytes, "text/csv, application/zip", fileName);
+                            }
+                        }
+                    }
+                }
+
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Convert Temu Order Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult ExportTemuTracking(string orderIDs)
+        {
+            try
+            {
+                //var csvContent = orderList.Aggregate((current, next) => current + "," + next);
+                byte[] bytes = null;
+                string handle = Guid.NewGuid().ToString();
+                if (orderIDs != null)
+                {
+                    var ids = orderIDs
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => Convert.ToInt32(x))
+                        .ToList();
+                    //using (var stream = _exportManager.ExportTemuOrderTrackingFile(ids.ToArray()) as MemoryStream)
+                    //{
+                    //    bytes = stream.ToArray();
+                    //}
+                    var temuTrackingLines = _orderService.GetExportTemuOrderTrackingLines(ids);
+                    bytes = CommonFunc.GenerateExcel(temuTrackingLines);
+                    TempData[handle] = bytes;
+                }
+
+                return new JsonResult()
+                {
+                    Data = new { Result = true, FileGuid = handle }
+                };
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Export Temu Tracking Failed." + exc.Message);
                 return RedirectToAction("List");
             }
         }

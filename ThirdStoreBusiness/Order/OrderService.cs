@@ -18,6 +18,7 @@ using ThirdStoreBusiness.DSChannel;
 using Ionic.Zip;
 using System.Text.RegularExpressions;
 using ThirdStoreCommon.Models.JobItem;
+using System.Threading;
 
 namespace ThirdStoreBusiness.Order
 {
@@ -103,6 +104,7 @@ namespace ThirdStoreBusiness.Order
                 updateOrder = existingOrder;
 
             updateOrder.Ref1 = netoOrder.OrderStatus;
+            updateOrder.PaymentTransactionID = netoOrder.PurchaseOrderNumber;
             updateOrder.SubTotal = Convert.ToDecimal(netoOrder.GrandTotal);
             updateOrder.TotalAmount = Convert.ToDecimal(netoOrder.GrandTotal);
             updateOrder.Postage = netoOrder.ShippingTotal;
@@ -157,6 +159,7 @@ namespace ThirdStoreBusiness.Order
                 }
                 updateOrderLine.Ref3 = line.ShippingMethod;
                 updateOrderLine.Ref4 = line.ShippingTracking;
+                updateOrderLine.Ref7 = !string.IsNullOrWhiteSpace( line.ItemNotes)? Regex.Match( line.ItemNotes, @"\d{3}-\d{10,}").Value:string.Empty;
             }
 
             return this.UpdateOrder(updateOrder);
@@ -169,6 +172,7 @@ namespace ThirdStoreBusiness.Order
             newOrder.TypeID = 1;//TODO
             newOrder.StatusID = 1;//TODO
             newOrder.ChannelOrderID = netoOrder.OrderID;
+            newOrder.PaymentTransactionID = netoOrder.PurchaseOrderNumber;
             newOrder.Ref1 = netoOrder.OrderStatus;
             newOrder.SubTotal = Convert.ToDecimal(netoOrder.GrandTotal);
             newOrder.TotalAmount = Convert.ToDecimal(netoOrder.GrandTotal);
@@ -223,6 +227,7 @@ namespace ThirdStoreBusiness.Order
                 }
                 newOrderLine.Ref3 = line.ShippingMethod;
                 newOrderLine.Ref4 = line.ShippingTracking;
+                newOrderLine.Ref7 = !string.IsNullOrWhiteSpace(line.ItemNotes) ? Regex.Match(line.ItemNotes, @"\d{3}-\d{10,}").Value : string.Empty;
 
                 newOrder.OrderLines.Add(newOrderLine);
             }
@@ -771,6 +776,134 @@ namespace ThirdStoreBusiness.Order
                 carrierCode = "TEAM GLOBAL EXPRESS";
             else
                 carrierCode = "Australia Post";
+
+            return carrierCode;
+        }
+
+        public IList<NetoOrderLine> ConvertTemuOrderToNetoOrder(IList<TemuOrderLine> temuOrderLines)
+        {
+            var retNetoOrderLines=new List<NetoOrderLine>();
+
+            foreach(var temuOrderLine in temuOrderLines)
+            {
+                var netoOrderLine = new NetoOrderLine();
+                netoOrderLine.PurchaseOrderId = temuOrderLine.OrderID;
+                //netoOrderLine.GroupOrderlinesBy = "Purchase Order ID";
+                netoOrderLine.OrderStatus = "New";
+                netoOrderLine.Approved = "Yes";
+                netoOrderLine.Email = temuOrderLine.VirtualEmail;
+                netoOrderLine.ShipFirstName = !string.IsNullOrWhiteSpace( temuOrderLine.RecipientFirstName)? temuOrderLine.RecipientFirstName: temuOrderLine.RecipientName;
+                netoOrderLine.ShipLastName = !string.IsNullOrWhiteSpace(temuOrderLine.RecipientLastName) ? temuOrderLine.RecipientLastName : temuOrderLine.RecipientName;
+                netoOrderLine.ShipCompany = temuOrderLine.RecipientName;
+                netoOrderLine.ShipAddressLine1 = temuOrderLine.ShipAddress1;
+                netoOrderLine.ShipAddressLine2 = temuOrderLine.ShipAddress2;
+                netoOrderLine.ShipCity = temuOrderLine.ShipCity;
+                netoOrderLine.ShipState = temuOrderLine.ShipState;
+                netoOrderLine.ShipPostCode = temuOrderLine.ShipPostalCode;
+                netoOrderLine.ShipCountry = temuOrderLine.ShipCountry;
+                netoOrderLine.ShipPhone = temuOrderLine.RecipientPhoneNumber;
+                netoOrderLine.BillFirstName = !string.IsNullOrWhiteSpace(temuOrderLine.RecipientFirstName) ? temuOrderLine.RecipientFirstName : temuOrderLine.RecipientName;
+                netoOrderLine.BillLastName = !string.IsNullOrWhiteSpace(temuOrderLine.RecipientLastName) ? temuOrderLine.RecipientLastName : temuOrderLine.RecipientName;
+                netoOrderLine.BillCompany = temuOrderLine.RecipientName;
+                netoOrderLine.BillAddressLine1 = temuOrderLine.ShipAddress1;
+                netoOrderLine.BillAddressLine2 = temuOrderLine.ShipAddress2;
+                netoOrderLine.BillCity = temuOrderLine.ShipCity;
+                netoOrderLine.BillState = temuOrderLine.ShipState;
+                netoOrderLine.BillPostCode = temuOrderLine.ShipPostalCode;
+                netoOrderLine.BillCountry = temuOrderLine.ShipCountry;
+                netoOrderLine.BillPhone = temuOrderLine.RecipientPhoneNumber;
+                netoOrderLine.PaymentMethod = "Visa";
+                netoOrderLine.ShippingMethod = "Standard";
+                netoOrderLine.ShippingCost = "0";
+                netoOrderLine.ShippingDiscountAmount = "0";
+                //netoOrderLine.AmountPaid=
+
+                var strPurchaseDate = temuOrderLine.PurchaseDate;
+                var tzIndex = strPurchaseDate.IndexOf("AEST");
+                if (tzIndex > 0)
+                {
+                    strPurchaseDate = strPurchaseDate.Substring(0, tzIndex).Trim();
+                }
+                DateTime parsedDate = Convert.ToDateTime(strPurchaseDate);
+                netoOrderLine.DatePaid = parsedDate.ToString("MM/dd/yyyy");
+                netoOrderLine.OrderLineSku = temuOrderLine.SKU;
+                netoOrderLine.OrderLineQty = temuOrderLine.QuantityPurchased;
+                netoOrderLine.OrderLineSerialNumber = temuOrderLine.OrderItemId;
+                netoOrderLine.OrderLineNotes = temuOrderLine.OrderItemId;
+                netoOrderLine.OrderLineWarehouseName = "3rd Store";
+                netoOrderLine.OrderLineUnitPrice = temuOrderLine.BasePriceTotal.Replace("AU$", "");
+                netoOrderLine.OrderLineDiscountAmount = "0";
+
+
+                retNetoOrderLines.Add(netoOrderLine);
+            }
+
+            return retNetoOrderLines;
+        }
+
+        public IList<ExportTemuOrderTrackingLine> GetExportTemuOrderTrackingLines(IList<int> orderIDs)
+        {
+            var orders = GetOrdersByIDs(orderIDs);
+            var ordersWithoutTracking = orders.Where(o =>o.OrderLines.Any(l=>string.IsNullOrWhiteSpace( l.Ref4))|| o.OrderLines.Count<=0).Select(o=>o.ChannelOrderID).ToList();
+
+            var netoOrders=_netoAPICallManager.DownloadNetoOrderByIDs(ordersWithoutTracking);
+            if (netoOrders != null && netoOrders.Count() > 0)
+            {
+                foreach (var netoOrder in netoOrders)
+                {
+                    var existingLocalOrder = GetOrderByChannelOrderID(netoOrder.OrderID, 1);
+                    if (existingLocalOrder != null)
+                    {
+                        //continue;
+                        UpdateLocalOrder(netoOrder, existingLocalOrder);
+                    }
+
+                }
+            }
+
+            orders = GetOrdersByIDs(orderIDs).Where(o => !o.OrderLines.Any(l => string.IsNullOrWhiteSpace(l.Ref4)) && o.OrderLines.Count > 0).ToList();
+
+            var exportTrackingLines = from order in orders
+                                      from orderLine in order.OrderLines
+                                      select new ExportTemuOrderTrackingLine
+                                      {
+                                          OrderID = order.PaymentTransactionID,
+                                          OrderItemID = orderLine.Ref7,
+                                          Quantity = orderLine.Qty,
+                                          ShipFrom = "3rd Store Warehouse",
+                                          Carrier = GetTemuCarrierCode(orderLine),
+                                          TrackingNumber = (!string.IsNullOrWhiteSpace(orderLine.Ref4) ? orderLine.Ref4.Split(';').FirstOrDefault() : string.Empty)
+                                      };
+
+            return exportTrackingLines.ToList();
+        }
+
+
+        private string GetTemuCarrierCode(D_Order_Line orderLine)
+        {
+            var carrierCode = "Australia Post";
+            var carrierStr = (!string.IsNullOrWhiteSpace(orderLine.Ref3) ? orderLine.Ref3.Split(';').FirstOrDefault() : string.Empty);
+            switch (carrierStr.ToLower())
+            {
+                case string a when a.Contains("hunter"):
+                    carrierCode = "Hunter Express";
+                    break;
+                case string a when a.Contains("fastway") || a.Contains("aramex"):
+                    carrierCode = "Aramex (AU)";
+                    break;
+                case string a when a.Contains("toll"):
+                    carrierCode = "Toll";
+                    break;
+                case string a when a.Contains("allied"):
+                    carrierCode = "Allied Express Transport";
+                    break;
+                case string a when a.Contains("eparcel")||a.Contains("australia post")||a.Contains("parcel post"):
+                    carrierCode = "Australia Post";
+                    break;
+                case string a when a.Contains("team global"):
+                    carrierCode = "Team Global Express";
+                    break;
+            }
 
             return carrierCode;
         }

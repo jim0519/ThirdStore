@@ -29,6 +29,8 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.Collections.Specialized;
 using Newtonsoft.Json;
+using OfficeOpenXml;
+using System.ComponentModel.DataAnnotations;
 
 namespace ThirdStoreCommon
 {
@@ -1274,6 +1276,100 @@ namespace ThirdStoreCommon
                 return default(string);
 
             return sku.Replace("(", "").Replace(")", "");
+        }
+
+
+        public static byte[] GenerateExcel<T>(IList<T> data, int addBlankColumn = 0)
+        {
+            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                var props = typeof(T).GetProperties();
+
+                for (int i = 0; i < props.Length; i++)
+                {
+                    var displayAttr = props[i].GetCustomAttribute<DisplayAttribute>();
+                    string columnName = displayAttr?.Name ?? props[i].Name;
+                    worksheet.Cells[1 + addBlankColumn, i + 1].Value = columnName;
+                }
+
+                for (int row = 0; row < data.Count; row++)
+                {
+                    for (int col = 0; col < props.Length; col++)
+                    {
+                        worksheet.Cells[row + 2 + addBlankColumn, col + 1].Value = props[col].GetValue(data[row]);
+                    }
+                }
+
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                return package.GetAsByteArray();
+            }
+        }
+
+        public static List<T> ReadExcelToList<T>(Stream excelStream) where T : new()
+        {
+            var result = new List<T>();
+
+            using (var package = new ExcelPackage(excelStream))
+            {
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null) return result;
+
+                var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                var colMapping = new Dictionary<int, PropertyInfo>();
+
+                for (int col = 1; col <= worksheet.Dimension.End.Column; col++)
+                {
+                    string header = worksheet.Cells[1, col].Text?.Trim();
+                    if (string.IsNullOrWhiteSpace(header)) continue;
+
+                    var prop = props.FirstOrDefault(p =>
+                    {
+                        var attr = p.GetCustomAttribute<DisplayAttribute>();
+                        return (attr != null && attr.Name == header)
+                               || p.Name.Equals(header, StringComparison.OrdinalIgnoreCase);
+                    });
+
+                    if (prop != null)
+                    {
+                        colMapping[col] = prop;
+                    }
+                }
+
+                for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                {
+                    var obj = new T();
+
+                    foreach (var kvp in colMapping)
+                    {
+                        int colIndex = kvp.Key;
+                        var prop = kvp.Value;
+                        var cellValue = worksheet.Cells[row, colIndex].Text?.Trim();
+
+                        if (!string.IsNullOrEmpty(cellValue))
+                        {
+                            try
+                            {
+                                object safeValue = Convert.ChangeType(cellValue, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+                                prop.SetValue(obj, safeValue);
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                    }
+
+                    result.Add(obj);
+                }
+            }
+
+            return result;
         }
 
     }

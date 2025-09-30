@@ -30,6 +30,8 @@ namespace ThirdStoreBusiness.API.Neto
         //Download New Catch Orders by period
         IEnumerable<GetOrderResponseOrder> DownloadNewNetoOrder(DateTime? fromTime, DateTime? toTime);
 
+        IEnumerable<GetOrderResponseOrder> DownloadNetoOrderByIDs(IList<string> orderIDs);
+
         IEnumerable<GetItemResponseItem> GetNetoProducts(bool isWithDesc=false);
 
         IEnumerable<GetItemResponseItem> GetNetoProductBySKUs(string[] skus, bool isWithDesc = false);
@@ -77,9 +79,15 @@ namespace ThirdStoreBusiness.API.Neto
                 var getOrderObj = new GetOrder();
                 getOrderObj.Filter = new GetOrderFilter();
                 if (fromTime != null)
+                {
                     getOrderObj.Filter.DatePlacedFrom = ((DateTime)fromTime).ToUniversalTime();
+                    getOrderObj.Filter.DatePlacedFromSpecified = true;
+                }
                 if (toTime != null)
+                {
                     getOrderObj.Filter.DatePlacedTo = ((DateTime)toTime).ToUniversalTime();
+                    getOrderObj.Filter.DatePlacedToSpecified = true;
+                }
 
                 var outputSelector = GetOrderOutputSelector();
                 getOrderObj.Filter.OutputSelector = outputSelector;
@@ -119,6 +127,59 @@ namespace ThirdStoreBusiness.API.Neto
                         throw new Exception(response.ErrorMessage);
                     }
                     pageNumber++;
+                }
+
+                return retOrders;
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Error(ex.Message);
+                throw ex;
+            }
+        }
+
+        public IEnumerable<GetOrderResponseOrder> DownloadNetoOrderByIDs(IList<string> orderIDs)
+        {
+            try
+            {
+                
+                var retOrders = new List<GetOrderResponseOrder>();
+                var getOrderObj = new GetOrder();
+                getOrderObj.Filter = new GetOrderFilter();
+                
+                var outputSelector = GetOrderOutputSelector();
+                getOrderObj.Filter.OutputSelector = outputSelector;
+
+                var grpOrderIDs = orderIDs.Select((p, index) => new { p, index }).GroupBy(g => g.index / 200, i => i.p);
+                foreach (var grpOrderID in grpOrderIDs)
+                {
+                    getOrderObj.Filter.OrderID = orderIDs.ToArray();
+
+                    var rawXML = CommonFunc.ConvertObjectToXMLString(getOrderObj, Encoding.UTF8);
+                    var getOrderRequest = new RestRequest("do/WS/NetoAPI");
+                    getOrderRequest.Method = Method.POST;
+                    getOrderRequest.AddHeader("NETOAPI_ACTION", "GetOrder");
+                    getOrderRequest.AddHeader("NETOAPI_USERNAME", _netoAPICredential.UserName);
+                    getOrderRequest.AddHeader("NETOAPI_KEY", _netoAPICredential.APIKey);
+                    getOrderRequest.AddParameter("application/xml", rawXML, ParameterType.RequestBody);
+
+                    IRestResponse response = _restClient.Execute(getOrderRequest);
+                    if (response.IsSuccessful)
+                    {
+                        var getOrderResponse = JsonConvert.DeserializeObject<GetOrderResponse>(response.Content);
+                        if (getOrderResponse.Ack != GetOrderResponseAck.Error)
+                        {
+                            retOrders.AddRange(getOrderResponse.Order);
+                        }
+                        else
+                        {
+                            throw new Exception(getOrderResponse.Messages.Error.Select(err => err.Message).Aggregate((current, next) => (current + ";" + next)));
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception(response.ErrorMessage);
+                    }
                 }
 
                 return retOrders;
@@ -404,6 +465,7 @@ namespace ThirdStoreBusiness.API.Neto
         {
             var outputSelector = new List<GetOrderFilterOutputSelector>();
             outputSelector.Add(GetOrderFilterOutputSelector.ID);
+            outputSelector.Add(GetOrderFilterOutputSelector.PurchaseOrderNumber);
             outputSelector.Add(GetOrderFilterOutputSelector.ShippingOption);
             outputSelector.Add(GetOrderFilterOutputSelector.DeliveryInstruction);
             outputSelector.Add(GetOrderFilterOutputSelector.Username);
@@ -446,7 +508,8 @@ namespace ThirdStoreBusiness.API.Neto
             outputSelector.Add(GetOrderFilterOutputSelector.OrderLineeBayListingType);
             outputSelector.Add(GetOrderFilterOutputSelector.OrderLineeBayDateCreated);
             outputSelector.Add(GetOrderFilterOutputSelector.OrderLineeBayDatePaid);
-            
+            outputSelector.Add(GetOrderFilterOutputSelector.OrderLineSerialNumber);
+            outputSelector.Add(GetOrderFilterOutputSelector.OrderLineItemNotes);
 
             return outputSelector.ToArray();
         }

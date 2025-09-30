@@ -47,5 +47,9 @@ namespace ThirdStoreBusiness.Order
         Stream ExportDSImportFile(IList<int> orderids);
 
         void UploadTracking(StreamReader trackingStreamReader);
+
+        IList<NetoOrderLine> ConvertTemuOrderToNetoOrder(IList<TemuOrderLine> temuOrderLines);
+
+        IList<ExportTemuOrderTrackingLine> GetExportTemuOrderTrackingLines(IList<int> orderIDs);
     }
 }

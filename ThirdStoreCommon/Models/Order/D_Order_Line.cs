@@ -21,7 +21,7 @@ namespace ThirdStoreCommon.Models.Order
         public string Ref4 { get; set; }
         public string Ref5 { get; set; }
         public string Ref6 { get; set; }
-        public string Ref7 { get; set; }
+        public string Ref7 { get; set; }//for Temu order line item id
         public string Ref8 { get; set; }
         public string Ref9 { get; set; }
         public string Ref10 { get; set; }
