@@ -819,11 +819,12 @@ namespace ThirdStoreBusiness.Order
                 //netoOrderLine.AmountPaid=
 
                 var strPurchaseDate = temuOrderLine.PurchaseDate;
-                var tzIndex = strPurchaseDate.IndexOf("AEST");
-                if (tzIndex > 0)
-                {
-                    strPurchaseDate = strPurchaseDate.Substring(0, tzIndex).Trim();
-                }
+                strPurchaseDate = Regex.Replace(strPurchaseDate, @"\s+[A-Z]{3,4}\(UTC[^\)]+\)", "");
+                //var tzIndex = strPurchaseDate.IndexOf("AEST");
+                //if (tzIndex > 0)
+                //{
+                //    strPurchaseDate = strPurchaseDate.Substring(0, tzIndex).Trim();
+                //}
                 DateTime parsedDate = Convert.ToDateTime(strPurchaseDate);
                 netoOrderLine.DatePaid = parsedDate.ToString("MM/dd/yyyy");
                 netoOrderLine.OrderLineSku = temuOrderLine.SKU;
