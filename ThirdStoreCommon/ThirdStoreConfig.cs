@@ -136,6 +136,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string TemuActiveProductFilePath
+        {
+            get
+            {
+                return AppDomain.CurrentDomain.BaseDirectory + "\\TemuFile\\ActiveProduct";
+            }
+        }
+
 
     }
 

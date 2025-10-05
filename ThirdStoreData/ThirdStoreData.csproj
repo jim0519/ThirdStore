@@ -51,6 +51,7 @@
     <Compile Include="IDbContext.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Mapping\D_AttachmentMap.cs" />
+    <Compile Include="Mapping\D_ListingMap.cs" />
     <Compile Include="Mapping\D_ReturnItemLineMap.cs" />
     <Compile Include="Mapping\D_ReturnItemMap.cs" />
     <Compile Include="Mapping\M_ReturnItemImageMap.cs" />

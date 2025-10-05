@@ -2524,3 +2524,47 @@ REFERENCES [dbo].[D_ReturnItem] ([ID])
 ON UPDATE CASCADE
 ON DELETE CASCADE
 GO
+
+
+
+
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_Listing]') AND type in (N'U'))
+DROP TABLE [dbo].[D_Listing]
+GO
+CREATE TABLE [dbo].[D_Listing](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[ItemID] [int] NOT NULL,--D_Item ID, one listing may contain multiple item ids, but now we do not consider variation on ebay
+	[ListingID] [varchar](4000) NOT NULL,
+	[ListingSKU] [varchar](4000) NOT NULL,
+	[ListingTitle] [varchar](4000) NOT NULL,
+	[ListingDescription] [varchar](MAX) NOT NULL,
+	[ListingPrice] decimal(18,2) NOT NULL,
+	[ListingInventoryQty] [int] NOT NULL,
+	[ListingStatusID][int] NOT NULL,
+	[IsAuto][bit] NOT NULL,
+	[LastUpdateTime] datetime not null,
+	[Ref1] [varchar](4000) NOT NULL,
+	[Ref2] [varchar](4000) NOT NULL,
+	[Ref3] [varchar](4000) NOT NULL,
+	[Ref4] [varchar](4000) NOT NULL,
+	[Ref5] [varchar](4000) NOT NULL,
+	[CreateTime] datetime not null,
+	[CreateBy] [varchar](4000) not null,
+	[EditTime] datetime not null,
+	[EditBy] [varchar](4000) not null,
+
+ CONSTRAINT [PK_D_Listing] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+ALTER TABLE [dbo].[D_Listing]  WITH NOCHECK ADD  CONSTRAINT [FK_D_Listing_D_Item] FOREIGN KEY([ItemID])
+REFERENCES [dbo].[D_Item] ([ID])
+GO
+
+ALTER TABLE [dbo].[D_Listing] NOCHECK CONSTRAINT [FK_D_Listing_D_Item]
+GO
