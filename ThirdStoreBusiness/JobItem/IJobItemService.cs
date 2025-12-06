@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using ThirdStoreCommon.Models.JobItem;
 using ThirdStoreCommon;
 using System.IO;
+using static ThirdStoreBusiness.JobItem.JobItemService;
+using ThirdStoreCommon.Models.Item;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -88,5 +90,7 @@ namespace ThirdStoreBusiness.JobItem
         ThirdStoreReturnResult<D_JobItem> MatchJobItemVerifyTracking(string jobItemLineID, string jobItemLineRef, string trackingNumber);
 
         Stream ExportGumtreeFeed(int[] jobItemIDs);
+        List<ExportProductListing> CalculateProductInventory(IList<D_Item> listingItems);
+        //IList<D_Item> FilterValidItems(IList<int> itemids = null);
     }
 }

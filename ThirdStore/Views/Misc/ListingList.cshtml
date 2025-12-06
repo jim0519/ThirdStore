@@ -1,0 +1,340 @@
+﻿@model ListingListViewModel
+@{
+    ViewBag.Title = "Listing List";
+    Layout = "~/Views/Shared/CommonList.cshtml";
+}
+
+<style type="text/css">
+    .noMatchingItem {
+        background-color: #ff8080;
+    }
+</style>
+
+
+@using (Html.BeginForm())
+{
+    <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
+        <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
+
+        <div id="divOperationBtn" style="float:right;margin-top:5px;">
+            <table>
+                <tr>
+                    <td>
+                        <div style="float:right">
+                            <input type="button" id="btnImportTemuListing" class="k-button" value="Import Temu Listing" />
+                            <input type="button" id="btnSyncOnlineInventory" class="k-button" value="Sync Online Inventory" />
+                            <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('#btnImportTemuListing').click(function (e) {
+                e.preventDefault();
+                var window = $("#importTemuListing-window");
+                if (!window.data("kendoWindow")) {
+                    window.kendoWindow({
+                        modal: true,
+                        width: "400px",
+                        title: "Import Temu Listing",
+                        actions: ["Close"]
+                    });
+                }
+                window.data('kendoWindow').center().open();
+
+            });
+
+            $('#btnSyncOnlineInventory').click(function () {
+                var link = '@Url.Action("SyncOnlineInventory", "Misc")';
+                @*var selectedUpdateFields = [];
+                $('input[name="@Html.FieldNameFor(model => model.SelectedUpdateFields)"]').each(function () {
+                    if ($(this).is(':checked'))
+                        selectedUpdateFields.push($(this).val());
+                });*@
+                var postData = {
+                    //SelectedUpdateFields: selectedUpdateFields
+                }
+                $.ajax({
+                    url: link,
+                    type: "POST",
+                    //contentType: "application/json; charset=utf-8",
+                    data: postData,
+                    dataType: "json",
+                    beforeSend: function () {
+                        $("#imgLoading").show();
+                        $("#btnSyncOnlineInventory").prop('disabled', true);
+                    },
+                    complete: function () {
+                        $("#imgLoading").hide();
+                        $("#btnSyncOnlineInventory").prop('disabled', false);
+                    },
+                    success: function (data) {
+                        if (data.Result) {
+                            alert("Sync Online Inventory Success");
+                            RefreshGrid(true);
+                        }
+                        else {
+                            alert("Sync Online Inventory Failed");
+                        }
+                    },
+                    error: function (data) {
+                        //debugger;
+                        alert("error");
+                    }
+                });
+                return false;
+            });
+
+
+        });
+    </script>
+
+    <table width="100%">
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(model => model.SearchSKU):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.SearchSKU)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(model => model.SearchTitle):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.SearchTitle)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(model => model.SearchItemID):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.SearchItemID)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.LabelFor(model => model.SearchIsAuto):
+            </td>
+            <td class="adminData">
+                @Html.DropDownListFor(model => model.SearchIsAuto, Model.YesOrNo)
+            </td>
+        </tr>
+
+        <tr>
+            <td class="adminTitle" colspan="2">
+                <input type="button" id="btnSearch" class="k-button" value="Search" />
+                <input type="button" id="btnClearAll" class="k-button" value="Clear All" />
+            </td>
+        </tr>
+    </table>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="listing-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#listing-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "@Html.Raw(Url.Action("ListingList", "Misc"))",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    },
+                                    update: {
+                                        url: "@Html.Raw(Url.Action("UpdateListing", "Misc"))",
+                                        type: "POST",
+                                        dataType: "json"
+                                        //data: gridUpdateData
+                                    }
+                                },
+                                requestEnd: function (e) {
+                                    if (e.type == "update")
+                                        RefreshGrid(false);
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors",
+                                    model: {
+                                        id: "ID",
+                                        fields: {
+                                            ID: { editable: false, type: "number" },
+                                            ListingSKU: { editable: false, type: "string"},
+                                            ListingTitle: { editable: false, type: "string"},
+                                            ListingPrice: { editable: true, type: "number" },
+                                            ListingInventoryQty: { editable: true, type: "number", validation: { required: true } },
+                                            //ListingStatusID: { editable: false, type: "string" },
+                                            ListingID: { editable: false, type: "string" },
+                                            IsAuto: { editable: true, type: "string" },
+                                            Ref1: { editable: false, type: "string" },
+                                            Ref2: { editable: false, type: "string" },
+                                            LastUpdateTime: { editable: false, type: "date" }
+                                        }
+                                    }
+                                },
+                                error: function(e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: "50",
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true,
+                                pageSizes: ["50","100",'500']
+                            },
+                            editable: true,
+                            scrollable: false,
+                            //resizable: true,
+                            toolbar: [ "save"],
+                            //excel: {
+                            //    allPages: true,
+                            //    fileName: "Listing.xlsx"
+                            //},
+                            dataBound: onListingGridDataBound,
+                            columns: [
+                                {
+                                    field: "ID",
+                                    headerTemplate: "<input id='mastercheckbox' type='checkbox'/>",
+                                    headerAttributes: { style: "text-align:center" },
+                                    attributes: { style: "text-align:center" },
+                                    template: "<input type='checkbox' value='#=ID#' class='checkboxGroups'/>",
+                                    width: 50
+                                },{
+                                    field: "ListingID",
+                                    //template: "<a href='https://www.ebay.com.au/itm/#=ListingID#' target='_blank' > #=ListingID#</a>",
+                                    //template: idColumnTemplate,
+                                    title: "Listing ID",
+                                    attributes: { style: "word-break:break-word" },
+                                    width: 80
+                                },{
+                                    field: "ListingSKU",
+                                    title: "SKU",
+                                    width: 120,
+                                attributes: { style: "word-break:break-word" }
+                                }, {
+                                    field: "ListingTitle",
+                                    title: "Title",
+                                    width: 200
+                                }, {
+                                    field: "ListingPrice",
+                                    title: "Listing Price",
+                                    width: 100
+                                }, {
+                                    field: "ListingInventoryQty",
+                                    title: "Inventory Qty",
+                                    width: 70
+                                }, {
+                                    field: "IsAuto",
+                                    title: "IsAuto",
+                                    width: 70
+                                }, {
+                                    field: "Ref1",
+                                    title: "Goods ID",
+                                    attributes: { style: "word-break:break-word" },
+                                    width: 100
+                                }, {
+                                    field: "Ref2",
+                                    title: "External Product ID",
+                                    attributes: { style: "word-break:break-word" },
+                                    width: 100
+                                }, {
+                                    field: "LastUpdateTime",
+                                    title: "Last Update Time",
+                                    width: 100,
+                                    type: "date",
+                                    format: "{0:dd/MM/yyyy HH:mm:ss}"
+                                }
+                            ]
+                        } );
+                    });
+    </script>
+    </td>
+    </tr>
+    </table>
+
+    <script>
+    var selectedIds = [];
+    $(document).ready(function () {
+
+        //clear all button
+        $('#btnClearAll').click(function () {
+
+            $('#@Html.FieldIdFor(model => model.SearchSKU)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchTitle)').val("");
+            $('#@Html.FieldIdFor(model => model.SearchIsAuto)').val("-1");
+            $('#@Html.FieldIdFor(model => model.SearchItemID)').val("");
+
+            selectedIds = [];
+            $('#selectedNum').text(selectedIds.length + ' selected');
+            RefreshGrid(false);
+
+            return false;
+        });
+
+    });
+    function additionalData() {
+        return {
+            SearchSKU: $('#@Html.FieldIdFor(model => model.SearchSKU)').val(),
+            SearchTitle: $('#@Html.FieldIdFor(model => model.SearchTitle)').val(),
+            SearchIsAuto: $('#@Html.FieldIdFor(model => model.SearchIsAuto)').val(),
+            SearchItemID: $('#@Html.FieldIdFor(model => model.SearchItemID)').val()
+        };
+    }
+
+    function onListingGridDataBound(e) {
+        onDataBound(e);
+
+        //change row color if address changed
+        var rows = e.sender.tbody.children();
+        for (var j = 0; j < rows.length; j++) {
+            var row = $(rows[j]);
+            var dataItem = e.sender.dataItem(row);
+            //debugger;
+            var matchingItem = dataItem.get("ItemID");
+            //var discontinued = dataItem.get("Discontinued");
+
+            if (matchingItem == 0) {
+                row.addClass("noMatchingItem");
+            }
+        }
+    }
+    </script>
+
+}
+
+
+<div id="importTemuListing-window" style="display:none;">
+    @using (Html.BeginForm("ImportTemuListing", "Misc", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <table style="text-align:left;">
+            <tr>
+                <td>
+                    <input type="file" id="importTemuListingFile" name="importTemuListingFile" multiple />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" class="k-button" value="Submit" />
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+
+

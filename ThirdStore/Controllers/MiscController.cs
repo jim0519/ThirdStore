@@ -25,6 +25,8 @@ using ThirdStoreBusiness.Image;
 using ThirdStoreBusiness.Item;
 using ThirdStoreData;
 using ThirdStoreCommon.Models.Item;
+using ThirdStoreBusiness.Listing;
+using ThirdStore.Models.Order;
 
 namespace ThirdStore.Controllers
 {
@@ -37,6 +39,7 @@ namespace ThirdStore.Controllers
         private readonly IItemService _itemService;
         private readonly IImageService _imageService;
         private readonly IDbContext _dbContext;
+        private readonly IListingService _listingService;
 
         public MiscController(
             IGumtreeFeedService gumtreeFeedService,
@@ -45,7 +48,8 @@ namespace ThirdStore.Controllers
             IJobItemService jobItemService,
             IItemService itemService,
             IImageService imageService,
-            IDbContext dbContext
+            IDbContext dbContext,
+            IListingService listingService
             )
         {
             _gumtreeFeedService = gumtreeFeedService;
@@ -55,6 +59,7 @@ namespace ThirdStore.Controllers
             _itemService = itemService;
             _imageService = imageService;
             _dbContext = dbContext;
+            _listingService = listingService;
         }
         // GET: Report
         public ActionResult Index()
@@ -225,6 +230,110 @@ namespace ThirdStore.Controllers
             return View();
         }
 
+        public ActionResult ListingList()
+        {
+            var model = new ListingListViewModel();
+
+            model.YesOrNo = YesNo.Y.ToSelectList(false).ToList();
+            model.YesOrNo.Insert(0, new SelectListItem { Text = "", Value = "-1", Selected = true });
+            model.SearchIsAuto = -1;
+
+            model.ListingStatuses.Add(new SelectListItem { Text = "", Value = "0" });
+            model.ListingStatuses.Add(new SelectListItem { Text = "Active", Value = "1" });
+            model.ListingStatuses.Add(new SelectListItem { Text = "InActive", Value = "2" });
+
+            return View(model);
+
+        }
+
+        [HttpPost]
+        public ActionResult ListingList(DataSourceRequest command, ListingListViewModel model)
+        {
+            var listings = _listingService.SearchListings(
+                sku: model.SearchSKU,
+                title: model.SearchTitle,
+                isAuto: model.SearchIsAuto,
+                itemID: model.SearchItemID,
+                pageIndex: command.Page - 1,
+                pageSize: command.PageSize);
+
+            var listingsGridView = listings.Select(l => l.ToModel());
+
+
+            var gridModel = new DataSourceResult() { Data = listingsGridView, Total = listings.TotalCount };
+            //return View();
+            return new JsonResult
+            {
+                Data = gridModel
+            };
+
+        }
+
+
+        [HttpPost]
+        public ActionResult UpdateListing(ListingGridViewModel model)
+        {
+            if (model != null)
+            {
+                var listing = _listingService.GetListingByID(model.ID);
+                if (listing != null)
+                {
+                    listing.ListingInventoryQty = model.ListingInventoryQty;
+                    listing.IsAuto = Convert.ToBoolean( model.IsAuto.ToEnumValue<YesNo>());
+                    listing.ListingPrice=model.ListingPrice;
+                    listing.Ref1 = model.Ref1;
+                    listing.Ref2 = model.Ref2;
+                    listing.FillOutNull();
+                    _listingService.UpdateListing(listing);
+                }
+            }
+
+            return new NullJsonResult();
+        }
+
+        [HttpPost]
+        public ActionResult ImportTemuListing()
+        {
+            try
+            {
+                var file = Request.Files["importTemuListingFile"];
+
+                if (file != null && file.ContentLength > 0)
+                {
+                    if (!Directory.Exists(ThirdStoreConfig.Instance.TemuActiveProductFilePath))
+                    {
+                        Directory.CreateDirectory(ThirdStoreConfig.Instance.TemuActiveProductFilePath);
+                    }
+
+                    file.SaveAs(ThirdStoreConfig.Instance.TemuActiveProductFilePath + "\\" + file.FileName);
+                    var isImportSuccess = _listingService.SyncLocalListings();
+                    if (!isImportSuccess)
+                        throw new Exception();
+                    //using (var sr = new StreamReader(file.InputStream))
+                    //{
+                    //    var context = new CsvContext();
+                    //    var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true,TextEncoding= Encoding.UTF8 };
+                    //    var orderLines = context.Read<ImportTemuOrderLine>(sr, inputFileDescription);
+                    //    _importManager.ImportTemuSalesOrder(orderLines);
+                    //}
+                }
+                SuccessNotification("Import Temu Listing Success.");
+                return RedirectToAction("ListingList");
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Import Temu Listing Failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SyncOnlineInventory(ListingListViewModel model)
+        {
+            var isSuccess = _listingService.SyncOnlineInventory();
+            return Json(new { Result = isSuccess });
+        }
 
 
         #region Import Temp

@@ -18,6 +18,8 @@ using ThirdStore.Models.ReturnItem;
 using ThirdStoreCommon.Models.ReturnItem;
 using ThirdStoreCommon.Models.Attachment;
 using static ThirdStore.Models.ReturnItem.ReturnItemViewModel;
+using ThirdStore.Models.Misc;
+using ThirdStoreCommon.Models.Listing;
 
 namespace ThirdStore.Extensions
 {
@@ -283,6 +285,15 @@ namespace ThirdStore.Extensions
         public static M_ReturnItemImage ToEntity(this ReturnItemViewModel.ReturnItemImageViewModel model, M_ReturnItemImage destination)
         {
             return model.MapTo(destination);
+        }
+
+        #endregion
+
+        #region Listing
+
+        public static ListingGridViewModel ToModel(this D_Listing entity)
+        {
+            return entity.MapTo<D_Listing, ListingGridViewModel>();
         }
 
         #endregion

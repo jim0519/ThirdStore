@@ -142,6 +142,12 @@ namespace ThirdStoreCommon
         CSEnquiry=3
     }
 
+    public enum ThirdStoreListingStatus
+    {
+        Actived = 1,
+        Disabled = 2
+    }
+
 
     public sealed class ThirdStoreCacheKey
     {

@@ -144,6 +144,14 @@ namespace ThirdStoreCommon
             }
         }
 
+        public string TemuStockPriceFilePath
+        {
+            get
+            {
+                return AppDomain.CurrentDomain.BaseDirectory + "\\TemuFile\\StockPrice";
+            }
+        }
+
 
     }
 

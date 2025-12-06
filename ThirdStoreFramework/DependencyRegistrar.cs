@@ -31,6 +31,7 @@ using ThirdStoreBusiness.Misc;
 using ThirdStoreBusiness.API.Dropshipzone;
 using ThirdStoreBusiness.ReturnItem;
 using ThirdStoreBusiness.Attachment;
+using ThirdStoreBusiness.Listing;
 
 namespace ThirdStoreFramework
 {
@@ -135,6 +136,9 @@ namespace ThirdStoreFramework
 
             //Return Item
             builder.RegisterType<ReturnItemService>().As<IReturnItemService>().InstancePerLifetimeScope();
+
+            //Listing
+            builder.RegisterType<ListingService>().As<IListingService>().InstancePerLifetimeScope();
 
             //Misc
             builder.RegisterType<NewAimSKUBarcodeService>().As<INewAimSKUBarcodeService>().InstancePerLifetimeScope();

@@ -206,8 +206,10 @@
     <Compile Include="Models\AccessControl\UserGridViewModel.cs" />
     <Compile Include="Models\AccessControl\UserListViewModel.cs" />
     <Compile Include="Models\AccessControl\LoginViewModel.cs" />
+    <Compile Include="Models\Misc\ListingGridViewModel.cs" />
     <Compile Include="Models\Misc\LogGridViewModel.cs" />
     <Compile Include="Models\Misc\DeveloperOperationViewModel.cs" />
+    <Compile Include="Models\Misc\ListingListViewModel.cs" />
     <Compile Include="Models\Misc\LogListViewModel.cs" />
     <Compile Include="Models\Misc\GumtreeFeedViewModel.cs" />
     <Compile Include="Models\Misc\GumtreeFeedGridViewModel.cs" />
@@ -447,6 +449,7 @@
     <Content Include="Views\Report\PriceCompareReport.cshtml" />
     <Content Include="Views\Misc\DeveloperOperation.cshtml" />
     <Content Include="Views\Report\SupplierStatisticReport.cshtml" />
+    <Content Include="Views\Misc\ListingList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

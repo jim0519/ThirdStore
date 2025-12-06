@@ -37,7 +37,8 @@ namespace ThirdStoreBusiness.Order
     public class TemuOrderLine
     {
         //[CsvColumn(Name = "\uFEFForder id")]
-        [CsvColumn(Name = "order id")]
+        //[CsvColumn(Name = "order id")]
+        [CsvColumn(Name = "Order ID")]
         public string OrderID { get; set; }
 
         [CsvColumn(Name = "order status")]
@@ -55,7 +56,7 @@ namespace ThirdStoreBusiness.Order
         [CsvColumn(Name = "contribution sku")]
         public string SKU { get; set; }
 
-        [CsvColumn(Name = "sku id")]
+        [CsvColumn(Name = "SKU ID")]
         public string SKUId { get; set; }
 
         [CsvColumn(Name = "quantity purchased")]
@@ -91,7 +92,7 @@ namespace ThirdStoreBusiness.Order
         [CsvColumn(Name = "ship postal code (Must be shipped to the following zip code.)")]
         public string ShipPostalCode { get; set; }
 
-        [CsvColumn(Name = "ship country ")]
+        [CsvColumn(Name = "ship country")]
         public string ShipCountry { get; set; }
 
         [CsvColumn(Name = "purchase date")]
@@ -103,10 +104,10 @@ namespace ThirdStoreBusiness.Order
         [CsvColumn(Name = "virtual email")]
         public string VirtualEmail { get; set; }
 
-        [CsvColumn(Name = "base price total")]
+        [CsvColumn(Name = "Base price total")]
         public string BasePriceTotal { get; set; }
 
-        [CsvColumn(Name = "tracking number")]
+        [CsvColumn(Name = "Tracking number")]
         public string TrackingNumber { get; set; }
 
         [CsvColumn(Name = "carrier")]

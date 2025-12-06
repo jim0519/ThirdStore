@@ -929,7 +929,7 @@ namespace ThirdStoreBusiness.JobItem
             return strDesc.ToString();
         }
 
-        private IList<D_Item> FilterValidItems(IList<int> itemids = null)
+        protected IList<D_Item> FilterValidItems(IList<int> itemids = null)
         {
             var notInItemType = new int[] { ThirdStoreItemType.PART.ToValue() };
             //var listingItems = from item in _itemRepository.Table
@@ -943,7 +943,7 @@ namespace ThirdStoreBusiness.JobItem
             return qlistingItems.ToList();
         }
 
-        private List<ExportProductListing> CalculateProductInventory(IList<D_Item> listingItems)
+        public List<ExportProductListing> CalculateProductInventory(IList<D_Item> listingItems)
         {
             //var itemRelationship = _itemService.GetAllItemsWithRelationship();
             
@@ -1103,9 +1103,14 @@ namespace ThirdStoreBusiness.JobItem
                             if (invJobItemIDs.Where(i => !i.Equals(addProductListing.FirstInvJobItemIDs)).Count() > 0)
                                 addProductListing.JobItemInvIDs = invJobItemIDs.Where(i => !i.Equals(addProductListing.FirstInvJobItemIDs)).Aggregate((current, next) => current + ";" + next);
                         }
+                        //if (!string.IsNullOrEmpty(addProductListing.JobItemInvIDs))
+                        //{
+                        //    var jobItemInvList = ConvertToJobItemReference(addProductListing.JobItemInvIDs.Split(';'));
+                        //    if(jobItemInvList.Count>0)
+                        //        addProductListing.JobItemInvList = ConvertToJobItemReference(addProductListing.JobItemInvIDs.Split(';')).Aggregate((current, next) => current + ";" + next);
+                        //}
                         if (!string.IsNullOrEmpty(addProductListing.JobItemInvIDs))
                             addProductListing.JobItemInvList = ConvertToJobItemReference(addProductListing.JobItemInvIDs.Split(';')).Aggregate((current, next) => current + ";" + next);
-
                         #endregion
 
                         //#region Old Calculate Inv Job Items
@@ -1248,7 +1253,8 @@ namespace ThirdStoreBusiness.JobItem
                 else
                 {
                     //retList.AddRange();
-                    retList.Add(notDesignatedJobItemInvs.Select(ji => "["+ji.JobItemID.ToString() + "]").Aggregate((current, next) => current+ "," + next));
+                    if(notDesignatedJobItemInvs.Count()>0)
+                        retList.Add(notDesignatedJobItemInvs.Select(ji => "["+ji.JobItemID.ToString() + "]").Aggregate((current, next) => current+ "," + next));
                 }
 
                 if(grpJobItemInvs.Count()>0)
@@ -2162,7 +2168,7 @@ namespace ThirdStoreBusiness.JobItem
             public int SumQty { get; set; }
         }
 
-        protected class ExportProductListing
+        public class ExportProductListing
         {
             public int ItemID { get; set; }
             public string SKU { get; set; }

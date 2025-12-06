@@ -21,6 +21,7 @@ using ThirdStore.Models.Misc;
 using ThirdStoreCommon.Models.ReturnItem;
 using ThirdStore.Models.ReturnItem;
 using ThirdStoreCommon.Models.Attachment;
+using ThirdStoreCommon.Models.Listing;
 
 namespace ThirdStore.Infrastructure
 {
@@ -114,6 +115,12 @@ namespace ThirdStore.Infrastructure
             Mapper.CreateMap<ReturnItemViewModel.ReturnItemLineViewModel, D_ReturnItemLine>();
             Mapper.CreateMap<ReturnItemViewModel.ReturnItemImageViewModel, M_ReturnItemImage>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));
+
+            //Listing
+            Mapper.CreateMap<D_Listing, ListingGridViewModel>()
+                //.ForMember((Expression<Func<ListingGridViewModel, object>>)(dest => dest.ShipType), mce => mce.MapFrom<string>((Expression<Func<D_PackageSetting, string>>)(s => ((OMSShipType)s.ShipTypeID).ToString())))
+                .ForMember(dest => dest.IsAuto, mce => mce.MapFrom(s => ((YesNo)Convert.ToInt32(s.IsAuto)).ToString()))
+                .ForMember(dest => dest.ListingStatusID, mce => mce.MapFrom(s => s.ListingStatusID.ToEnumName<ThirdStoreListingStatus>()));
 
         }
 

@@ -319,7 +319,7 @@ namespace ThirdStore.Controllers
                     using (var sr = new StreamReader(file.InputStream))
                     {
                         var context = new CsvContext();
-                        var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.UTF8 };
+                        var inputFileDescription = new CsvFileDescription() { SeparatorChar = ',', FirstLineHasColumnNames = true, IgnoreUnknownColumns = true, TextEncoding = Encoding.UTF8  };
                         var temuOrderLines = context.Read<TemuOrderLine>(sr, inputFileDescription);
                         var netoOrderLines = _orderService.ConvertTemuOrderToNetoOrder(temuOrderLines.ToList());
 

@@ -786,6 +786,8 @@ namespace ThirdStoreBusiness.Order
 
             foreach(var temuOrderLine in temuOrderLines)
             {
+                if (string.IsNullOrWhiteSpace(temuOrderLine.SKU))
+                    continue;
                 var netoOrderLine = new NetoOrderLine();
                 netoOrderLine.PurchaseOrderId = temuOrderLine.OrderID;
                 //netoOrderLine.GroupOrderlinesBy = "Purchase Order ID";
@@ -799,7 +801,7 @@ namespace ThirdStoreBusiness.Order
                 netoOrderLine.ShipAddressLine2 = temuOrderLine.ShipAddress2;
                 netoOrderLine.ShipCity = temuOrderLine.ShipCity;
                 netoOrderLine.ShipState = temuOrderLine.ShipState;
-                netoOrderLine.ShipPostCode = temuOrderLine.ShipPostalCode;
+                netoOrderLine.ShipPostCode = temuOrderLine.ShipPostalCode.Trim();
                 netoOrderLine.ShipCountry = temuOrderLine.ShipCountry;
                 netoOrderLine.ShipPhone = temuOrderLine.RecipientPhoneNumber;
                 netoOrderLine.BillFirstName = !string.IsNullOrWhiteSpace(temuOrderLine.RecipientFirstName) ? temuOrderLine.RecipientFirstName : temuOrderLine.RecipientName;
@@ -809,7 +811,7 @@ namespace ThirdStoreBusiness.Order
                 netoOrderLine.BillAddressLine2 = temuOrderLine.ShipAddress2;
                 netoOrderLine.BillCity = temuOrderLine.ShipCity;
                 netoOrderLine.BillState = temuOrderLine.ShipState;
-                netoOrderLine.BillPostCode = temuOrderLine.ShipPostalCode;
+                netoOrderLine.BillPostCode = temuOrderLine.ShipPostalCode.Trim();
                 netoOrderLine.BillCountry = temuOrderLine.ShipCountry;
                 netoOrderLine.BillPhone = temuOrderLine.RecipientPhoneNumber;
                 netoOrderLine.PaymentMethod = "Visa";
