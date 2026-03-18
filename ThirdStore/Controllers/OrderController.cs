@@ -94,6 +94,8 @@ namespace ThirdStore.Controllers
                 { 
                     viewModel.OrderTransactions = i.OrderLines.Select(l => l.Ref2.ToString()).Aggregate((current, next) => current + ";" + next);
                     viewModel.SKUs=i.OrderLines.Select(l=>l.SKU+":"+l.Qty+(!string.IsNullOrWhiteSpace(l.Ref5)?"("+l.Ref5.Split(',').Select((r,j)=>r+ (!string.IsNullOrWhiteSpace(l.Ref6) && l.Ref6.Split(',').Count() > j ? " " + _jobItemService.GetJobItemByID(Convert.ToInt32(l.Ref6.Split(',')[j])).Ref2:string.Empty) ).Aggregate((current, next) => current + "," + next) +")":string.Empty)).Aggregate((current, next) => current + ";" + next);
+                    var trackingNumbers = i.OrderLines.Where(l => !string.IsNullOrWhiteSpace( l.Ref4)).Select(l => l.Ref4);
+                    viewModel.TrackingNumbers = trackingNumbers.Count() > 0 ? trackingNumbers.Aggregate((current, next) => current + ";" + next): string.Empty;
                 }
                 return viewModel;
             });
@@ -384,6 +386,38 @@ namespace ThirdStore.Controllers
                 LogManager.Instance.Error(exc.Message);
                 ErrorNotification("Export Temu Tracking Failed." + exc.Message);
                 return RedirectToAction("List");
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult BulkBooking(string orderIDs)
+        {
+            try
+            {
+                
+                if (orderIDs != null)
+                {
+                    var ids = orderIDs
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => Convert.ToInt32(x))
+                        .ToList();
+
+                    _orderService.BulkBooking(ids);
+                }
+
+                return new JsonResult()
+                {
+                    Data = new { Result = true }
+                };
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                return new JsonResult()
+                {
+                    Data = new { Result = false, ErrMsg=exc.Message }
+                };
             }
         }
 

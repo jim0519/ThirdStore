@@ -51,5 +51,7 @@ namespace ThirdStoreBusiness.Order
         IList<NetoOrderLine> ConvertTemuOrderToNetoOrder(IList<TemuOrderLine> temuOrderLines);
 
         IList<ExportTemuOrderTrackingLine> GetExportTemuOrderTrackingLines(IList<int> orderIDs);
+
+        void BulkBooking(IList<int> orderIDs);
     }
 }

@@ -29,8 +29,22 @@
         <tr>
             <td colspan="2">
                 <input type="button" id="btnUpdateOrder" class="k-button" value="Update Orders Instructions" />
+                <input type="button" id="btnUpdateOrder24H" class="k-button" value="Update Orders Last 24 Hours" />
                 <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
                 <script>
+                    function formatDateTime(date) {
+                        const pad = n => n.toString().padStart(2, '0');
+
+                        return (
+                            pad(date.getDate()) + '/' +
+                            pad(date.getMonth() + 1) + '/' +
+                            date.getFullYear() + ' ' +
+                            pad(date.getHours()) + ':' +
+                            pad(date.getMinutes()) + ':' +
+                            pad(date.getSeconds())
+                        );
+                    }
+
                     $(document).ready(function () {
 
                         $("#btnConvertTemuOrder").click(function (e) {
@@ -83,6 +97,17 @@
                                 }
                             });
                             return false;
+                        });
+
+                        $("#btnUpdateOrder24H").click(function (e) {
+                            var now = new Date();
+                            var before24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                            var nowFormatted = formatDateTime(now);
+                            var before24hFormatted = formatDateTime(before24h);
+
+                            $('#@Html.FieldIdFor(model => model.UpdateOrderFrom)').val(before24hFormatted);
+                            $('#@Html.FieldIdFor(model => model.UpdateOrderTo)').val(nowFormatted);
+                            $("#btnUpdateOrder").click();
                         });
 
                         $("#btnUpdateOrder").click(function (e) {
@@ -219,6 +244,48 @@
                             window.data('kendoWindow').close();
                         });
 
+                        $('#btnBulkBooking').click(function () {
+
+                            var link = "@Html.Raw(Url.Action("BulkBooking", "Order"))"
+                            var ids = selectedIds.join(",");
+                            var postData = {
+                                orderIds: ids
+                            };
+
+                            $.ajax({
+                                url: link,
+                                type: "POST",
+                                data: postData,
+                                beforeSend: function () {
+                                    $("#imgLoading").show();
+                                },
+                                complete: function () {
+                                    $("#imgLoading").hide();
+                                },
+                                success: function (response) {
+                                    //debugger;
+                                    if (!response.Result) {
+                                        if (response.ErrMsg != undefined && response.ErrMsg != "") {
+                                            alert(response.ErrMsg);
+                                        }
+                                    }
+                                    else {
+                                        alert("Bulk booking successfully");
+                                        selectedIds = [];
+                                        $('#selectedNum').text(selectedIds.length + ' selected');
+                                        RefreshGrid(true);
+                                    }
+                                },
+                                error: function (response) {
+                                    //form.submit();
+                                    alert("error");
+                                }
+                            });
+
+
+
+                        });
+
                     });
 
                 </script>
@@ -229,6 +296,7 @@
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right">
+            <input type="button" id="btnBulkBooking" class="k-button" value="Bulk Booking" />
             <input type="button" id="btnConvertTemuOrder" class="k-button" value="Convert Temu Order" />
             <input type="button" id="btnExportTemuTracking" class="k-button" value="Export Temu Tracking" />
             <input type="button" id="btnExportDSZFile" class="k-button" value="Export DSZ File" />
@@ -349,6 +417,7 @@
                                             ID: { editable: false, type: "number" },
                                             ChannelOrderID: { editable: false, type: "string" },
                                             PaymentTransactionID: { editable: false, type: "string" },
+                                            TrackingNumbers: { editable: false, type: "string" },
                                             OrderTransactions: { editable: false, type: "string" },
                                             Ref2: { editable:@if (Model.CanEditOrder)
                                             {<text>true </text> }
@@ -451,6 +520,10 @@
                                 }, {
                                     field: "PaymentTransactionID",
                                     title: "Purchase Order #",
+                                    width: 100
+                                }, {
+                                    field: "TrackingNumbers",
+                                    title: "TrackingNumbers",
                                     width: 100
                                 }, {
                                     field: "CustomerID",

@@ -30,6 +30,8 @@ using ThirdStoreBusiness.ReturnItem;
 using ThirdStoreBusiness.Setting;
 using ThirdStore.Models.Item;
 using ThirdStoreBusiness.Attachment;
+using System.Web.Hosting;
+using System.Threading.Tasks;
 
 namespace ThirdStore.Controllers
 {
@@ -166,7 +168,7 @@ namespace ThirdStore.Controllers
             };
         }
 
-        public ActionResult Create(int fromJobItemID = 0,int fromReturnItemID=0)
+        public ActionResult Create(int fromJobItemID = 0, int opType = 0, int fromReturnItemID=0)//opType:0:edit,1:resend
         {
             var newJobItemViewModel = new JobItemViewModel();
             newJobItemViewModel.Qty = -1;
@@ -177,7 +179,7 @@ namespace ThirdStore.Controllers
                 if(jobItem!=null)
                 {
                     newJobItemViewModel = jobItem.ToCreateNewModel();
-
+                    newJobItemViewModel.OPType = opType;
                     newJobItemViewModel.Reference = string.Empty;
                     newJobItemViewModel.ShipTime = null;
                     newJobItemViewModel.TrackingNumber = string.Empty;
@@ -565,7 +567,7 @@ namespace ThirdStore.Controllers
 
 
         [HttpPost]
-        public ActionResult ReadJobItemLines(DataSourceRequest command, int jobItemID, int fromReturnItemID=0)
+        public ActionResult ReadJobItemLines(DataSourceRequest command, int jobItemID, int opType, int fromReturnItemID=0)
         {
             var jobItemLines = new List<JobItemViewModel.JobItemLineViewModel>();
             if (jobItemID > 0)
@@ -575,6 +577,13 @@ namespace ThirdStore.Controllers
                 if (jobItem != null)
                 {
                     jobItemLines = jobItem.JobItemLines.Select(r => r.ToModel()).ToList();
+                    if (opType == 1)
+                    {
+                        foreach (var l in jobItemLines)
+                        {
+                            l.ID = 0;
+                        }
+                    }
                 }
 
 
@@ -861,12 +870,36 @@ namespace ThirdStore.Controllers
                 //and Price<>0 and Description<>'' and Name<>'' and Type<>1 and LEN(SKU)<=23";
                 //               var syncItemIDs = _dbContext.SqlQuery<int>(syncItemQuery).ToList();
                 //               var retMessage = _jobItemService.SyncInventory(syncItemIDs);
-                var retMessage = _jobItemService.SyncInventory(model.AffectTimeFrom, model.AffectTimeTo);
 
-                if (retMessage.IsSuccess)
-                    return Json(new { Result = true });
-                else
-                    return Json(new { Result = false, ErrMsg = retMessage.Mesage });
+                var from = model.AffectTimeFrom;
+                var to = model.AffectTimeTo;
+
+                HostingEnvironment.QueueBackgroundWorkItem(async ct =>
+                {
+                    try
+                    {
+                        var ret = _jobItemService.SyncInventory(from, to);
+
+                        // TODO: 记录日志/状态到数据库（推荐）
+                        // _jobLogService.Save(jobId, ret.IsSuccess, ret.Message);
+
+                        await Task.CompletedTask;
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: 记录异常日志
+                        LogManager.Instance.Error(ex.Message);
+                    }
+                });
+
+                return Json(new { Result = true });
+
+                //var retMessage = _jobItemService.SyncInventory(model.AffectTimeFrom, model.AffectTimeTo);
+
+                //if (retMessage.IsSuccess)
+                //    return Json(new { Result = true });
+                //else
+                //    return Json(new { Result = false, ErrMsg = retMessage.Mesage });
             }
             catch(Exception ex)
             {

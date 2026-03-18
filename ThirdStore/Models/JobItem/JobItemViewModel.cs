@@ -54,6 +54,7 @@ namespace ThirdStore.Models.JobItem
         public IList<JobItemAttachmentViewModel> JobItemViewAttachments { get; set; }
         public string Notes { get; set; }
         public string CSNotes { get; set; }
+        public int OPType { get; set; }
 
 
         public IList<SelectListItem> JobItemTypes { get; set; }

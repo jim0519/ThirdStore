@@ -881,6 +881,36 @@ namespace ThirdStoreBusiness.Order
             return exportTrackingLines.ToList();
         }
 
+        public void BulkBooking(IList<int> orderIDs)
+        {
+            var orders = GetOrdersByIDs(orderIDs);
+            foreach (var order in orders)
+            {
+                //if (order.OrderLines.Any(l => string.IsNullOrEmpty(l.Ref4)))
+                //    continue;
+
+                foreach(var orderLine in order.OrderLines)
+                {
+                    if(string.IsNullOrWhiteSpace( orderLine.Ref4)||string.IsNullOrWhiteSpace( orderLine.Ref6))
+                        continue;
+                    var trackingNumber = orderLine.Ref4;
+                    var jobItemIDs = orderLine.Ref6.Split(',').Select(ji=>Convert.ToInt32( ji));
+
+                    var jobItems=_jobItemService.GetJobItemsByIDs(jobItemIDs.ToList());
+                    if(jobItems!=null)
+                    {
+                        foreach(var jobItem in jobItems)
+                        {
+                            jobItem.TrackingNumber = jobItem.TrackingNumber + (string.IsNullOrEmpty(jobItem.TrackingNumber) ? string.Empty : ";") + trackingNumber;
+                            jobItem.StatusID = ThirdStoreJobItemStatus.BOOKED.ToValue();
+                            _jobItemService.UpdateJobItem(jobItem);
+                        }
+                    }
+
+                }
+            }
+        }
+
 
         private string GetTemuCarrierCode(D_Order_Line orderLine)
         {

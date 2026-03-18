@@ -30,9 +30,29 @@
             <tr>
                 <td colspan="2">
                     <input type="button" id="btnSyncInventory" class="k-button" value="Sync Inventory" />
+                    <input type="button" id="btnSyncInventory24H" class="k-button" value="Sync Inventory for Today" />
                     <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
                     <script>
+                        function formatDateTime(date) {
+                            const pad = n => n.toString().padStart(2, '0');
+
+                            return (
+                                pad(date.getDate()) + '/' +
+                                pad(date.getMonth() + 1) + '/' +
+                                date.getFullYear()
+                            );
+                        }
+
                         $(document).ready(function () {
+
+                            $("#btnSyncInventory24H").click(function (e) {
+                                var now = new Date();
+                                var nowFormatted = formatDateTime(now);
+                                $('#@Html.FieldIdFor(model => model.AffectTimeFrom)').val(nowFormatted);
+                                $('#@Html.FieldIdFor(model => model.AffectTimeTo)').val(nowFormatted);
+                                $("#btnSyncInventory").click();
+                            });
+
                             $("#btnSyncInventory").click(function (e) {
                                 if ($('#@Html.FieldIdFor(model => model.AffectTimeFrom)').val() == "" || $('#@Html.FieldIdFor(model => model.AffectTimeTo)').val() == "") {
                                     alert("Please input From Date and To Date.");
@@ -56,10 +76,12 @@
                                     },
                                     complete: function () {
                                         $("#imgLoading").hide();
+                                        $('#@Html.FieldIdFor(model => model.AffectTimeFrom)').val();
+                                        $('#@Html.FieldIdFor(model => model.AffectTimeTo)').val();
                                     },
                                     success: function (data) {
                                         if (data.Result) {
-                                            alert("Sync Inventory Finished");
+                                            alert("Sync Inventory is processing background, please allow up to 1 hours to finish.");
                                         }
                                         else {
                                             if (data.Message != "")
@@ -157,7 +179,7 @@
                         if (!confirm("Are you sure to duplicate the job item?")) { return; }
 
                         var selectedJobItemID = selectedIds[0];
-                        var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromJobItemID = "_selectedJobItemID_" }))'.replace('_selectedJobItemID_', selectedJobItemID);
+                        var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromJobItemID = "_selectedJobItemID_", OPType = "1" }))'.replace('_selectedJobItemID_', selectedJobItemID);
                         location.href = link;
                     });
 

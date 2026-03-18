@@ -104,7 +104,7 @@ namespace ThirdStoreBusiness.Order
         [CsvColumn(Name = "virtual email")]
         public string VirtualEmail { get; set; }
 
-        [CsvColumn(Name = "Base price total")]
+        [CsvColumn(Name = "goods base price")]
         public string BasePriceTotal { get; set; }
 
         [CsvColumn(Name = "Tracking number")]

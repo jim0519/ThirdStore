@@ -302,7 +302,7 @@ namespace ThirdStoreBusiness.Listing
                     var itemInv = itemInventory.FirstOrDefault(inv=>inv.ItemID.Equals(l.ItemID));
                     if(itemInv!=null)
                     {
-                        l.ListingInventoryQty= itemInv.Qty;
+                        l.ListingInventoryQty= (itemInv.Qty-1>=0? itemInv.Qty - 1:0);
                         UpdateListing(l);
                     }
                 }

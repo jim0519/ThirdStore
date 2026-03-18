@@ -46,6 +46,7 @@ namespace ThirdStore.Models.Order
         public string Ref3 { get; set; }
         public string Ref4 { get; set; }
         public string Ref5 { get; set; }
+        public string TrackingNumbers { get; set; }
         public System.DateTime CreateTime { get; set; }
         public string CreateBy { get; set; }
         public System.DateTime EditTime { get; set; }
