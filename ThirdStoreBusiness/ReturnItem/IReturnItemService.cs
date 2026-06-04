@@ -24,6 +24,7 @@ namespace ThirdStoreBusiness.ReturnItem
         D_ReturnItem FindByTrackingNumber(string trackingNumber);
 
         D_ReturnItem GetReturnItemByID(int id);
+        IList<D_ReturnItem> GetReturnItemsByIDs(IList<int> id);
 
         void InsertReturnItem(D_ReturnItem returnItem);
 
@@ -253,6 +254,12 @@ namespace ThirdStoreBusiness.ReturnItem
                 return true;
 
             return false;
+        }
+
+        public IList<D_ReturnItem> GetReturnItemsByIDs(IList<int> id)
+        {
+            var returnItems= _returnItemRepository.Table.Where(ri => id.Contains(ri.ID)).ToList();
+            return returnItems;
         }
     }
 }

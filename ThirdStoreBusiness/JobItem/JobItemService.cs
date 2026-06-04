@@ -23,6 +23,7 @@ using LINQtoCSV;
 using System.IO;
 using ThirdStoreBusiness.DSChannel;
 using ThirdStoreBusiness.Setting;
+using ThirdStoreCommon.Models.ReturnItem;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -2151,7 +2152,72 @@ namespace ThirdStoreBusiness.JobItem
             }
         }
 
-        
+        public D_JobItem ConvertReturnItemToJobItem(D_ReturnItem returnItem)
+        {
+            var currentTime = DateTime.Now;
+            var currentUser= Constants.SystemUser;
+            if (_workContext.CurrentUser != null)
+                currentUser = _workContext.CurrentUser.Email;
+            var item=_itemRepository.GetById(returnItem.ReturnItemLines.FirstOrDefault().ItemID);
+            if (item == null)
+                return default;
+            var newJobItem = new D_JobItem()
+            {
+                CreateTime = currentTime,
+                CreateBy = currentUser,
+                EditTime = currentTime,
+                EditBy = currentUser,
+                ConditionID = ThirdStoreJobItemCondition.NEW.ToValue(),
+                DesignatedSKU = string.Empty,
+                ItemDetail = $"Return item id - {returnItem.ID}, return item reference - {returnItem.Ref1}",
+                ItemName =item.Name,
+                ItemPrice = Math.Round(item.Cost * 11 / 9, 2),
+                Location = returnItem.Location,
+                Qty = -1,
+                Ref1 = string.Empty,
+                Ref2 = "#",
+                Ref3 = string.Empty,
+                Ref4 = string.Empty,
+                Ref5 = string.Empty,
+                StatusID = ThirdStoreJobItemStatus.PENDING.ToValue(),
+                Type= ThirdStoreJobItemType.SELFSTORED.ToValue(),
+                
+            };
+
+            var newJobItemLine = new D_JobItemLine()
+            {
+                CreateTime = currentTime,
+                CreateBy = currentUser,
+                EditTime = currentTime,
+                EditBy = currentUser,
+                ItemID = returnItem.ReturnItemLines.FirstOrDefault().ItemID,
+                SKU = returnItem.ReturnItemLines.FirstOrDefault().SKU,
+                Qty= returnItem.ReturnItemLines.FirstOrDefault().Qty,
+                Width= returnItem.ReturnItemLines.FirstOrDefault().Width,
+                Length= returnItem.ReturnItemLines.FirstOrDefault().Length,
+                Height= returnItem.ReturnItemLines.FirstOrDefault().Height,
+                Weight= returnItem.ReturnItemLines.FirstOrDefault().Weight,
+                Ref1= returnItem.ReturnItemLines.FirstOrDefault().Ref1,
+            };
+
+            newJobItem.JobItemLines.Add(newJobItemLine);
+
+            var jobItemImages = returnItem.ReturnItemImages.Select(r =>
+            {
+                var img = _imageService.DuplicateImageByID(r.ImageID);
+                //var img = _imageService.GetImageByID(r.ImageID);
+                return new M_JobItemImage() { ImageID = img.ID , StatusID = r.StatusID, DisplayOrder = r.DisplayOrder, CreateBy = currentUser, CreateTime = currentTime, EditBy = currentUser, EditTime = currentTime };
+            }).ToList();
+
+            foreach (var jobItemImage in jobItemImages)
+            {
+                // Process each return item image
+                newJobItem.JobItemImages.Add(jobItemImage);
+            }
+
+            return newJobItem;
+
+        }
 
         protected class JobItemInv
         {

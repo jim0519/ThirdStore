@@ -15,7 +15,7 @@ namespace ThirdStoreCommon
         private static ThirdStoreConfig _instance;
         private ThirdStoreConfig()
         {
-        
+            SupplierIDMapping = LoadSupplierIDMapping();
         }
 
         public static ThirdStoreConfig Instance
@@ -150,6 +150,20 @@ namespace ThirdStoreCommon
             {
                 return AppDomain.CurrentDomain.BaseDirectory + "\\TemuFile\\StockPrice";
             }
+        }
+
+        public IReadOnlyDictionary<string, int> SupplierIDMapping { get; }
+
+        private Dictionary<string, int> LoadSupplierIDMapping()
+        {
+            return new Dictionary<string, int>
+            {
+                { "Plaza", 1 },
+                { "Auction", 2 },
+                { "Sello", 3 },
+                { "Alfordson", 4 },
+                { "Other", 5 }
+            };
         }
 
 

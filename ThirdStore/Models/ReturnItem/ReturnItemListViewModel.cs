@@ -12,7 +12,7 @@ namespace ThirdStore.Models.ReturnItem
     {
         public ReturnItemListViewModel()
         {
-            this.ReturnItemStatuses = new List<SelectListItem>();
+            this.ReturnItemTypes = new List<SelectListItem>();
         }
 
         //public int SearchStatus { get; set; }
@@ -21,7 +21,7 @@ namespace ThirdStore.Models.ReturnItem
 
         public string SearchSKU { get; set; }
 
-        public IList<SelectListItem> ReturnItemStatuses { get; set; }
+        public IList<SelectListItem> ReturnItemTypes { get; set; }
 
     }
 }

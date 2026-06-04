@@ -16,13 +16,13 @@ namespace ThirdStoreData.Mapping
                 .IsRequired()
                 .HasMaxLength(500);
 
-            this.Property(t => t.Location)
-                .IsRequired()
-                .HasMaxLength(500);
+            //this.Property(t => t.Location)
+            //    .IsRequired()
+            //    .HasMaxLength(500);
 
-            this.Property(t => t.TrackingNumber)
-                .IsRequired()
-                .HasMaxLength(500);
+            //this.Property(t => t.TrackingNumber)
+            //    .IsRequired()
+            //    .HasMaxLength(500);
 
             this.Property(t => t.CreateBy)
                 .IsRequired()
@@ -65,13 +65,13 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.ItemID).HasColumnName("ItemID");
             this.Property(t => t.SKU).HasColumnName("SKU");
             this.Property(t => t.Qty).HasColumnName("Qty");
-            this.Property(t => t.Location).HasColumnName("Location");
+            //this.Property(t => t.Location).HasColumnName("Location");
             this.Property(t => t.Weight).HasColumnName("Weight");
             this.Property(t => t.Length).HasColumnName("Length");
             this.Property(t => t.Width).HasColumnName("Width");
             this.Property(t => t.Height).HasColumnName("Height");
             this.Property(t => t.CubicWeight).HasColumnName("CubicWeight");
-            this.Property(t => t.TrackingNumber).HasColumnName("TrackingNumber");
+            //this.Property(t => t.TrackingNumber).HasColumnName("TrackingNumber");
             this.Property(t => t.CreateTime).HasColumnName("CreateTime");
             this.Property(t => t.CreateBy).HasColumnName("CreateBy");
             this.Property(t => t.EditTime).HasColumnName("EditTime");

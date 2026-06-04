@@ -142,6 +142,7 @@
     <Compile Include="ReportPrint\ReportPrintService.cs" />
     <Compile Include="Report\IReportService.cs" />
     <Compile Include="Report\ReportService.cs" />
+    <Compile Include="ReturnItem\ReturnItemImportLine.cs" />
     <Compile Include="ReturnItem\IReturnItemService.cs" />
     <Compile Include="ScheduleTask\IScheduleRuleService.cs" />
     <Compile Include="ScheduleTask\UpdateDSZDataAndSync.cs" />

@@ -8,6 +8,7 @@ using ThirdStoreCommon;
 using System.IO;
 using static ThirdStoreBusiness.JobItem.JobItemService;
 using ThirdStoreCommon.Models.Item;
+using ThirdStoreCommon.Models.ReturnItem;
 
 namespace ThirdStoreBusiness.JobItem
 {
@@ -92,5 +93,7 @@ namespace ThirdStoreBusiness.JobItem
         Stream ExportGumtreeFeed(int[] jobItemIDs);
         List<ExportProductListing> CalculateProductInventory(IList<D_Item> listingItems);
         //IList<D_Item> FilterValidItems(IList<int> itemids = null);
+
+        D_JobItem ConvertReturnItemToJobItem(D_ReturnItem returnItem);
     }
 }

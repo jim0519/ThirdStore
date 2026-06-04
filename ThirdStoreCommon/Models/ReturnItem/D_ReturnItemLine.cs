@@ -15,14 +15,14 @@ namespace ThirdStoreCommon.Models.ReturnItem
         public int ItemID { get; set; }
         public string SKU { get; set; }
         public int Qty { get; set; }
-        public string Location { get; set; }
+        //public string Location { get; set; }
         public decimal Weight { get; set; }
         public decimal Length { get; set; }
         public decimal Width { get; set; }
         public decimal Height { get; set; }
         public decimal CubicWeight { get; set; }
-        public string TrackingNumber { get; set; }
-        public string Ref1 { get; set; }
+        //public string TrackingNumber { get; set; }
+        public string Ref1 { get; set; }//cubic meter
         public string Ref2 { get; set; }
         public string Ref3 { get; set; }
         public string Ref4 { get; set; }

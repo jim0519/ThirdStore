@@ -1243,6 +1243,43 @@ namespace ThirdStore.Controllers
         }
 
 
+        [HttpPost]
+        public ActionResult ConvertReturnItemToJobItem(string returnItemIDs)
+        {
+            try
+            {
+                if (returnItemIDs != null)
+                {
+                    var ids = returnItemIDs
+                            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => Convert.ToInt32(x))
+                            .ToList();
+                    
+                    var returnItems = _returnItemService.GetReturnItemsByIDs(ids);
+
+                    foreach (var returnItem in returnItems)
+                    {
+                        var jobItem = _jobItemService.ConvertReturnItemToJobItem(returnItem);
+                        if (jobItem != null)
+                        {
+                            returnItem.ConvertToJobItemID = jobItem.ID;
+                        }
+
+                        _jobItemService.InsertJobItem(jobItem);
+                        _returnItemService.UpdateReturnItem(returnItem);
+                    }
+                }
+                return Json(new { Result = true });
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                return Json(new { Result = false });
+            }
+
+        }
+
+
         #region Private Methods
 
         private void FillDropDownDS(JobItemViewModel model)

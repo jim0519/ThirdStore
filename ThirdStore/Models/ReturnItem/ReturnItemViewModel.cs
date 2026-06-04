@@ -16,6 +16,13 @@ namespace ThirdStore.Models.ReturnItem
             this.ReturnItemViewImages = new List<ReturnItemImageViewModel>();
         }
 
+        public string RecordID { get; set; }
+        [UIHint("DateNullable")]
+        public DateTime ReceivedDate { get; set; }
+        [UIHint("DateNullable")]
+        public DateTime? ProcessDate { get; set; }
+        public int ReturnTypeID { get; set; }
+        public string Location { get; set; }
         public int StatusID { get; set; }
         public string TrackingNumber { get; set; }
         public string Note { get; set; }
@@ -24,6 +31,8 @@ namespace ThirdStore.Models.ReturnItem
         public string CarrierName { get; set; }
         public bool NOP { get; set; }
         public bool FullSet { get; set; }
+        public string CreateBy { get; set; }
+        public int ConvertToJobItemID { get; set; }
 
         //public System.DateTime CreateTime { get; set; }
         //public string CreateBy { get; set; }
@@ -33,6 +42,7 @@ namespace ThirdStore.Models.ReturnItem
         public IList<SelectListItem> ReturnItemStatuses { get; set; }
         public IList<SelectListItem> Suppliers { get; set; }
         public IList<SelectListItem> Couriers { get; set; }
+        public IList<SelectListItem> ReturnTypes { get; set; }
 
         public IList<ReturnItemLineViewModel> ReturnItemViewLines { get; set; }
         public IList<ReturnItemImageViewModel> ReturnItemViewImages { get; set; }
@@ -46,8 +56,8 @@ namespace ThirdStore.Models.ReturnItem
             public decimal Width { get; set; }
             public decimal Height { get; set; }
             public decimal CubicWeight { get; set; }
-            public string Location { get; set; }
-            public string TrackingNumber { get; set; }
+            //public string Location { get; set; }
+            //public string TrackingNumber { get; set; }
             public string Ref1 { get; set; }
         }
 

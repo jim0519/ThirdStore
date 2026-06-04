@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ThirdStoreCommon.Models.Image;
+using ThirdStoreCommon.Models.JobItem;
 
 namespace ThirdStoreCommon.Models.ReturnItem
 {
@@ -20,7 +21,12 @@ namespace ThirdStoreCommon.Models.ReturnItem
         public string CarrierName { get; set; }
         public bool NOP { get; set; }
         public bool FullSet { get; set; }
-        public string Ref1 { get; set; }
+        public string Location { get; set; }
+        public int ReturnTypeID { get; set; }
+        public DateTime ReceivedDate { get; set; }
+        public DateTime? ProcessDate { get; set; }
+        public int ConvertToJobItemID { get; set; }
+        public string Ref1 { get; set; }//Record_ID
         public string Ref2 { get; set; }
         public string Ref3 { get; set; }
         public string Ref4 { get; set; }
@@ -31,6 +37,7 @@ namespace ThirdStoreCommon.Models.ReturnItem
         public System.DateTime EditTime { get; set; }
         public string EditBy { get; set; }
 
+        public virtual D_JobItem JobItem { get; set; }
         public virtual ICollection<D_ReturnItemLine> ReturnItemLines { get; set; }
         public virtual ICollection<M_ReturnItemImage> ReturnItemImages { get; set; }
     }

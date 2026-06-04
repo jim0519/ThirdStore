@@ -29,6 +29,10 @@ namespace ThirdStoreData.Mapping
                 .IsRequired()
                 .HasMaxLength(4000);
 
+            this.Property(t => t.Location)
+                .IsRequired()
+                .HasMaxLength(500);
+
             this.Property(t => t.CreateBy)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -72,8 +76,13 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.CarrierName).HasColumnName("CarrierName");
             this.Property(t => t.NOP).HasColumnName("NOP");
             this.Property(t => t.FullSet).HasColumnName("FullSet");
+            this.Property(t => t.Location).HasColumnName("Location");
+            this.Property(t => t.ReturnTypeID).HasColumnName("ReturnTypeID");
+            this.Property(t => t.ReceivedDate).HasColumnName("ReceivedDate");
+            this.Property(t => t.ProcessDate).HasColumnName("ProcessDate");
             this.Property(t => t.CreateTime).HasColumnName("CreateTime");
             this.Property(t => t.CreateBy).HasColumnName("CreateBy");
+            this.Property(t => t.ConvertToJobItemID).HasColumnName("ConvertToJobItemID");
             this.Property(t => t.EditTime).HasColumnName("EditTime");
             this.Property(t => t.EditBy).HasColumnName("EditBy");
             this.Property(t => t.Ref1).HasColumnName("Ref1");
@@ -82,6 +91,12 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Ref4).HasColumnName("Ref4");
             this.Property(t => t.Ref5).HasColumnName("Ref5");
             this.Property(t => t.Note).HasColumnName("Note");
+
+            // Relationships
+
+            this.HasRequired(t => t.JobItem)
+                .WithMany()
+                .HasForeignKey(d => d.ConvertToJobItemID);
         }
     }
 }

@@ -1917,6 +1917,11 @@ CREATE TABLE [dbo].[D_ReturnItem](
 	[Note] varchar(4000) NOT NULL,
 	[NOP] bit not null,
 	[FullSet] bit not null,
+	[Location] [varchar](500) NOT NULL,
+	[ReturnTypeID] int NOT NULL,
+	[ReceivedDate] datetime not null,
+	[ProcessDate] datetime null,
+	[ConvertToJobItemID] int NOT NULL,
 	[Ref1] [varchar](4000) NOT NULL,
 	[Ref2] [varchar](4000) NOT NULL,
 	[Ref3] [varchar](4000) NOT NULL,
@@ -1935,6 +1940,12 @@ CREATE TABLE [dbo].[D_ReturnItem](
 GO
 
 
+ALTER TABLE [dbo].[D_ReturnItem]  WITH NOCHECK ADD  CONSTRAINT [FK_D_ReturnItem_D_JobItem] FOREIGN KEY([ConvertToJobItemID])
+REFERENCES [dbo].[D_JobItem] ([ID])
+GO
+
+ALTER TABLE [dbo].[D_ReturnItem] NOCHECK CONSTRAINT [FK_D_ReturnItem_D_JobItem]
+GO
 
 
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[D_ReturnItemLine]') AND type in (N'U'))
@@ -1951,8 +1962,8 @@ CREATE TABLE [dbo].[D_ReturnItemLine](
 	[Width] decimal(18,8) NOT NULL,
 	[Height] decimal(18,8) NOT NULL,
 	[CubicWeight] decimal(18,8) NOT NULL,
-	[Location] [varchar](500) NOT NULL,
-	[TrackingNumber] [varchar](500) NOT NULL,
+	--[Location] [varchar](500) NOT NULL,
+	--[TrackingNumber] [varchar](500) NOT NULL,
 	[Ref1] [varchar](4000) NOT NULL,
 	[Ref2] [varchar](4000) NOT NULL,
 	[Ref3] [varchar](4000) NOT NULL,
@@ -2410,6 +2421,59 @@ GETDATE(),
 
 
 
+
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_ReturnItem' AND C.Name='SupplierID')
+	ALTER TABLE dbo.D_ReturnItem ADD
+		SupplierID int NOT NULL CONSTRAINT DF_D_ReturnItem_SupplierID DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_ReturnItem_SupplierID')
+	ALTER TABLE dbo.D_ReturnItem
+		DROP CONSTRAINT DF_D_ReturnItem_SupplierID
+GO
+
+
+
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_ReturnItem' AND C.Name='CarrierName')
+	ALTER TABLE dbo.D_ReturnItem ADD
+		CarrierName [varchar](100) NOT NULL CONSTRAINT DF_D_ReturnItem_CarrierName DEFAULT ''
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_ReturnItem_CarrierName')
+	ALTER TABLE dbo.D_ReturnItem
+		DROP CONSTRAINT DF_D_ReturnItem_CarrierName
+GO
+
+
+
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_ReturnItem' AND C.Name='NOP')
+	ALTER TABLE dbo.D_ReturnItem ADD
+		NOP bit NOT NULL CONSTRAINT DF_D_ReturnItem_NOP DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_ReturnItem_NOP')
+	ALTER TABLE dbo.D_ReturnItem
+		DROP CONSTRAINT DF_D_ReturnItem_NOP
+GO
+
+
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_ReturnItem' AND C.Name='FullSet')
+	ALTER TABLE dbo.D_ReturnItem ADD
+		FullSet bit NOT NULL CONSTRAINT DF_D_ReturnItem_FullSet DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_ReturnItem_FullSet')
+	ALTER TABLE dbo.D_ReturnItem
+		DROP CONSTRAINT DF_D_ReturnItem_FullSet
+GO
 
 
 

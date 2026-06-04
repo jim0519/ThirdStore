@@ -1,19 +1,24 @@
-﻿using System;
+﻿using Microsoft.Ajax.Utilities;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using ThirdStoreFramework.Controllers;
-using ThirdStoreCommon;
-using ThirdStoreFramework.Kendoui;
-using ThirdStore.Models.ReturnItem;
 using ThirdStore.Extensions;
-using ThirdStoreBusiness.ReturnItem;
-using ThirdStoreBusiness.Item;
-using ThirdStoreCommon.Models.ReturnItem;
-using ThirdStoreFramework.MVC;
 using ThirdStore.Models.Item;
+using ThirdStore.Models.ReturnItem;
 using ThirdStoreBusiness.Image;
+using ThirdStoreBusiness.Item;
+using ThirdStoreBusiness.ReturnItem;
+using ThirdStoreCommon;
+using ThirdStoreCommon.Models.Image;
+using ThirdStoreCommon.Models.ReturnItem;
+using ThirdStoreFramework.Controllers;
+using ThirdStoreFramework.Kendoui;
+using ThirdStoreFramework.MVC;
 
 namespace ThirdStore.Controllers
 {
@@ -35,8 +40,8 @@ namespace ThirdStore.Controllers
         {
             var model = new ReturnItemListViewModel();
 
-            model.ReturnItemStatuses = ThirdStoreReturnItemStatus.PARTIAL.ToSelectList(false).ToList();
-            model.ReturnItemStatuses.Insert(0, new SelectListItem { Text = "All", Value = "0" });
+            model.ReturnItemTypes = ThirdStoreReturnItemType.Parts.ToSelectList(false).ToList();
+            model.ReturnItemTypes.Insert(0, new SelectListItem { Text = "All", Value = "0" });
 
             return View(model);
         }
@@ -301,6 +306,10 @@ namespace ThirdStore.Controllers
         //[ParameterBasedOnFormName("save-print", "isPrintLabel")]
         public ActionResult ValidateInput(ReturnItemViewModel model, bool isPrintLabel)
         {
+
+            if (string.IsNullOrWhiteSpace(model.Location))
+                return Json(new { Result = false, Message = "Please make sure return item have valid location." });
+
             if (!string.IsNullOrEmpty(model.DesignatedSKU))
             {
                 var designatedItem = _itemService.GetItemBySKU(model.DesignatedSKU);
@@ -334,10 +343,10 @@ namespace ThirdStore.Controllers
 
                         if (leftJoinResult.Any(lj => lj == null) || rightJoinResult.Any(rj => rj == null))
                         {
-                            if(model.StatusID==ThirdStoreReturnItemStatus.FULL.ToValue())
+                            if(model.ReturnTypeID==ThirdStoreReturnItemType.Full.ToValue())
                                 return Json(new { Result = false, Message = "The status cannot be FULL as the item structure is not completed." });
                         }
-                        else if(model.StatusID == ThirdStoreReturnItemStatus.PARTIAL.ToValue())
+                        else if(model.ReturnTypeID == ThirdStoreReturnItemType.Parts.ToValue())
                         {
                             return Json(new { Result = false, Message = "The status should be FULL as the item structure is completed." });
                         }
@@ -357,7 +366,7 @@ namespace ThirdStore.Controllers
                     return Json(new { Result = false, Message = "Return item can only contain one item." });
                 }
 
-                if (model.StatusID == ThirdStoreReturnItemStatus.PARTIAL.ToValue())
+                if (model.ReturnTypeID == ThirdStoreReturnItemType.Parts.ToValue())
                 {
                     return Json(new { Result = false, Message = "The status should be FULL as the item structure is completed." });
                 }
@@ -368,8 +377,7 @@ namespace ThirdStore.Controllers
                 if(model.ReturnItemViewLines.Any(l => l.Width.Equals(0) || l.Length.Equals(0) || l.Height.Equals(0) || l.Weight.Equals(0) || l.CubicWeight.Equals(0)))
                     return Json(new { Result = false, Message = "The length, width, height, weight and cubic weight must not be equal to 0." });
                 
-                if(model.ReturnItemViewLines.Any(l=>string.IsNullOrWhiteSpace( l.Location)))
-                    return Json(new { Result = false, Message = "Please make sure all return line items have valid locations." });
+                
             }
 
 
@@ -489,13 +497,174 @@ namespace ThirdStore.Controllers
             return new NullJsonResult();
         }
 
+        [HttpPost]
+        public ActionResult UploadReturnItem()
+        {
+            try
+            {
+                var files = Request.Files;
+                HttpPostedFileBase zipFile = null;
+                HttpPostedFileBase excelFile = null;
 
+                for (int i = 0; i < files.Count; i++)
+                {
+                    var file = files[i];
+
+                    if (file == null || file.ContentLength == 0)
+                        continue;
+
+                    var ext = Path.GetExtension(file.FileName).ToLower();
+
+                    if (ext == ".zip")
+                        zipFile = file;
+                    else if (ext == ".xlsx" || ext == ".xls")
+                        excelFile = file;
+                }
+
+                if (zipFile == null || excelFile == null)
+                    throw new Exception("Please upload zip and excel together.");
+
+                ProcessFiles(zipFile, excelFile);
+
+                return RedirectToAction("List");
+            }
+            catch (Exception exc)
+            {
+                LogManager.Instance.Error(exc.Message);
+                ErrorNotification("Upload return item failed." + exc.Message);
+                return RedirectToAction("List");
+            }
+        }
+
+        private void ProcessFiles(HttpPostedFileBase zipFile, HttpPostedFileBase excelFile)
+        {
+            List<ReturnItemImportLine> returnItemImportLines;
+            using (var excelStream = excelFile.InputStream)
+            {
+                returnItemImportLines = CommonFunc.ReadExcelToList<ReturnItemImportLine>(excelStream);
+            }
+
+            //check if import lines are valid
+            var emptySKUs = returnItemImportLines.Where(r => string.IsNullOrWhiteSpace(r.Detected_SKU)).ToList();
+            if(emptySKUs.Count>0)
+            {
+                var noSKURecordIDs = emptySKUs.Select(r => r.Record_ID).Aggregate((current, next) => current + "," + next);
+                throw new Exception($"The following record IDs have no detected SKU: {noSKURecordIDs}");
+            }
+
+            var wrongSKUs= returnItemImportLines.Where(r => _itemService.GetItemBySKU(r.Detected_SKU)==null).ToList();
+            if (wrongSKUs.Count > 0)
+            {
+                var wrongSKURecordIDs = wrongSKUs.Select(r => r.Record_ID).Aggregate((current, next) => current + "," + next);
+                throw new Exception($"The following record IDs have no detected SKU: {wrongSKURecordIDs}");
+            }
+
+            List<D_Image> images;
+            using (var zipStream = zipFile.InputStream)
+            {
+                images = ReadZipImages(zipStream);
+            }
+
+            foreach (var returnItemImportLine in returnItemImportLines)
+            {
+                //if (string.IsNullOrWhiteSpace(returnItemImportLine.Detected_SKU))
+                //    continue;
+                var item = _itemService.GetItemBySKU(returnItemImportLine.Detected_SKU.Trim());
+                //if (item == null)
+                //    continue;
+
+                var newReturnItem = new D_ReturnItem();
+                newReturnItem.Ref1= returnItemImportLine.Record_ID;
+                newReturnItem.ReceivedDate = DateTime.ParseExact(returnItemImportLine.Received_Date,"M/d/yyyy", CultureInfo.InvariantCulture);
+                newReturnItem.Location = returnItemImportLine.Location;
+                newReturnItem.SupplierID = ThirdStoreConfig.Instance.SupplierIDMapping[returnItemImportLine.Supplier];
+                newReturnItem.TrackingNumber= returnItemImportLine.Tracking;
+                newReturnItem.ReturnTypeID = returnItemImportLine.Return_Type.ToEnumValue<ThirdStoreReturnItemType>();
+                newReturnItem.NOP = returnItemImportLine.NOP == "Y" ? true : false;
+                newReturnItem.Note= returnItemImportLine.Comment;
+                newReturnItem.ProcessDate = !string.IsNullOrWhiteSpace( returnItemImportLine.Process_Date)? DateTime.ParseExact(returnItemImportLine.Process_Date, "M/d/yyyy", CultureInfo.InvariantCulture) : (DateTime?)null;
+                newReturnItem.StatusID = 1;//Todo: need to confirm the status with business
+                newReturnItem.CreateBy = returnItemImportLine.Created_By;
+                newReturnItem.CreateTime = DateTime.Now;
+                newReturnItem.EditBy = returnItemImportLine.Created_By;
+                newReturnItem.EditTime = DateTime.Now;
+
+                newReturnItem.FillOutNull();
+
+                var newReturnItemLine = new D_ReturnItemLine();
+                
+                newReturnItemLine.SKU = item.SKU;
+                newReturnItemLine.ItemID = item.ID;
+                newReturnItemLine.Qty = 1;
+                newReturnItemLine.Weight = item.GrossWeight;
+                newReturnItemLine.Length = item.Length;
+                newReturnItemLine.Width = item.Width;
+                newReturnItemLine.Height = item.Height;
+                newReturnItemLine.CubicWeight = item.Length * item.Width * item.Height * 250;
+                newReturnItemLine.Ref1 = (item.Length * item.Width * item.Height).ToString();
+                newReturnItemLine.CreateBy = returnItemImportLine.Created_By;
+                newReturnItemLine.CreateTime = DateTime.Now;
+                newReturnItemLine.EditBy = returnItemImportLine.Created_By;
+                newReturnItemLine.EditTime = DateTime.Now;
+
+                newReturnItemLine.FillOutNull();
+                newReturnItem.ReturnItemLines.Add(newReturnItemLine);
+
+                var matchImages = images.Where(x => x.ImageName.StartsWith(returnItemImportLine.Record_ID));
+                if (matchImages != null)
+                {
+                    newReturnItem.ReturnItemImages = matchImages.Select(img => new M_ReturnItemImage()
+                    {
+                        ImageID = img.ID,
+                        CreateBy = returnItemImportLine.Created_By,
+                        CreateTime = DateTime.Now,
+                        EditBy = returnItemImportLine.Created_By,
+                        EditTime = DateTime.Now
+                    }).ToList();
+                }
+
+
+                _returnItemService.InsertReturnItem(newReturnItem);
+
+
+                
+            }
+        }
+
+        private List<D_Image> ReadZipImages(Stream zipStream)
+        {
+            var list = new List<D_Image>();
+
+            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    if (string.IsNullOrEmpty(entry.Name))
+                        continue;
+
+                    var ext = Path.GetExtension(entry.Name).ToLower();
+                    if (!(ext == ".jpg" || ext == ".png" || ext == ".jpeg"))
+                        continue;
+
+                    var savePath = Path.Combine(ThirdStoreConfig.Instance.ThirdStoreImagesPath, entry.Name);
+
+                    using (var entryStream = entry.Open())
+                    {
+                        var img = _imageService.SaveImage(entryStream, entry.Name);
+                        list.Add(img);
+                    }
+                }
+            }
+
+            return list;
+        }
 
         private void FillDropDownDS(ReturnItemViewModel model)
         {
-            model.ReturnItemStatuses = ThirdStoreReturnItemStatus.PARTIAL.ToSelectList(false).ToList();
+            model.ReturnItemStatuses = ThirdStoreReturnItemStatus.Received.ToSelectList(false).ToList();
             model.Suppliers=ThirdStoreSupplier.T.ToSelectList(false).ToList();
             //model.Couriers = ThirdStoreCouriers.AustraliaPost.ToSelectList(false).ToList();
+            model.ReturnTypes= ThirdStoreReturnItemType.Full.ToSelectList(false).ToList();
         }
 
         private string GetSKUsDetails(D_ReturnItem returnItem)

@@ -11,21 +11,77 @@
     <div style="border-bottom: 1px dotted #998675;margin-top: 30px;margin-bottom: 10px;height: 35px;">
         <div style="float:left; font-size:x-large;color:brown;">Search Criteria</div>
         <div id="divOperationBtn" style="float:right;margin-top:5px;">
-            @*<input type="button" id="btnConvertJobItem" class="k-button" value="Convert Job Item" />*@
+            <input type="button" id="btnConvertJobItem" class="k-button" value="Convert Job Item" />
+            <input type="button" id="btnUploadReturnItem" class="k-button" value="Upload Return Items" />
         </div>
 
     </div>
     <script>
         $(document).ready(function () {
             $("#btnConvertJobItem").click(function (e) {
-                if (selectedIds.length != 1) {
-                    alert("Please select one return item to convert.");
+                if (selectedIds.length == 0) {
+                    alert("Please select at least one return item to convert.");
                     return false;
                 }
 
-                var selectedReturnItemID = selectedIds[0];
-                var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromReturnItemID = "_selectedReturnItemID_" }))'.replace('_selectedReturnItemID_', selectedReturnItemID);
-                location.href = link;
+                if (selectedIds.length == 1) {
+
+                    var link = '@Html.Raw(Url.Action("Create", "JobItem", new { FromReturnItemID = "_selectedReturnItemID_" }))'.replace('_selectedReturnItemID_', selectedIds[0]);
+                    location.href = link;
+                }
+
+                var selectedReturnItemIDs = selectedIds.join(",");
+
+                var postData = {
+                    returnItemIDs: selectedReturnItemIDs
+                };
+                var link = "@Html.Raw(Url.Action("ConvertReturnItemToJobItem", "JobItem"))"
+
+                $.ajax({
+                    url: link,
+                    type: "POST",
+                    //contentType: "application/json; charset=utf-8",
+                    data: postData,
+                    dataType: "json",
+                    beforeSend: function () {
+                        $("#imgLoading").show();
+                    },
+                    complete: function () {
+                        $("#imgLoading").hide();
+                    },
+                    success: function (data) {
+                        if (data.Result) {
+                            alert("Convert return items successfully.")
+                        }
+                        else {
+                            alert("Convert return items Failed");
+                        }
+                        window.location = '@Url.Action("List", "JobItem")';
+
+                    },
+                    error: function (data) {
+                        //debugger;
+                        alert("error");
+                    }
+                });
+                return false;
+
+
+            });
+
+            $('#btnUploadReturnItem').click(function (e) {
+                e.preventDefault();
+                var window = $("#uploadReturnItem-window");
+                if (!window.data("kendoWindow")) {
+                    window.kendoWindow({
+                        modal: true,
+                        width: "400px",
+                        title: "Upload Return Item",
+                        actions: ["Close"]
+                    });
+                }
+                window.data('kendoWindow').center().open();
+
             });
         });
     </script>
@@ -171,3 +227,20 @@
 }
 
 
+<div id="uploadReturnItem-window" style="display:none;">
+    @using (Html.BeginForm("UploadReturnItem", "ReturnItem", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <table style="text-align:left;">
+            <tr>
+                <td>
+                    <input type="file" id="uploadReturnItemFile" name="uploadReturnItemFile" multiple />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="submit" class="k-button" value="Submit" />
+                </td>
+            </tr>
+        </table>
+    }
+</div>

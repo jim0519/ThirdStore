@@ -66,8 +66,35 @@
     <table style="width:100%;">
         <tr>
             <td>
+                @Html.LabelFor(m => m.RecordID)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.RecordID)
+            </td>
+            <td>
+                @Html.LabelFor(m => m.ReceivedDate)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.ReceivedDate)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.ReturnTypeID)
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.ReturnTypeID, Model.ReturnTypes)
+            </td>
+            <td>
+                @Html.LabelFor(m => m.ProcessDate)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.ProcessDate)
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @Html.LabelFor(m => m.TrackingNumber)
-
             </td>
             <td>
                 @if (Model.ID == 0)
@@ -100,7 +127,7 @@
             </td>
         </tr>
         <tr>
-            <td>
+            <!--<td>
                 @Html.LabelFor(m => m.DesignatedSKU)
 
             </td>
@@ -109,8 +136,14 @@
                 @if (!string.IsNullOrWhiteSpace(Model.DesignatedSKU))
                 {
                     <a href='@Url.Action("EditBySKU", "Item")?SKU=@Model.DesignatedSKU' target='_blank'>View</a>
-                }
+                }-->
                 @*@Html.ValidationMessageFor(model => model.DesignatedSKU)*@
+            <!--</td>-->
+            <td>
+                @Html.LabelFor(m => m.Location)
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Location)
             </td>
             <td>
                 @Html.LabelFor(m => m.Note)
@@ -128,10 +161,10 @@
                 @Html.CheckBoxFor(model => model.NOP)
             </td>
             <td>
-                @Html.LabelFor(m => m.FullSet)
+                @Html.LabelFor(m => m.CreateBy)
             </td>
             <td>
-                @Html.CheckBoxFor(model => model.FullSet)
+                @Html.EditorFor(model => model.CreateBy)
             </td>
         </tr>
 
@@ -212,29 +245,29 @@
                                 },
                                 Qty: { editable: false, type: "number", validation: { required: true, min: 1 }, defaultValue: 1 },
 
-                                IsOrginalPackage: { editable: true, type: "boolean" },
+                                //IsOrginalPackage: { editable: true, type: "boolean" },
                                 Weight: { editable: true, type: "number" },
                                 Length: { editable: true, type: "number" },
                                 Width: { editable: true, type: "number" },
                                 Height: { editable: true, type: "number" },
                                 CubicWeight: { editable: true, type: "number" },
                                 Ref1: { editable: true, type: "number" },
-                                Location: { editable: true, type: "string" },
-                                TrackingNumber:{ editable: true, type: "string" }
+                                //Location: { editable: true, type: "string" },
+                                //TrackingNumber:{ editable: true, type: "string" }
                             }
                         }
                     },
                     pageSize: "100",
                     requestEnd: function (e) {
-                        debugger;
+                        //debugger;
                         if (e.type == "create" || e.type == "update" || e.type =="destroy") {
                             //alert(e.type + " completed.");
-                            ValidateFullSet(e)
+                            //ValidateFullSet(e)
                             //this.read();
                         }
                     },
                     error: function (e) {
-                        debugger;
+                        //debugger;
                         display_kendoui_grid_error(e);
                         // Cancel the changes
                         this.cancelChanges();
@@ -370,16 +403,16 @@
                     format: "{0:n4}",
                     editor: editNumber
                 },
-                {
-                    field: "Location",
-                    template: "#=Location#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Location' value='#=Location#' />",
-                    width: 100,
-                    },
-                    {
-                        field: "TrackingNumber",
-                        template: "#=TrackingNumber#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].TrackingNumber' value='#=TrackingNumber#' />",
-                        width: 100,
-                    },
+                //{
+                //    field: "Location",
+                //    template: "#=Location#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].Location' value='#=Location#' />",
+                //    width: 100,
+                //    },
+                //    {
+                //        field: "TrackingNumber",
+                //        template: "#=TrackingNumber#" + "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].TrackingNumber' value='#=TrackingNumber#' />",
+                //        width: 100,
+                //    },
                 //    field: "CreateTime",
                 //    template: "<input type='hidden' name='ReturnItemViewLines[#= index(data)#].CreateTime' value='#=CreateTime#' />",
                 //    hidden: true

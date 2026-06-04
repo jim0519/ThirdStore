@@ -121,8 +121,12 @@ namespace ThirdStoreCommon
 
     public enum ThirdStoreReturnItemStatus
     {
-        PARTIAL = 1,
-        FULL = 2
+        Received = 1,
+    }
+    public enum ThirdStoreReturnItemType
+    {
+        Parts = 1,
+        Full = 2
     }
 
     public enum ThirdStoreCouriers
