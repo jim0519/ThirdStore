@@ -118,6 +118,12 @@ namespace ThirdStoreCommon
         UserAccessControl=6,
         DeveloperOperation=7
     }
+    public enum ThirdStoreItemImageType
+    {
+        ItemImage=0,
+        BNImage=1,
+        OpenedImage=2
+    }
 
     public enum ThirdStoreReturnItemStatus
     {

@@ -186,6 +186,32 @@ namespace ThirdStore.Controllers
                 }
             }
 
+            if (model.BNImages != null && model.BNImages.Count > 0)
+            {
+                foreach (var lModel in model.BNImages)
+                {
+                    var newEntityLine = lModel.ToEntity().FillOutNull();
+                    newEntityLine.CreateTime = createTime;
+                    newEntityLine.CreateBy = createBy;
+                    newEntityLine.EditTime = createTime;
+                    newEntityLine.EditBy = createBy;
+                    newEntityModel.ItemImages.Add(newEntityLine);
+                }
+            }
+
+            if (model.OpenedImages != null && model.OpenedImages.Count > 0)
+            {
+                foreach (var lModel in model.OpenedImages)
+                {
+                    var newEntityLine = lModel.ToEntity().FillOutNull();
+                    newEntityLine.CreateTime = createTime;
+                    newEntityLine.CreateBy = createBy;
+                    newEntityLine.EditTime = createTime;
+                    newEntityLine.EditBy = createBy;
+                    newEntityModel.ItemImages.Add(newEntityLine);
+                }
+            }
+
             if (model.ItemViewAttachments != null && model.ItemViewAttachments.Count > 0)
             {
                 foreach (var lModel in model.ItemViewAttachments)
@@ -340,6 +366,58 @@ namespace ThirdStore.Controllers
                 }
             }
 
+            if (model.BNImages != null && model.BNImages.Count > 0)
+            {
+                foreach (var lModel in model.BNImages)
+                {
+                    if (lModel.ID > 0)
+                    {
+                        var originLine = editEntityModel.ItemImages.Where(l => l.ID == lModel.ID).FirstOrDefault();
+                        if (originLine != null)
+                        {
+                            originLine = lModel.ToEntity(originLine).FillOutNull();
+                            originLine.EditTime = editTime;
+                            originLine.EditBy = editBy;
+                        }
+                    }
+                    else
+                    {
+                        var editEntityLine = lModel.ToEntity().FillOutNull();
+                        editEntityLine.CreateTime = editTime;
+                        editEntityLine.CreateBy = editBy;
+                        editEntityLine.EditTime = editTime;
+                        editEntityLine.EditBy = editBy;
+                        editEntityModel.ItemImages.Add(editEntityLine);
+                    }
+                }
+            }
+
+            if (model.OpenedImages != null && model.OpenedImages.Count > 0)
+            {
+                foreach (var lModel in model.OpenedImages)
+                {
+                    if (lModel.ID > 0)
+                    {
+                        var originLine = editEntityModel.ItemImages.Where(l => l.ID == lModel.ID).FirstOrDefault();
+                        if (originLine != null)
+                        {
+                            originLine = lModel.ToEntity(originLine).FillOutNull();
+                            originLine.EditTime = editTime;
+                            originLine.EditBy = editBy;
+                        }
+                    }
+                    else
+                    {
+                        var editEntityLine = lModel.ToEntity().FillOutNull();
+                        editEntityLine.CreateTime = editTime;
+                        editEntityLine.CreateBy = editBy;
+                        editEntityLine.EditTime = editTime;
+                        editEntityLine.EditBy = editBy;
+                        editEntityModel.ItemImages.Add(editEntityLine);
+                    }
+                }
+            }
+
             if (model.ItemViewAttachments != null && model.ItemViewAttachments.Count > 0)
             {
                 foreach (var lModel in model.ItemViewAttachments)
@@ -464,7 +542,7 @@ namespace ThirdStore.Controllers
         }
 
         [HttpPost]
-        public ActionResult UploadImages(HttpPostedFileBase[] itemImages)
+        public ActionResult UploadImages(HttpPostedFileBase[] itemImages,int imageTypeID)
         {
 
             var lstSavedImages = new List<ItemViewModel.ItemImageViewModel>();
@@ -473,7 +551,7 @@ namespace ThirdStore.Controllers
                 foreach (var imgFile in itemImages)
                 {
                     var img = _imageService.SaveImage(imgFile.InputStream, imgFile.FileName);
-                    var imgViewModel = new ItemViewModel.ItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID) };
+                    var imgViewModel = new ItemViewModel.ItemImageViewModel() { ImageID = img.ID, ImageName = img.ImageName, ImageURL = _imageService.GetImageURL(img.ID), ImageTypeID = imageTypeID };
                     lstSavedImages.Add(imgViewModel);
                 }
             }
@@ -556,7 +634,7 @@ namespace ThirdStore.Controllers
                 var item = _itemService.GetItemByID(itemID);
                 if (item != null)
                 {
-                    itemImages = item.ItemImages.Select(r =>
+                    itemImages = item.ItemImages.Where(x => x.ImageTypeID == 0).Select(r =>
                     {
                         var viewModel = r.ToModel();
                         viewModel.ImageURL = _imageService.GetImageURL(r.ImageID);
@@ -567,6 +645,70 @@ namespace ThirdStore.Controllers
 
 
                 var gridModel = new DataSourceResult() { Data = itemImages, Total = itemImages.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else
+                return Json(new object { });
+        }
+
+        [HttpPost]
+        public ActionResult ReadBNImages(DataSourceRequest command, int itemID)
+        {
+            if (itemID > 0)
+            {
+                IList<ItemViewModel.ItemImageViewModel> bnImages = null;
+                var item = _itemService.GetItemByID(itemID);
+                if (item != null)
+                {
+                    bnImages = item.ItemImages.Where(x => x.ImageTypeID == 1).Select(r =>
+                    {
+                        var viewModel = r.ToModel();
+                        viewModel.ImageURL = _imageService.GetImageURL(r.ImageID);
+                        viewModel.ImageName = r.Image.ImageName;
+                        return viewModel;
+                    }).ToList();
+                }
+
+
+                var gridModel = new DataSourceResult() { Data = bnImages, Total = bnImages.Count };
+
+
+                //return View();
+                return new JsonResult
+                {
+                    Data = gridModel
+                };
+            }
+            else
+                return Json(new object { });
+        }
+
+        [HttpPost]
+        public ActionResult ReadOpenedImages(DataSourceRequest command, int itemID)
+        {
+            if (itemID > 0)
+            {
+                IList<ItemViewModel.ItemImageViewModel> openedImages = null;
+                var item = _itemService.GetItemByID(itemID);
+                if (item != null)
+                {
+                    openedImages = item.ItemImages.Where(x => x.ImageTypeID == 2).Select(r =>
+                    {
+                        var viewModel = r.ToModel();
+                        viewModel.ImageURL = _imageService.GetImageURL(r.ImageID);
+                        viewModel.ImageName = r.Image.ImageName;
+                        return viewModel;
+                    }).ToList();
+                }
+
+
+                var gridModel = new DataSourceResult() { Data = openedImages, Total = openedImages.Count };
 
 
                 //return View();

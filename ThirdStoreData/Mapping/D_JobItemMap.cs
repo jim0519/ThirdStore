@@ -60,6 +60,10 @@ namespace ThirdStoreData.Mapping
                .IsRequired()
                .HasMaxLength(4000);
 
+            this.Property(t => t.Ref6)
+               .IsRequired()
+               .HasMaxLength(4000);
+
             this.Property(t => t.Note)
                 .IsRequired()
                 .HasMaxLength(4000);
@@ -86,6 +90,7 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.Ref3).HasColumnName("Ref3");
             this.Property(t => t.Ref4).HasColumnName("Ref4");
             this.Property(t => t.Ref5).HasColumnName("Ref5");
+            this.Property(t => t.Ref6).HasColumnName("Ref6");
             this.Property(t => t.Note).HasColumnName("Note");
             this.Property(t => t.PricePercentage).HasColumnName("PricePercentage");
             this.Property(t => t.StocktakeTime).HasColumnName("StocktakeTime");

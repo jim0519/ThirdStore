@@ -55,12 +55,14 @@ namespace ThirdStore.Models.JobItem
         public string Notes { get; set; }
         public string CSNotes { get; set; }
         public int OPType { get; set; }
+        public int UseItemImageType { get; set; }
 
 
         public IList<SelectListItem> JobItemTypes { get; set; }
         public IList<SelectListItem> JobItemConditions { get; set; }
         public IList<SelectListItem> JobItemStatuses { get; set; }
         public IList<SelectListItem> InspectorList { get; set; }
+        public IList<SelectListItem> ItemImageTypes { get; set; }
         public IList<JobItemLineViewModel> JobItemViewLines { get; set; }
         public IList<JobItemImageViewModel> JobItemViewImages { get; set; }
         public IList<SelectListItem> ReviewStatuses { get; set; }

@@ -80,7 +80,8 @@ namespace ThirdStore.Infrastructure
             Mapper.CreateMap<D_JobItem, JobItemViewModel>()
                 .ForMember((dest => dest.Ref2), mce => mce.MapFrom(s => s.Ref2.ToCharArray().Select(c => c.ToString()).ToList()))
                 .ForMember(dest => dest.ReviewComments, mce => mce.MapFrom(s => s.Ref5))
-                .ForMember(dest => dest.CSNotes, mce => mce.MapFrom(s => s.Ref3));
+                .ForMember(dest => dest.CSNotes, mce => mce.MapFrom(s => s.Ref3))
+                .ForMember(dest => dest.UseItemImageType, mce => mce.MapFrom(s => s.Ref6.ToEnumValue<ThirdStoreItemImageType>()));
             Mapper.CreateMap<D_JobItemLine, JobItemViewModel.JobItemLineViewModel>();
             Mapper.CreateMap<M_JobItemImage, JobItemViewModel.JobItemImageViewModel>()
                 .ForMember(dest=>dest.StatusID,mce=>mce.MapFrom(s=>Convert.ToBoolean( s.StatusID)));
@@ -89,7 +90,8 @@ namespace ThirdStore.Infrastructure
             Mapper.CreateMap<JobItemViewModel, D_JobItem>()
                 .ForMember(dest => dest.Ref2, mce => mce.MapFrom(s => (s.Ref2 != null && s.Ref2.Count > 0 ? string.Join("", s.Ref2) : string.Empty)))
             .ForMember(dest => dest.Ref5, mce => mce.MapFrom(s =>s.ReviewComments))
-            .ForMember(dest => dest.Ref3, mce => mce.MapFrom(s => s.CSNotes));
+            .ForMember(dest => dest.Ref3, mce => mce.MapFrom(s => s.CSNotes))
+            .ForMember(dest => dest.Ref6, mce => mce.MapFrom(s => s.UseItemImageType.ToEnumName<ThirdStoreItemImageType>()));
             Mapper.CreateMap<JobItemViewModel.JobItemLineViewModel, D_JobItemLine>();
             Mapper.CreateMap<JobItemViewModel.JobItemImageViewModel, M_JobItemImage>()
                 .ForMember(dest => dest.StatusID, mce => mce.MapFrom(s => Convert.ToInt32(s.StatusID)));

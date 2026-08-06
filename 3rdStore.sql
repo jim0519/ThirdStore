@@ -2568,3 +2568,33 @@ GO
 
 ALTER TABLE [dbo].[D_Listing] NOCHECK CONSTRAINT [FK_D_Listing_D_Item]
 GO
+
+
+
+
+
+
+
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='M_ItemImage' AND C.Name='ImageTypeID')
+	ALTER TABLE dbo.M_ItemImage ADD
+		ImageTypeID int NOT NULL CONSTRAINT DF_M_ItemImage_ImageTypeID DEFAULT 0
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_M_ItemImage_ImageTypeID')
+	ALTER TABLE dbo.M_ItemImage
+		DROP CONSTRAINT DF_M_ItemImage_ImageTypeID
+GO
+
+
+-- Add Ref6 in D_JobItem
+IF NOT EXISTS (SELECT * FROM SysObjects O INNER JOIN SysColumns C ON O.ID=C.ID WHERE
+ ObjectProperty(O.ID,'IsUserTable')=1 AND O.Name='D_JobItem' AND C.Name='Ref6')
+	ALTER TABLE dbo.D_JobItem ADD
+		Ref6 varchar(4000) NOT NULL CONSTRAINT DF_D_JobItem_Ref6 DEFAULT '0'
+GO
+		
+IF EXISTS (SELECT [name] FROM sysobjects WHERE [name] = 'DF_D_JobItem_Ref6')
+	ALTER TABLE dbo.D_JobItem
+		DROP CONSTRAINT DF_D_JobItem_Ref6
+GO

@@ -774,7 +774,7 @@ namespace ThirdStoreBusiness.JobItem
             if (item.ItemImages.Count > 0)
             {
                 var isSKUImageURLValid = false;
-                foreach (var itmImg in item.ItemImages.OrderBy(img => img.DisplayOrder))
+                foreach (var itmImg in item.ItemImages.Where(img => img.ImageTypeID == 0).OrderBy(img => img.DisplayOrder))
                 {
                     if (i <= 6)
                     {
@@ -883,6 +883,37 @@ namespace ThirdStoreBusiness.JobItem
 
                             break;
                         }
+                    }
+                }
+            }
+
+            if (i < 12)
+            {
+                var useItemImageTypeID = 0;
+                var firstOfFirstInvJobItem = firstInvJobItems.FirstOrDefault();
+                //var BNImages = item.ItemImages.Where(img => img.ImageTypeID == 1).OrderBy(img => img.DisplayOrder);
+                //var OpenedImages = item.ItemImages.Where(img => img.ImageTypeID == 2).OrderBy(img => img.DisplayOrder);
+                if (firstOfFirstInvJobItem != null)
+                {
+                    if (firstOfFirstInvJobItem.Ref6 == ThirdStoreItemImageType.ItemImage.ToValue().ToString())
+                    {
+                        if (firstOfFirstInvJobItem.ConditionID == ThirdStoreJobItemCondition.NEW.ToValue())
+                            useItemImageTypeID = ThirdStoreItemImageType.BNImage.ToValue();
+                        else
+                            useItemImageTypeID = ThirdStoreItemImageType.OpenedImage.ToValue();
+                    }
+                    else
+                        useItemImageTypeID = firstOfFirstInvJobItem.Ref6.ToValue();
+                }
+
+                var addonImages = item.ItemImages.Where(img => img.ImageTypeID == useItemImageTypeID && img.StatusID == 1).OrderBy(img => img.DisplayOrder);
+                foreach (var addonImage in addonImages)
+                {
+                    if (i < 12)
+                    {
+                        var jobItemImgURL = _imageService.GetImageURL(addonImage.ImageID);
+                        lstImageURLs.Add(jobItemImgURL);
+                        i++;
                     }
                 }
             }
@@ -1329,7 +1360,7 @@ namespace ThirdStoreBusiness.JobItem
                 if (item.ItemImages.Count > 0)
                 {
                     var isSKUImageURLValid = false;
-                    foreach (var itmImg in item.ItemImages.OrderBy(img=>img.DisplayOrder))
+                    foreach (var itmImg in item.ItemImages.Where(img=>img.ImageTypeID==0).OrderBy(img=>img.DisplayOrder))
                     {
                         if (i <6)
                         {
@@ -1539,7 +1570,43 @@ namespace ThirdStoreBusiness.JobItem
                             }
                         }
                     }
+                    
+                    if (i<12)
+                    {
+                        var useItemImageTypeID = 0;
+                        var firstOfFirstInvJobItem = firstInvJobItems.FirstOrDefault();
+                        //var BNImages = item.ItemImages.Where(img => img.ImageTypeID == 1).OrderBy(img => img.DisplayOrder);
+                        //var OpenedImages = item.ItemImages.Where(img => img.ImageTypeID == 2).OrderBy(img => img.DisplayOrder);
+                        if (firstOfFirstInvJobItem != null)
+                        {
+                            if (firstOfFirstInvJobItem.Ref6 == ThirdStoreItemImageType.ItemImage.ToValue().ToString())
+                            {
+                                if (firstOfFirstInvJobItem.ConditionID == ThirdStoreJobItemCondition.NEW.ToValue())
+                                    useItemImageTypeID = ThirdStoreItemImageType.BNImage.ToValue();
+                                else
+                                    useItemImageTypeID = ThirdStoreItemImageType.OpenedImage.ToValue();
+                            }
+                            else
+                                useItemImageTypeID = firstOfFirstInvJobItem.Ref6.ToValue();
+                        }
+
+                        var addonImages = item.ItemImages.Where(img => img.ImageTypeID == useItemImageTypeID&&img.StatusID==1).OrderBy(img => img.DisplayOrder);
+                        foreach(var addonImage in addonImages)
+                        {
+                            if (i < 12)
+                            {
+                                var addonImgURL = _imageService.GetImageURL(addonImage.ImageID);
+                                var addonImgName = (i == 0 ? "Main" : "Alt " + i);
+                                lstItemImages.Add(new UpdateItemItemImage() { Name = addonImgName, URL = addonImgURL, Delete = false });
+                                i++;
+                            }
+                        }
+                    }
+
+
                 }
+
+                
 
                 if (onlineListing != null && onlineListing.Images.Count() > i)
                 {

@@ -30,6 +30,7 @@ namespace ThirdStoreCommon.Models.JobItem
         public string Ref3 { get; set; }//CS Note
         public string Ref4 { get; set; }//Previous Location
         public string Ref5 { get; set; }//Review Comments
+        public string Ref6 { get; set; }//Use Item Image Type
         public string Note { get; set; }
         public decimal PricePercentage { get; set; } = 1;
         public DateTime? StocktakeTime { get; set; }

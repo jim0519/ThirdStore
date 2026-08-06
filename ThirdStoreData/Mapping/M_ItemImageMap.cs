@@ -28,6 +28,7 @@ namespace ThirdStoreData.Mapping
             this.Property(t => t.ImageID).HasColumnName("ImageID");
             this.Property(t => t.DisplayOrder).HasColumnName("DisplayOrder");
             this.Property(t => t.StatusID).HasColumnName("StatusID");
+            this.Property(t => t.ImageTypeID).HasColumnName("ImageTypeID");
             this.Property(t => t.CreateTime).HasColumnName("CreateTime");
             this.Property(t => t.CreateBy).HasColumnName("CreateBy");
             this.Property(t => t.EditTime).HasColumnName("EditTime");

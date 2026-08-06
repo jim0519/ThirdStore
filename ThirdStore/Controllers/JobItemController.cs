@@ -1258,6 +1258,9 @@ namespace ThirdStore.Controllers
             //var result = jobItemsInspectors.Where(ins=>!userList.Contains(ins));
             model.ReviewStatuses = ThirdStoreReviewStatus.PendingReview.ToSelectList(false).ToList();
             model.ReviewStatuses.Insert(0, new SelectListItem { Text = "", Value = "0" });
+
+            model.ItemImageTypes = ThirdStoreItemImageType.BNImage.ToSelectList(false,new int[] { 0}).ToList();
+            model.ItemImageTypes.Insert(0, new SelectListItem { Text = "", Value = "0" });
         }
 
         private string GetSKUsDetails(D_JobItem jobItem)

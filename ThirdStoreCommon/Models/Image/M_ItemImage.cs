@@ -10,6 +10,7 @@ namespace ThirdStoreCommon.Models.Image
         public int ImageID { get; set; }
         public int DisplayOrder { get; set; }
         public int StatusID { get; set; }
+        public int ImageTypeID { get; set; }
         public System.DateTime CreateTime { get; set; }
         public string CreateBy { get; set; }
         public System.DateTime EditTime { get; set; }

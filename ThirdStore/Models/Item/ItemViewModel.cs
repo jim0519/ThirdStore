@@ -1,12 +1,14 @@
-﻿using System;
+﻿using FluentValidation.Attributes;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
-using ThirdStoreFramework.MVC;
 using System.Web.Mvc;
-using System.ComponentModel.DataAnnotations;
-using FluentValidation.Attributes;
 using ThirdStore.Validators.Item;
+using ThirdStoreCommon.Models.Image;
+using ThirdStoreCommon.Models.Item;
+using ThirdStoreFramework.MVC;
 
 namespace ThirdStore.Models.Item
 {
@@ -66,6 +68,8 @@ namespace ThirdStore.Models.Item
         public IList<SelectListItem> Suppliers { get; set; }
         public IList<ChildItemLineViewModel> ChildItemLines { get; set; }
         public IList<ItemImageViewModel> ItemViewImages { get; set; }
+        public IList<ItemImageViewModel> BNImages { get; set; }
+        public IList<ItemImageViewModel> OpenedImages { get; set; }
 
         public IList<ItemAttachmentViewModel> ItemViewAttachments { get; set; }
         public string Notes { get; set; }
@@ -83,9 +87,23 @@ namespace ThirdStore.Models.Item
             public string ImageURL { get; set; }
             public string ImageName { get; set; }
             public int DisplayOrder { get; set; }
+            public int ImageTypeID { get; set; }
             public bool StatusID { get; set; }
         }
 
+        //public class NormalImageViewModel : ItemImageViewModel
+        //{
+
+        //}
+
+        //public class BNImageViewModel: ItemImageViewModel
+        //{
+
+        //}
+        //public class OpenedImageViewModel : ItemImageViewModel
+        //{
+
+        //}
         public class ItemAttachmentViewModel : BaseEntityViewModel
         {
             public int AttachmentID { get; set; }

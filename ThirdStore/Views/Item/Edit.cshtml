@@ -9,12 +9,17 @@
 
 @using (Html.BeginForm())
 {
+    <div id="divUploadImage" style="float: left; margin: 8px 0;">
+        <input type="file" id="uploadImages" name="uploadImages" multiple accept="image/*" />
+        <input type="button" id="btnUpload" value="Upload" />
+        <img name="imgUploadLoading" src="~/Content/images/loading.gif" style="display:none; vertical-align:middle;" />
+    </div>
     if (Model.ShowSyncInventory)
     {
         @*<div id="divOperationBtnLeft" style="float:left; margin-bottom:5px;">
-            
 
-        </div>*@
+
+            </div>*@
         <div id="divOperationBtn" style="float:right; margin-bottom:5px;">
             <img id="imgLoading" src="~/Content/images/loading.gif" style="display:none;" />
             <input type="button" id="btnRedownloadImage" class="k-button" value="Redownload Images" style="margin-right:100px" />
