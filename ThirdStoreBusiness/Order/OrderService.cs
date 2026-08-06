@@ -737,7 +737,7 @@ namespace ThirdStoreBusiness.Order
                 {
                     var shipmentDetail = new ShipmentDetail();
                     shipmentDetail.OrderLineItemID = orderLineTracking.OrderLine.Ref2;
-                    shipmentDetail.ShippingCarrierUsed = MapShippingCarrier(orderLineTracking.TrackingDetail.Carrier);
+                    shipmentDetail.ShippingCarrierUsed = MapShippingCarrier(orderLineTracking.TrackingDetail.Carrier.Trim());
                     shipmentDetail.ShipmentTrackingNumber = orderLineTracking.TrackingDetail.TrackingNumber;
 
                     shipmentDetails.Add(shipmentDetail);
@@ -774,8 +774,10 @@ namespace ThirdStoreBusiness.Order
                 carrierCode = "Allied Express";
             else if (carrier == "TEAM GLOBAL EXPRESS")
                 carrierCode = "TEAM GLOBAL EXPRESS";
+            else if (carrier == "iMile Tracking")
+                carrierCode = "iMile";
             else
-                carrierCode = "Australia Post";
+                carrierCode = carrier;
 
             return carrierCode;
         }
